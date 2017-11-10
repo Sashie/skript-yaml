@@ -8,15 +8,17 @@ Rather then checking the file each time this addon caches the yaml file to memor
 
 
 ### Effect
-
+Loads a yaml file into memory
+  - The optional adds an id name otherwise it uses the files name itself as the id
 
 #### Syntax
 
-`[re]load y[a]ml %string% [as %-string%]`
+`[re]load y[a]ml %string% [as [id] %-string%]`
 
 #### Example
 
 ```
+#Both examples produce the same id for use in other effects/expressions
 load yaml "plugins/test/config.yml"
 load yaml "plugins/test/config.yml" as "config"
 ```
@@ -25,7 +27,7 @@ load yaml "plugins/test/config.yml" as "config"
 
 
 ### Effect
-
+Unloads a yaml file from memory
 
 #### Syntax
 
@@ -39,7 +41,7 @@ unload yaml "config"
 ---
 
 ### Effect
-
+Gets a list of all 'cached' yaml files
 
 #### Syntax
 
@@ -54,7 +56,7 @@ broadcast "%{_list::*}%"
 ---
 
 ### Effect
-
+Saves the current yaml to file
 
 #### Syntax
 
@@ -68,7 +70,7 @@ save yaml file "config"
 ---
 
 ### Effect
-
+Gets, sets, removes valeus/nodes etc.. of a yaml file
 
 #### Syntax
 
