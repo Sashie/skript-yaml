@@ -76,7 +76,7 @@ Gets, sets, removes values/nodes etc.. of a cached yaml file
 
 #### Syntax
 
-`[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) [id] %string%`
+`[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%`
 
 #### Example
 

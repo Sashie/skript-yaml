@@ -1,6 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +24,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) [id] %string%");
+				"[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%");
 	}
 
 	private Expression<String> node, file;
