@@ -29,14 +29,11 @@ public class EffLoadYaml extends AsyncEffect {
 	@Override
 	protected void execute(@Nullable Event event) {
 		final String name = this.file.getSingle(event);
-		
-		
 
-		File yamlFile = new File(name);
+		String server = (new File("").getAbsolutePath()) + File.separator;
+		File yamlFile = new File(server + name);
 		if (name.contains("/")) {
-			yamlFile = new File(name.replaceAll("/", Matcher.quoteReplacement(File.separator)));
-		} else if (!name.contains(File.separator)) {
-			yamlFile = new File(File.separator + name);
+			yamlFile = new File(server + name.replaceAll("/", Matcher.quoteReplacement(File.separator)));
 		}
 
 		if (!yamlFile.exists()) {

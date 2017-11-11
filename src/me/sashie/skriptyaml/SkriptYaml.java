@@ -12,11 +12,18 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 
 public class SkriptYaml extends JavaPlugin {
-	
+
 	public final static Logger LOGGER = Bukkit.getServer() != null ? Bukkit.getLogger() : Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	public final static HashMap<String, YamlFile> YAML_STORE = new HashMap<String, YamlFile>();
 
+	private static SkriptYaml instance;
+
 	public SkriptYaml() {
+		if (instance == null) {
+			instance = this;
+		} else {
+			throw new IllegalStateException();
+		}
 	}
 
 	@Override
@@ -31,8 +38,15 @@ public class SkriptYaml extends JavaPlugin {
 			}
 		} else {
 			Bukkit.getPluginManager().disablePlugin(this);
-			error( "Skript not found, plugin disabled." );
+			error("Skript not found, plugin disabled.");
 		}
+	}
+
+	public static SkriptYaml getInstance() {
+		if (instance == null) {
+			throw new IllegalStateException();
+		}
+		return instance;
 	}
 
 	public static void warn(String error) {

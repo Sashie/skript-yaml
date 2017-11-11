@@ -1,22 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * Copyright 2011-2017 Peter Güttinger and contributors
- */
 package me.sashie.skriptyaml.skript;
 
 import javax.annotation.Nullable;
@@ -32,8 +13,7 @@ import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
 public class CondYamlIsLoaded extends Condition {
-	//y[a]ml[s] %strings% (is|are) loaded
-	//y[a]ml[s] %strings% ((are|is) not|(is|are)n[']t) loaded
+	
 	static {
 		Skript.registerCondition(CondYamlIsLoaded.class,
 				"y[a]ml[s] %strings% (is|are) loaded", 
@@ -51,11 +31,11 @@ public class CondYamlIsLoaded extends Condition {
 	}
 	
 	@Override
-	public boolean check(final Event e) {
-		return name.check(e, new Checker<String>() {
+	public boolean check(final Event event) {
+		return name.check(event, new Checker<String>() {
 			@Override
 			public boolean check(final String s) {
-				if (null == SkriptYaml.YAML_STORE.get(s))
+				if (!SkriptYaml.YAML_STORE.containsKey(name.getSingle(event)))
 					return false;
 				return true;
 			}

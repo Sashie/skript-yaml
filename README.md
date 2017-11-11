@@ -6,7 +6,7 @@ Rather then checking the file each time this addon caches the yaml file to memor
 ## Syntax
 
 
-### Effect
+### Effect (Load yaml)
 Loads a yaml file into memory
   - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml")
   - The second input allows you to choose your own id for this file
@@ -26,7 +26,7 @@ load yaml "plugins/test/config.yml" as "config"
 
 ---
 
-### Effect
+### Effect (Unload yaml)
 Unloads a yaml file from memory
 
 #### Syntax
@@ -40,7 +40,7 @@ unload yaml "config"
 ```
 ---
 
-### Effect
+### Effect (Save yaml)
 Saves the current cached yaml elements to file
 
 #### Syntax
@@ -50,11 +50,11 @@ Saves the current cached yaml elements to file
 #### Example
 
 ```
-save yaml file "config"
+save yaml "config"
 ```
 ---
 
-### Expression
+### Expression (Return all cached yaml)
 Returns a list of all 'cached' yaml file ids
 
 #### Syntax
@@ -69,7 +69,7 @@ broadcast "%{_list::*}%"
 ```
 ---
 
-### Expression
+### Expression (Yaml)
 Gets, sets, removes values/nodes etc.. of a cached yaml file
   - Requires the id used/created from the load effect
   - This expression does not save to file
@@ -90,4 +90,35 @@ broadcast "%{_test}%"
 ```
 ---
 
+### Condition (Is yaml loaded)
+Checks if one or more yaml files are loaded into memory using said id
 
+#### Syntax
+
+`y[a]ml[s] %strings% (is|are) loaded`
+`y[a]ml[s] %strings% ((are|is) not|(is|are)n[']t) loaded`
+
+---
+
+### Condition (Does yaml path exist)
+Checks if one or more paths exist in a cached yaml file using said id
+  - First input is the path
+  - Second input is the id
+
+#### Syntax
+
+`y[a]ml [path[s]] %strings% in %string% exists`
+`y[a]ml [path[s]] %strings% in %string% does(n't| not) exist`
+
+#### Example
+
+```
+set skript-yaml value "test.test" from "config" to "test"
+set skript-yaml value "test2.test2" from "config" to "test"
+
+yaml path "test.test" and "test2.test2" in "config" exists:
+    broadcast "this works"
+yaml path "test.test" and "boop.boop" in "config" exists:
+    broadcast "this will fail"
+```
+---
