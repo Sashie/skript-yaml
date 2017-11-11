@@ -107,8 +107,8 @@ Checks if one or more paths exist in a cached yaml file using said id
 
 #### Syntax
 
-`y[a]ml [path[s]] %strings% in %string% exists`
-`y[a]ml [path[s]] %strings% in %string% does(n't| not) exist`
+`[skript-]y[a]ml [path[s]] %strings% in %string% exists`
+`[skript-]y[a]ml [path[s]] %strings% in %string% does(n't| not) exist`
 
 #### Example
 
