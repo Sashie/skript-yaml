@@ -104,6 +104,7 @@ Checks if one or more yaml files are loaded into memory using said id
 Checks if one or more paths exist in a cached yaml file using said id
   - First input is the path
   - Second input is the id
+  - If multiple paths are checked at once it will return false on the first one found to not exist
 
 #### Syntax
 
