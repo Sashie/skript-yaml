@@ -16,7 +16,7 @@ public class ExprAllLoadedYaml extends SimpleExpression<String> {
 
 	static {
 		Skript.registerExpression(ExprAllLoadedYaml.class, String.class, ExpressionType.SIMPLE,
-				"(the|all [of the]) [currently] loaded y[a]ml [files]");
+				"[(the|all (of the|the))] [currently] loaded y[a]ml [files]");
 	}
 
 	public Class<? extends String> getReturnType() {

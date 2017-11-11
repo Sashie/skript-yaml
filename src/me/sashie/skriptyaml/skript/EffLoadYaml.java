@@ -10,18 +10,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import me.sashie.skriptyaml.AsyncEffect;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.YamlFile;
-import me.sashie.skriptyaml.AsyncEffect;
 
 public class EffLoadYaml extends AsyncEffect {
 
 	static {
-		Skript.registerEffect(EffLoadYaml.class, "[re]load y[a]ml %string% [as [id] %-string%]");
+		Skript.registerEffect(EffLoadYaml.class, "[re]load [y[a]ml] %string% [as %-string%]");
 	}
 
 	private Expression<String> file;
@@ -36,12 +35,14 @@ public class EffLoadYaml extends AsyncEffect {
 		File yamlFile = new File(name);
 		if (name.contains("/")) {
 			yamlFile = new File(name.replaceAll("/", Matcher.quoteReplacement(File.separator)));
+		} else if (!name.contains(File.separator)) {
+			yamlFile = new File(File.separator + name);
 		}
 
 		if (!yamlFile.exists()) {
 			//SkriptYaml.warn("No yaml file by the name '" + yamlFile.getName() + "' exists at that location");
 			//return;
-			SkriptYaml.warn("No yaml by the name '" + yamlFile.getName() + "' exists at that location, generating one...");
+			//SkriptYaml.warn("No yaml by the name '" + yamlFile.getName() + "' exists at that location, generating one...");
 			try {
 				if (!yamlFile.exists()) {
 					File folder;
@@ -72,14 +73,11 @@ public class EffLoadYaml extends AsyncEffect {
 			}
 			SkriptYaml.YAML_STORE.put(n, yaml);
 		}
-		
-		SkriptYaml.error("test1");
-		
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "[re]load yaml file " + this.file.toString(event, b);
+		return "[re]load yaml " + this.file.toString(event, b);
 	}
 
 	@Override

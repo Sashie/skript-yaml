@@ -7,17 +7,17 @@ import javax.annotation.Nullable;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import me.sashie.skriptyaml.AsyncEffect;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.YamlFile;
 
-public class EffSaveYaml extends Effect {
+public class EffSaveYaml extends AsyncEffect {
 
 	static {
-		Skript.registerEffect(EffSaveYaml.class, "save y[a]ml %string%");
+		Skript.registerEffect(EffSaveYaml.class, "save [y[a]ml] %string%");
 		//Skript.registerEffect(EffSaveYaml.class, "save y[a]ml [file] %string% [to path %-string%]"); This is debatable
 	}
 
@@ -28,7 +28,7 @@ public class EffSaveYaml extends Effect {
 		final String name = this.file.getSingle(event);
 		
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
+			//SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
 			return;
 		}
 		

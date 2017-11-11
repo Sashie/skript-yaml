@@ -14,7 +14,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 public class EffUnloadYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffUnloadYaml.class, "unload y[a]ml %string%");
+		Skript.registerEffect(EffUnloadYaml.class, "unload [y[a]ml] %string%");
 	}
 
 	private Expression<String> file;
@@ -24,7 +24,7 @@ public class EffUnloadYaml extends Effect {
 		final String name = this.file.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
+			//SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
 			return;
 		}
 

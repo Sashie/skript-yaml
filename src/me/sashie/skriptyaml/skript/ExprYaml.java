@@ -25,7 +25,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (in|at|from) [id] %string%");
+				"[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) [id] %string%");
 	}
 
 	private Expression<String> node, file;
@@ -65,7 +65,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (in|at|from) [id] " + this.file.toString(event, b);
+		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b);
 	}
 
 	@Override

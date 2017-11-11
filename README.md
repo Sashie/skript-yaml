@@ -9,11 +9,13 @@ Rather then checking the file each time this addon caches the yaml file to memor
 
 ### Effect
 Loads a yaml file into memory
-  - The optional adds an id name otherwise it uses the files name itself as the id
+  - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml")
+  - The second input allows you to choose your own id for this file
+  - If the optional id isnt used then the files name minus the extention is used as the id
 
 #### Syntax
 
-`[re]load y[a]ml %string% [as [id] %-string%]`
+`[re]load [y[a]ml] %string% [as [id] %-string%]`
 
 #### Example
 
@@ -31,7 +33,7 @@ Unloads a yaml file from memory
 
 #### Syntax
 
-`unload y[a]ml %string%`
+`unload [y[a]ml] %string%`
 
 #### Example
 
@@ -41,11 +43,25 @@ unload yaml "config"
 ---
 
 ### Effect
-Gets a list of all 'cached' yaml files
+Saves the current cached yaml elements to file
 
 #### Syntax
 
-`(the|all [of the]) [currently] loaded y[a]ml [files]`
+`save [y[a]ml] %string%`
+
+#### Example
+
+```
+save yaml file "config"
+```
+---
+
+### Effect
+Returns a list of all 'cached' yaml file ids
+
+#### Syntax
+
+`[(the|all (of the|the))] [currently] loaded y[a]ml [files]`
 
 #### Example
 
@@ -56,25 +72,12 @@ broadcast "%{_list::*}%"
 ---
 
 ### Effect
-Saves the current yaml to file
+Gets, sets, removes values/nodes etc.. of a cached yaml file
+  - Requires the id used/created from the load effect
 
 #### Syntax
 
-`save y[a]ml %string%`
-
-#### Example
-
-```
-save yaml file "config"
-```
----
-
-### Effect
-Gets, sets, removes valeus/nodes etc.. of a yaml file
-
-#### Syntax
-
-`[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (in|at|from) [file] %string%`
+`[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) [id] %string%`
 
 #### Example
 
