@@ -6,7 +6,6 @@ Rather then checking the file each time this addon caches the yaml file to memor
 ## Syntax
 
 
-
 ### Effect
 Loads a yaml file into memory
   - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml")
@@ -26,7 +25,6 @@ load yaml "plugins/test/config.yml" as "config"
 ```
 
 ---
-
 
 ### Effect
 Unloads a yaml file from memory
@@ -56,7 +54,7 @@ save yaml file "config"
 ```
 ---
 
-### Effect
+### Expression
 Returns a list of all 'cached' yaml file ids
 
 #### Syntax
@@ -71,9 +69,10 @@ broadcast "%{_list::*}%"
 ```
 ---
 
-### Effect
+### Expression
 Gets, sets, removes values/nodes etc.. of a cached yaml file
   - Requires the id used/created from the load effect
+  - This expression does not save to file
 
 #### Syntax
 
