@@ -11,11 +11,11 @@ Rather then checking the file each time this addon caches the yaml file to memor
 Loads a yaml file into memory
   - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml")
   - The second input allows you to choose your own id for this file
-  - If the optional id isnt used then the files name minus the extention is used as the id
+  - If the second input isn't used then the files name minus the extention is used as the id
 
 #### Syntax
 
-`[re]load [y[a]ml] %string% [as [id] %-string%]`
+`[re]load [y[a]ml] %string% [as %-string%]`
 
 #### Example
 
