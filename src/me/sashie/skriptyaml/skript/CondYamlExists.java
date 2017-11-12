@@ -16,8 +16,8 @@ public class CondYamlExists extends Condition {
 
 	static {
 		Skript.registerCondition(CondYamlExists.class, 
-				"[skript-]y[a]ml [path[s]] %strings% in %string% exists", 
-				"[skript-]y[a]ml [path[s]] %strings% in %string% does(n't| not) exist");
+				"[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% exists", 
+				"[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% does(n't| not) exist");
 	}
 
 	private Expression<String> path;
@@ -58,7 +58,7 @@ public class CondYamlExists extends Condition {
 
 	@Override
 	public String toString(final @Nullable Event event, final boolean debug) {
-		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does" : " do") + " not exist" : "exists");
+		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does" : " do") + " not exist" : "exist");
 	}
 	
 }

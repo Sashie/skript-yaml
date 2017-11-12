@@ -86,7 +86,7 @@ set yaml value "test1.test2" from file "config" to "test3"
 set {_test} to yaml value "test1.test2" from file "config"
 broadcast "%{_test}%"
 
-#same syntax for this expression as skQuery and skellett
+#similar syntax as skQuery and skellett
 ```
 ---
 
@@ -96,6 +96,7 @@ Checks if one or more yaml files are loaded into memory using said id
 #### Syntax
 
 `y[a]ml[s] %strings% (is|are) loaded`
+
 `y[a]ml[s] %strings% ((are|is) not|(is|are)n[']t) loaded`
 
 ---
@@ -108,8 +109,9 @@ Checks if one or more paths exist in a cached yaml file using said id
 
 #### Syntax
 
-`[skript-]y[a]ml [path[s]] %strings% in %string% exists`
-`[skript-]y[a]ml [path[s]] %strings% in %string% does(n't| not) exist`
+`[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% exists`
+
+`[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% does(n't| not) exist`
 
 #### Example
 
@@ -123,3 +125,8 @@ yaml path "test.test" and "boop.boop" in "config" exists:
     broadcast "this will fail"
 ```
 ---
+
+## Thanks!
+I'd like to thank the whole Skript community, without users like you I wouldn't have bothered to make this!
+
+A special shout out goes to @Pickachu for helping me with the syntax and some ideas <3
