@@ -129,4 +129,4 @@ yaml path "test.test" and "boop.boop" in "config" exists:
 ## Thanks!
 I'd like to thank the whole Skript community, without users like you I wouldn't have bothered to make this!
 
-A special shout out goes to @Pickachu for helping me with the syntax and some ideas <3
+A special shout out goes to @Pikachu for helping me with the syntax and some ideas <3
