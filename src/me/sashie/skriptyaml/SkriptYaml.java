@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import ch.njol.skript.Skript;
@@ -36,6 +37,17 @@ public class SkriptYaml extends JavaPlugin {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			new MetricsLite(this);
+			/*
+			Metrics metrics = new Metrics(this);
+			metrics.addCustomChart(new Metrics.SimplePie("skript_version", new Callable<String>() {
+			    @Override
+			    public String call() throws Exception {
+			        return Skript.getVersion().toString();
+			    }
+			}));
+			*/
 		} else {
 			Bukkit.getPluginManager().disablePlugin(this);
 			error("Skript not found, plugin disabled.");
