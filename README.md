@@ -76,7 +76,7 @@ Gets, sets, removes values/nodes etc.. of a cached yaml file
 
 #### Syntax
 
-`[[skript-]y[a]ml] (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%`
+`[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string%`
 
 #### Example
 
@@ -95,7 +95,7 @@ Gets a list of all nodes of a cached yaml file
 
 #### Syntax
 
-`[all] [[skript-]y[a]ml] node[s] (of|in|from) %string%`
+`[all] [[skript-]y[a]ml] (node|path)[s] (of|in|from) %string%`
 
 #### Example
 
@@ -128,9 +128,9 @@ Checks if one or more paths exist in a cached yaml file using said id
 
 #### Syntax
 
-`[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% exists`
+`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% exists`
 
-`[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% does(n't| not) exist`
+`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) exist`
 
 #### Example
 

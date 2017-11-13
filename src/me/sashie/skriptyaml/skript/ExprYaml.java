@@ -24,7 +24,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%");
+				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string%");
 	}
 
 	private Expression<String> node, file;

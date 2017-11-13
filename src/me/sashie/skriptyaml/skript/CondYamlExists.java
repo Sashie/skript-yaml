@@ -16,8 +16,8 @@ public class CondYamlExists extends Condition {
 
 	static {
 		Skript.registerCondition(CondYamlExists.class, 
-				"[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% exists", 
-				"[skript-]y[a]ml [path[s]] %strings% (of|in|from) %string% does(n't| not) exist");
+				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% exists", 
+				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) exist");
 	}
 
 	private Expression<String> path;
