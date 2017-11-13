@@ -23,15 +23,6 @@ public class CondYamlExists extends Condition {
 	private Expression<String> path;
 	private Expression<String> name;
 
-	@SuppressWarnings({"unchecked"})
-	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		path = (Expression<String>) exprs[0];
-		name = (Expression<String>) exprs[1];
-		setNegated(matchedPattern == 1);
-		return true;
-	}
-
 	@Override
 	public boolean check(final Event event) {
 		return path.check(event, new Checker<String>() {
@@ -60,5 +51,13 @@ public class CondYamlExists extends Condition {
 	public String toString(final @Nullable Event event, final boolean debug) {
 		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does" : " do") + " not exist" : "exist");
 	}
-	
+
+	@SuppressWarnings({"unchecked"})
+	@Override
+	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+		path = (Expression<String>) exprs[0];
+		name = (Expression<String>) exprs[1];
+		setNegated(matchedPattern == 1);
+		return true;
+	}
 }

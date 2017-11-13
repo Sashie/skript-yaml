@@ -76,7 +76,7 @@ Gets, sets, removes values/nodes etc.. of a cached yaml file
 
 #### Syntax
 
-`[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%`
+`[[skript-]y[a]ml] (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%`
 
 #### Example
 
@@ -87,6 +87,25 @@ set {_test} to yaml value "test1.test2" from file "config"
 broadcast "%{_test}%"
 
 #similar syntax as skQuery and skellett
+```
+---
+
+### Expression (All yaml nodes)
+Gets a list of all nodes of a cached yaml file
+
+#### Syntax
+
+`[all] [[skript-]y[a]ml] node[s] (of|in|from) %string%`
+
+#### Example
+
+```
+set yaml value "test1.test2" from file "config" to "test3"
+set yaml value "boop.beep" from file "config" to "bop"
+
+set {_list::*} to all yaml nodes of "config"
+broadcast "%{_list::*}%"
+
 ```
 ---
 

@@ -24,7 +24,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[skript-]y[a]ml (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%");
+				"[[skript-]y[a]ml] (1¦value|2¦node[s]|3¦node[s with] keys|4¦list) %string% (of|in|from) %string%");
 	}
 
 	private Expression<String> node, file;
@@ -45,23 +45,6 @@ public class ExprYaml extends SimpleExpression<Object> {
 		return state == States.VALUE ? true : false;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(Expression<?>[] e, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
-		if (parse.mark == 1) {
-			state = States.VALUE;
-		} else if (parse.mark == 2) {
-			state = States.NODES;
-		} else if (parse.mark == 3) {
-			state = States.NODES_KEYS;
-		} else if (parse.mark == 4) {
-			state = States.LIST;
-		}
-		node = (Expression<String>) e[0];
-		file = (Expression<String>) e[1];
-		return true;
-	}
-
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
 		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b);
@@ -75,7 +58,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 		final String path = this.node.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml file by the name '" + name + "' has been registered/loaded");
+			SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
 			return null;
 		}
 
@@ -167,5 +150,22 @@ public class ExprYaml extends SimpleExpression<Object> {
 			}
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean init(Expression<?>[] e, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
+		if (parse.mark == 1) {
+			state = States.VALUE;
+		} else if (parse.mark == 2) {
+			state = States.NODES;
+		} else if (parse.mark == 3) {
+			state = States.NODES_KEYS;
+		} else if (parse.mark == 4) {
+			state = States.LIST;
+		}
+		node = (Expression<String>) e[0];
+		file = (Expression<String>) e[1];
+		return true;
 	}
 }

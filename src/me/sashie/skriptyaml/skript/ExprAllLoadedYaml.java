@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.Changer;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -29,20 +30,30 @@ public class ExprAllLoadedYaml extends SimpleExpression<String> {
 	}
 
 	@Override
-	public boolean init(Expression<?>[] args, int arg1, Kleenean arg2, ParseResult arg3) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
 		return true;
 	}
 
 	@Override
-	public String toString(@Nullable Event arg0, boolean arg1) {
+	public String toString(@Nullable Event event, boolean debug) {
 		return "(the|all [of the]) [currently] loaded y[a]ml [files]";
 	}
 
 	@Override
 	@Nullable
-	protected String[] get(Event arg0) {
+	protected String[] get(Event event) {
 		if (SkriptYaml.YAML_STORE.isEmpty())
 			return null;
 		return SkriptYaml.YAML_STORE.keySet().toArray(new String[SkriptYaml.YAML_STORE.keySet().size()]);
+	}
+
+	@Override
+	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
+
+	}
+
+	@Override
+	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
+		return null;
 	}
 }

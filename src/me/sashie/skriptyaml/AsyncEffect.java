@@ -29,7 +29,7 @@ public abstract class AsyncEffect extends DelayFork {//Delay {//Effect {
             public void run() {
                 execute(e); // Execute this effect
                 if (next != null) {
-	                Bukkit.getScheduler().runTask(Skript.getInstance(), new Runnable() {
+					Bukkit.getScheduler().runTask(Skript.getInstance(), new Runnable() {
 	                    @Override
 	                    public void run() { // Walk to next item synchronously
 	    					
