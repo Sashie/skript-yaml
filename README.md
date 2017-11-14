@@ -3,6 +3,20 @@ The proper way to do yaml in skript
 
 Rather then checking the file each time this addon caches the yaml file to memory
 
+These results speak for themselves..
+
+<p align="center">
+  <img src="https://github.com/Sashie/skript-yaml/blob/master/res/results1.png" alt="Results 1"/>
+</p>
+<p align="center">
+  <img src="https://github.com/Sashie/skript-yaml/blob/master/res/results2.jpg" alt="Results 2""/>
+</p>
+<p align="center">
+  <img src="https://github.com/Sashie/skript-yaml/blob/master/res/results3.png" alt="Results 3""/>
+</p>
+
+The skript used for this test is found [here](https://github.com/Sashie/skript-yaml/blob/master/res/yaml-tests.sk)
+
 ## Syntax
 
 
@@ -148,4 +162,4 @@ yaml path "test.test" and "boop.boop" in "config" exists:
 ## Thanks!
 I'd like to thank the whole Skript community, without users like you I wouldn't have bothered to make this!
 
-A special shout out goes to @Pikachu for helping me with the syntax and some ideas <3
+A special shout out goes to @Pikachu920 for helping me with the syntax and some ideas <3
