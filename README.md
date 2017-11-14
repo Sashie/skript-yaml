@@ -24,7 +24,7 @@ The skript used for this test is found [here](https://github.com/Sashie/skript-y
 Loads a yaml file into memory
   - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml")
   - The second input allows you to choose your own id for this file
-  - If the second input isn't used then the files name minus the extention is used as the id
+  - If the second input isn't used then the files name minus the extention is used as the id for example 'config.yml' becomes 'config'
 
 #### Syntax
 
@@ -34,8 +34,14 @@ Loads a yaml file into memory
 
 ```
 #Both examples produce the same id for use in other effects/expressions
-load yaml "plugins/test/config.yml"
-load yaml "plugins/test/config.yml" as "config"
+load yaml "plugins/MyAwesomePlugin/config.yml"
+load yaml "plugins/MyAwesomePlugin/config.yml" as "config"
+
+
+#to get similar function as the other addons you would do this sort of thing with the id...
+	load yaml "plugins/MyAwesomePlugin/config.yml" as "plugins/MyAwesomePlugin/config.yml"
+	set yaml value "version" from "plugins/MyAwesomePlugin/config.yml" to 1.0
+	broadcast "%yaml value "version" from "plugins/MyAwesomePlugin/config.yml"%"
 ```
 
 ---
@@ -95,9 +101,9 @@ Gets, sets, removes values/nodes etc.. of a cached yaml file
 #### Example
 
 ```
-set yaml value "test1.test2" from file "config" to "test3"
+set yaml value "test1.test2" from "config" to "test3"
 
-set {_test} to yaml value "test1.test2" from file "config"
+set {_test} to yaml value "test1.test2" from "config"
 broadcast "%{_test}%"
 
 #similar syntax as skQuery and skellett
@@ -114,8 +120,8 @@ Gets a list of all nodes of a cached yaml file
 #### Example
 
 ```
-set yaml value "test1.test2" from file "config" to "test3"
-set yaml value "boop.beep" from file "config" to "bop"
+set yaml value "test1.test2" from "config" to "test3"
+set yaml value "boop.beep" from "config" to "bop"
 
 set {_list::*} to all yaml nodes of "config"
 broadcast "%{_list::*}%"
