@@ -16,10 +16,10 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
-public class ExprAllYaml extends SimpleExpression<String> {
+public class ExprAllYamlNodes extends SimpleExpression<String> {
 
 	static {
-		Skript.registerExpression(ExprAllYaml.class, String.class, ExpressionType.SIMPLE,
+		Skript.registerExpression(ExprAllYamlNodes.class, String.class, ExpressionType.SIMPLE,
 				"[all] [[skript-]y[a]ml] (node|path)[s] (of|in|from) %string%");
 	}
 

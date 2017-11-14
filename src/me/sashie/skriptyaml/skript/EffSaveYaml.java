@@ -42,7 +42,7 @@ public class EffSaveYaml extends AsyncEffect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "[re]load yaml file " + this.file.toString(event, b);
+		return "save yaml file " + this.file.toString(event, b);
 	}
 
 	@Override
