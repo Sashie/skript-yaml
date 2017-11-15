@@ -1,4 +1,4 @@
-function createYMLFile(directory: text, yaml: text, usageSeperator: string = "||", listSeperator: string = ";"):
+function createYMLFile(directory: text, yaml: text, usageSeperator: string = "||", listSeperator: string = ";", unload: boolean = true):
   load yaml {_directory} as {_directory}
   loop split {_yaml} at {_usageSeperator}:
     if loop-value parsed as "val[ue]: %text%:%text%" is set:
@@ -6,5 +6,7 @@ function createYMLFile(directory: text, yaml: text, usageSeperator: string = "||
       set skript-yaml value {_values::1} from {_directory} to {_values::2}
     else if loop-value parsed as "l[i]st:[ ]%text%:%text%" is set:
       set {_values::*} to loop-value parsed as "l[i]st:[ ]%text%:%text%"
-      set skript-yaml list {_values::1} to split {_values::2} at {_listSeperator}
+      set skript-yaml list {_values::1} from {_directory} to split {_values::2} at {_listSeperator}
   save yaml {_directory}
+  if {_unload} is true:
+    unload yaml {_directory}
