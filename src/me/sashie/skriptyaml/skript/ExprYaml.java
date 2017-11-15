@@ -1,7 +1,6 @@
 package me.sashie.skriptyaml.skript;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -50,13 +49,12 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b);
+		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b) + (matchedPattern == 0 ? "" : " without string checks");
 	}
 
 	@Override
 	@Nullable
 	protected Object[] get(Event event) {
-
 		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
 
@@ -82,7 +80,6 @@ public class ExprYaml extends SimpleExpression<Object> {
 			List<?> items = config.getList(path);
 			return items.toArray();
 		}
-
 		return null;
 	}
 
@@ -104,25 +101,21 @@ public class ExprYaml extends SimpleExpression<Object> {
 			return;
 		}
 		//TODO add possible warning if setting a value or list with the same path
-		Object target = delta[0] == null ? "" : delta[0];
 		if (state == States.VALUE) {
-			if (mode == ChangeMode.SET) {
+			if (mode == ChangeMode.SET) 
 				config.set(path, parseString(delta[0]));
-			}
 		} else if (state == States.NODES_KEYS) {
-			if (mode == ChangeMode.ADD) {
+			if (mode == ChangeMode.ADD)
 				config.createSection(path);
-			} else if (mode == ChangeMode.REMOVE) {
-				config.set(path + "." + target, null);
-			}
+			else if (mode == ChangeMode.REMOVE)
+				config.set(path + "." + (delta[0] == null ? "" : delta[0]), null);
 		} else if (state == States.LIST) {
 			ArrayList<Object> objects = (ArrayList<Object>) config.getList(path);
 			if (mode == ChangeMode.ADD) {
-				if (objects == null) {
+				if (objects == null)
 					config.set(path, arrayToList(new ArrayList<Object>(), delta));
-				} else {
+				else
 					arrayToList(objects, delta);
-				}
 			} else if (mode == ChangeMode.REMOVE) {
 				for (Object o : delta)
 					objects.remove(parseString(o));
@@ -149,7 +142,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 			//if (s.matches("true|false")) {
 			//	config.set(path, Boolean.valueOf(s));
 			if (s.matches("true|false|yes|no|on|off")) {
-                return s.matches("true|yes|on");
+				return s.matches("true|yes|on");
 			} else if (s.matches("(-)?\\d+")) {
 				return Long.parseLong(s);
 			} else if (s.matches("(-)?\\d+(\\.\\d+)")) {
@@ -182,15 +175,15 @@ public class ExprYaml extends SimpleExpression<Object> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(Expression<?>[] e, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
-		if (parse.mark == 1) {
+		if (parse.mark == 1)
 			state = States.VALUE;
-		} else if (parse.mark == 2) {
+		else if (parse.mark == 2)
 			state = States.NODES;
-		} else if (parse.mark == 3) {
+		else if (parse.mark == 3)
 			state = States.NODES_KEYS;
-		} else if (parse.mark == 4) {
+		else if (parse.mark == 4)
 			state = States.LIST;
-		}
+		
 		node = (Expression<String>) e[0];
 		file = (Expression<String>) e[1];
 		this.matchedPattern = matchedPattern;

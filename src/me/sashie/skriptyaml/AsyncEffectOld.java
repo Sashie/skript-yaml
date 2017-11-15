@@ -22,7 +22,8 @@ public abstract class AsyncEffectOld extends DelayFork {
 	protected TriggerItem walk(Event e) {
 		debug(e, true);
 		TriggerItem next = getNext();
-		if (e.getClass().isAssignableFrom(SkriptStopEvent.class)) {
+		// if (e.getEventName().equals("SkriptStopEvent")) {
+		if (e.getClass().isAssignableFrom(SkriptStopEvent.class)) {	// Because a bukkit task can't be created on server stop
 			execute(e);
 			if (next != null)
 				TriggerItem.walk(next, e);
@@ -37,7 +38,6 @@ public abstract class AsyncEffectOld extends DelayFork {
 						Bukkit.getScheduler().runTask(Skript.getInstance(), new Runnable() {
 							@Override
 							public void run() { // Walk to next item synchronously
-
 								// walk(next, e);
 								TriggerItem.walk(next, e);
 
@@ -47,12 +47,6 @@ public abstract class AsyncEffectOld extends DelayFork {
 				}
 			});
 		}
-
-		// SkriptYaml.error("hmm " + e.getEventName());
-		// if (e.getEventName().equals("SkriptStopEvent")) {
-		// SkriptYaml.error("test2 " + ((SkriptStopEvent) e).isAsynchronous());
-		// }
-
 		return null;
 	}
 }

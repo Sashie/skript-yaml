@@ -93,15 +93,18 @@ broadcast "%{_list::*}%"
 Gets, sets, removes values/nodes etc.. of a cached yaml file
   - Requires the id used/created from the load effect
   - This expression does not save to file
+  - Lists accept list variables for input
+  - Using 'without string checks' optional is a tiny bit faster but doesn't check/convert strings for numbers or booleans
 
 #### Syntax
 
-`[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string%`
+`[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]`
 
 #### Example
 
 ```
 set yaml value "test1.test2" from "config" to "test3"
+set yaml list "list.name" from "config" to {_list::*}
 
 set {_test} to yaml value "test1.test2" from "config"
 broadcast "%{_test}%"
@@ -163,6 +166,25 @@ yaml path "test.test" and "test2.test2" in "config" exists:
 yaml path "test.test" and "boop.boop" in "config" exists:
     broadcast "this will fail"
 ```
+---
+
+## Skripts
+
+
+[ez-yaml.sk](https://github.com/Sashie/skript-yaml/blob/master/res/ez-yaml.sk)
+
+  - Updated version thanks to @Pikachu920 of [this](https://forums.skunity.com/resources/ezyml.85/) Skript API
+
+```
+createYMLFile("plugins/MyAwesomePlugin/boop.yml", "list: listName:50;3.14;true;false;yes;no;on;off||value: valueName1:true||value: valueName2:2||value: valueName3:2.6||value: valueName4:This is a string")
+```
+
+---
+
+[yaml-tests.sk](https://github.com/Sashie/skript-yaml/blob/master/res/yaml-tests.sk)
+
+  - Same as above test made by @Rezz converted to skript-yaml by @Pickachu920
+  
 ---
 
 ## Thanks!
