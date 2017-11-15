@@ -1,6 +1,7 @@
 package me.sashie.skriptyaml.skript;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -24,9 +25,11 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string%");
+				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string%",
+				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% without string checks");
 	}
 
+	private int matchedPattern;
 	private Expression<String> node, file;
 
 	private static enum States {
@@ -83,6 +86,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
 		final String name = this.file.getSingle(event);
@@ -99,10 +103,11 @@ public class ExprYaml extends SimpleExpression<Object> {
 			config.set(path, null);
 			return;
 		}
+		//TODO add possible warning if setting a value or list with the same path
 		Object target = delta[0] == null ? "" : delta[0];
 		if (state == States.VALUE) {
 			if (mode == ChangeMode.SET) {
-				config.set(path, delta[0]);
+				config.set(path, parseString(delta[0]));
 			}
 		} else if (state == States.NODES_KEYS) {
 			if (mode == ChangeMode.ADD) {
@@ -111,28 +116,49 @@ public class ExprYaml extends SimpleExpression<Object> {
 				config.set(path + "." + target, null);
 			}
 		} else if (state == States.LIST) {
+			ArrayList<Object> objects = (ArrayList<Object>) config.getList(path);
 			if (mode == ChangeMode.ADD) {
-				@SuppressWarnings("unchecked")
-				ArrayList<Object> objects = (ArrayList<Object>) config.getList(path);
-				if (config.getList(path) == null) {
-					ArrayList<Object> obj = new ArrayList<>();
-					obj.add(delta[0]);
-					config.set(path, obj);
+				if (objects == null) {
+					config.set(path, arrayToList(new ArrayList<Object>(), delta));
 				} else {
-					objects.add(delta[0]);
+					arrayToList(objects, delta);
 				}
 			} else if (mode == ChangeMode.REMOVE) {
-				config.getList(path).remove(delta[0]);
+				for (Object o : delta)
+					objects.remove(parseString(o));
+			} else if (mode == ChangeMode.SET) {
+				if (objects == null) {
+					config.set(path, arrayToList(new ArrayList<Object>(), delta));
+				} else {
+					objects.clear();
+					arrayToList(objects, delta);
+				}
 			}
 		}
-		
-		/*
-		try {
-			config.save(name);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+	}
+
+	private ArrayList<Object> arrayToList(ArrayList<Object> list, Object[] array) {
+		for (Object o : array)
+			list.add(parseString(o));
+		return list;
+	}
+
+	private Object parseString(Object delta) {
+		if (matchedPattern == 0 && String.class.isAssignableFrom(delta.getClass())) {
+			String s = ((String) delta);
+			//if (s.matches("true|false")) {
+			//	config.set(path, Boolean.valueOf(s));
+			if (s.matches("true|false|yes|no|on|off")) {
+                return s.matches("true|yes|on");
+			} else if (s.matches("(-)?\\d+")) {
+				return Long.parseLong(s);
+			} else if (s.matches("(-)?\\d+(\\.\\d+)")) {
+				return Double.parseDouble(s);
+			} else {
+				return s;
+			}
 		}
-		*/
+		return delta;
 	}
 
 	@Override
@@ -145,8 +171,9 @@ public class ExprYaml extends SimpleExpression<Object> {
 				return CollectionUtils.array(Object.class);
 			}
 		} else if (state == States.LIST) {
-			if (mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE) {
-				return CollectionUtils.array(Object.class);
+			if (mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE || mode == Changer.ChangeMode.SET) {
+				return CollectionUtils.array(Object[].class);
+				
 			}
 		}
 		return null;
@@ -166,6 +193,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 		}
 		node = (Expression<String>) e[0];
 		file = (Expression<String>) e[1];
+		this.matchedPattern = matchedPattern;
 		return true;
 	}
 }
