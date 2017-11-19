@@ -12,6 +12,10 @@ import org.bukkit.event.Event;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -20,6 +24,20 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import me.sashie.skriptyaml.SkriptYaml;
 
+@Name("YAML")
+@Description("Gets, sets, removes values/nodes etc.. of a cached yaml file" +
+		"\n  - Requires the id used/created from the load effect" +
+		"\n  - This expression does not save to file" +
+		"\n  - Lists accept list variables for input" +
+		"\n  - Using 'without string checks' optional is a tiny bit faster but doesn't check/convert strings for numbers or booleans")
+@Examples({
+		"set yaml value \"test1.test2\" from \"config\" to \"test3\"",
+		"set yaml list \"list.name\" from \"config\" to {_list::*}",
+		" ",
+		"set {_test} to yaml value \"test1.test2\" from \"config\"",
+		"broadcast \"%{_test}%\""
+})
+@Since("1.0.5")
 public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
