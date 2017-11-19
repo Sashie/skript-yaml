@@ -6,6 +6,10 @@ import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -13,6 +17,13 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
+@Name("Return All Cached YAML")
+@Description("Returns a list of all \"cached\" yaml file IDs.")
+@Examples({
+		"set {_list::*} to the currently loaded yaml files",
+		"broadcast \"%{_list::*}%\""
+})
+@Since("1.0.5")
 public class ExprAllLoadedYaml extends SimpleExpression<String> {
 
 	static {
