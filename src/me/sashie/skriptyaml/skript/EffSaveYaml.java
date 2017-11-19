@@ -7,6 +7,10 @@ import javax.annotation.Nullable;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
@@ -14,6 +18,12 @@ import me.sashie.skriptyaml.AsyncEffect;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.YamlFile;
 
+@Name("Save YAML")
+@Description("Saves the current cached YAML elements to file.")
+@Examples({
+		"save yaml \"config\""
+})
+@Since("1.0.5")
 public class EffSaveYaml extends AsyncEffect {
 
 	static {
