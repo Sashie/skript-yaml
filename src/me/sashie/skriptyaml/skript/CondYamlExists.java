@@ -5,6 +5,10 @@ import javax.annotation.Nullable;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -12,6 +16,21 @@ import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
+@Name("Does YAML Path Exist")
+@Description("Checks if one or more paths exist in a cached YAML file using said ID." +
+		"\n  - First input is the path." +
+		"\n  - Second input is the ID." +
+		"\n  - If multiple paths are checked at once it will return false on the first one found to not exist.")
+@Examples({
+		"set skript-yaml value \"test.test\" from \"config\" to \"test\"",
+		"set skript-yaml value \"test2.test2\" from \"config\" to \"test\"",
+		" ",
+		"yaml path \"test.test\" and \"test2.test2\" in \"config\" exists:",
+		"\tbroadcast \"this works\"",
+		"yaml path \"test.test\" and \"boop.boop\" in \"config\" exists:",
+		"\tbroadcast \"this will fail\""
+})
+@Since("1.0.5")
 public class CondYamlExists extends Condition {
 
 	static {
