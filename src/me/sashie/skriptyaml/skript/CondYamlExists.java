@@ -30,7 +30,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 		"yaml path \"test.test\" and \"boop.boop\" in \"config\" exists:",
 		"\tbroadcast \"this will fail\""
 })
-@Since("1.0.5")
+@Since("1.0.3")
 public class CondYamlExists extends Condition {
 
 	static {

@@ -23,7 +23,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 		" ",
 		"yaml \"config\" and \"messages\" aren't loaded:",
 })
-@Since("1.0.5")
+@Since("1.0.3")
 public class CondYamlIsLoaded extends Condition {
 
 	static {

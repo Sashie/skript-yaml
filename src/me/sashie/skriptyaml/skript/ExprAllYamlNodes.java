@@ -29,7 +29,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 		"set {_list::*} to all yaml nodes of \"config\"",
 		"broadcast \"%{_list::*}%\""
 })
-@Since("1.0.5")
+@Since("1.0.4")
 public class ExprAllYamlNodes extends SimpleExpression<String> {
 
 	static {

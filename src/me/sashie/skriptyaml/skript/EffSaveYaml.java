@@ -23,7 +23,7 @@ import me.sashie.skriptyaml.YamlFile;
 @Examples({
 		"save yaml \"config\""
 })
-@Since("1.0.5")
+@Since("1.0.0")
 public class EffSaveYaml extends AsyncEffect {
 
 	static {

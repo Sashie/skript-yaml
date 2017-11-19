@@ -23,7 +23,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 		"set {_list::*} to the currently loaded yaml files",
 		"broadcast \"%{_list::*}%\""
 })
-@Since("1.0.5")
+@Since("1.0.0")
 public class ExprAllLoadedYaml extends SimpleExpression<String> {
 
 	static {

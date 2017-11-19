@@ -37,7 +37,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 		"set {_test} to yaml value \"test1.test2\" from \"config\"",
 		"broadcast \"%{_test}%\""
 })
-@Since("1.0.5")
+@Since("1.0.0")
 public class ExprYaml extends SimpleExpression<Object> {
 
 	static {

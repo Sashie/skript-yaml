@@ -36,7 +36,7 @@ import me.sashie.skriptyaml.YamlFile;
 		"\tset yaml value \"version\" from \"plugins/MyAwesomePlugin/config.yml\" to 1.0",
 		"\tbroadcast \"%yaml value \"\"version\"\" from \"\"plugins/MyAwesomePlugin/config.yml\"\"%\""
 })
-@Since("1.0.5")
+@Since("1.0.0")
 public class EffLoadYaml extends AsyncEffect {
 
 	static {

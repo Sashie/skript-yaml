@@ -20,7 +20,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 @Examples({
 		"unload yaml \"config\""
 })
-@Since("1.0.5")
+@Since("1.0.0")
 public class EffUnloadYaml extends Effect {
 
 	static {
