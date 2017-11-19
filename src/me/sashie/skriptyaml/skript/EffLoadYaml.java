@@ -10,6 +10,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
@@ -17,6 +21,22 @@ import me.sashie.skriptyaml.AsyncEffect;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.YamlFile;
 
+@Name("Load YAML")
+@Description("Loads a YAML file into memory." +
+		"\n  - The first input is the YAML file path (ie. \"plugins/MyAwesomePlugin/config.yml\")." +
+		"\n  - The second input allows you to choose your own ID for this file." +
+		"\n  - If the second input isn't used then the files name minus the extention is used as the ID for example `config.yml` becomes `config`.")
+@Examples({
+		"#Both examples produce the same id for use in other effects/expressions",
+		"load yaml \"plugins/MyAwesomePlugin/config.yml\"",
+		"load yaml \"plugins/MyAwesomePlugin/config.yml\" as \"config\"",
+		" ",
+		"#to get similar function as the other addons you would do this sort of thing with the id...",
+		"\tload yaml \"plugins/MyAwesomePlugin/config.yml\" as \"plugins/MyAwesomePlugin/config.yml\"",
+		"\tset yaml value \"version\" from \"plugins/MyAwesomePlugin/config.yml\" to 1.0",
+		"\tbroadcast \"%yaml value \"\"version\"\" from \"\"plugins/MyAwesomePlugin/config.yml\"\"%\""
+})
+@Since("1.0.5")
 public class EffLoadYaml extends AsyncEffect {
 
 	static {

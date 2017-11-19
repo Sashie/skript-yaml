@@ -9,6 +9,10 @@ import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -16,6 +20,16 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
+@Name("All YAML Nodes")
+@Description("Gets a list of all nodes of a cached YAML file.")
+@Examples({
+		"set yaml value \"test1.test2\" from \"config\" to \"test3\"",
+		"set yaml value \"boop.beep\" from \"config\" to \"bop\"",
+		" ",
+		"set {_list::*} to all yaml nodes of \"config\"",
+		"broadcast \"%{_list::*}%\""
+})
+@Since("1.0.5")
 public class ExprAllYamlNodes extends SimpleExpression<String> {
 
 	static {
