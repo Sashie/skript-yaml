@@ -5,12 +5,22 @@ import javax.annotation.Nullable;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
+@Name("Unload YAML")
+@Description("Unloads a YAML file from memory.")
+@Examples({
+		"unload yaml \"config\""
+})
+@Since("1.0.5")
 public class EffUnloadYaml extends Effect {
 
 	static {
