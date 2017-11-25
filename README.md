@@ -3,20 +3,6 @@ The proper way to do yaml in skript
 
 Rather then checking the file each time this addon caches the yaml file to memory
 
-These results speak for themselves..
-
-<p align="center">
-  <img src="https://github.com/Sashie/skript-yaml/blob/master/res/results1.png" alt="Results 1"/>
-</p>
-<p align="center">
-  <img src="https://github.com/Sashie/skript-yaml/blob/master/res/results2.jpg" alt="Results 2""/>
-</p>
-<p align="center">
-  <img src="https://github.com/Sashie/skript-yaml/blob/master/res/results3.png" alt="Results 3""/>
-</p>
-
-The skript used for this test is found [here](https://github.com/Sashie/skript-yaml/blob/master/res/yaml-tests.sk)
-
 ## Syntax
 
 
@@ -168,32 +154,6 @@ Checks if one or more yaml files are loaded into memory using said id
 `y[a]ml[s] %strings% (is|are) loaded`
 
 `y[a]ml[s] %strings% ((are|is) not|(is|are)n[']t) loaded`
-
----
-
-### Condition (Does yaml path exist)
-Checks if one or more paths exist in a cached yaml file using said id
-  - First input is the path
-  - Second input is the id
-  - If multiple paths are checked at once it will return false on the first one found to not exist
-
-#### Syntax
-
-`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% exists`
-
-`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) exist`
-
-#### Example
-
-```
-set skript-yaml value "test.test" from "config" to "test"
-set skript-yaml value "test2.test2" from "config" to "test"
-
-yaml path "test.test" and "test2.test2" in "config" exists:
-    broadcast "this works"
-yaml path "test.test" and "boop.boop" in "config" exists:
-    broadcast "this will fail"
-```
 
 ---
 
