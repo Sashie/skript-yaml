@@ -76,20 +76,7 @@ public class EffLoadYaml extends AsyncEffect {
 			}
 		}
 
-		
 		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
-		
-		
-//		YamlConfig yaml = new YamlConfigManager(SkriptYaml.getInstance()).getNewConfig(yamlFile);
-		
-		//YamlConfigManager manager = new YamlConfigManager(SkriptYaml.getInstance());
-		//YamlFile yaml = new YamlFile(name, manager.getNewConfig(yamlFile));
-		
-		//YamlFile yaml = new YamlFile(name, (new YamlConfigManager(SkriptYaml.getInstance())).getNewConfig(yamlFile));
-		
-		//YamlFile yaml = new YamlFile(name, YamlConfiguration.loadConfiguration(yamlFile));
-		//yaml.file = YamlConfiguration.loadConfiguration(yamlFile);
-		//yaml.path = name;
 
 		if (null != id) {
 			SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);

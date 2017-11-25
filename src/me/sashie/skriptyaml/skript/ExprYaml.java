@@ -88,7 +88,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 		if (state == States.VALUE) {
 			return CollectionUtils.array(config.getProperty(path));
 		} else if (state == States.NODES) {
-			List<String> nodes = config.getAllKeys();
+			List<String> nodes = config.getAllKeys();	//TODO check if this will still null out like Issue #2
 			return nodes.toArray(new String[nodes.size()]);
 		} else if (state == States.NODES_KEYS) {
 			List<String> nodesKeys = config.getKeys(path);
