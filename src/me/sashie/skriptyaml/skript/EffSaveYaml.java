@@ -1,7 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.io.IOException;
-
 import javax.annotation.Nullable;
 
 import org.bukkit.event.Event;
@@ -16,7 +14,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.AsyncEffect;
 import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.YamlFile;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("Save YAML")
 @Description("Saves the current cached YAML elements to file.")
@@ -42,17 +40,13 @@ public class EffSaveYaml extends AsyncEffect {
 			return;
 		}
 		
-		YamlFile yaml = SkriptYaml.YAML_STORE.get(name);
-		try {
-			yaml.file.save(yaml.path);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
+		yaml.save();//.save(yaml.path);
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "save yaml file " + this.file.toString(event, b);
+		return "save yaml " + this.file.toString(event, b);
 	}
 
 	@Override

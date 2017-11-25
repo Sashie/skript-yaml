@@ -43,7 +43,7 @@ public class EffUnloadYaml extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "unload yaml file " + this.file.toString(event, b);
+		return "unload yaml " + this.file.toString(event, b);
 	}
 
 	@Override

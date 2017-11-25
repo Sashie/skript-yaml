@@ -10,11 +10,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 public class SkriptYaml extends JavaPlugin {
 
 	public final static Logger LOGGER = Bukkit.getServer() != null ? Bukkit.getLogger() : Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	public final static HashMap<String, YamlFile> YAML_STORE = new HashMap<String, YamlFile>();
+	public final static HashMap<String, YAMLProcessor> YAML_STORE = new HashMap<String, YAMLProcessor>();
 
 	private static SkriptYaml instance;
 

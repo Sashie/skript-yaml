@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
@@ -19,7 +18,8 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.AsyncEffect;
 import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.YamlFile;
+import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("Load YAML")
 @Description("Loads a YAML file into memory." +
@@ -76,9 +76,20 @@ public class EffLoadYaml extends AsyncEffect {
 			}
 		}
 
-		YamlFile yaml = new YamlFile();
-		yaml.file = YamlConfiguration.loadConfiguration(yamlFile);
-		yaml.path = name;
+		
+		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
+		
+		
+//		YamlConfig yaml = new YamlConfigManager(SkriptYaml.getInstance()).getNewConfig(yamlFile);
+		
+		//YamlConfigManager manager = new YamlConfigManager(SkriptYaml.getInstance());
+		//YamlFile yaml = new YamlFile(name, manager.getNewConfig(yamlFile));
+		
+		//YamlFile yaml = new YamlFile(name, (new YamlConfigManager(SkriptYaml.getInstance())).getNewConfig(yamlFile));
+		
+		//YamlFile yaml = new YamlFile(name, YamlConfiguration.loadConfiguration(yamlFile));
+		//yaml.file = YamlConfiguration.loadConfiguration(yamlFile);
+		//yaml.path = name;
 
 		if (null != id) {
 			SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);

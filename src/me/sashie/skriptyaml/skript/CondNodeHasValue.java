@@ -16,27 +16,24 @@ import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
-@Name("Does YAML Path Exist")
-@Description("Checks if one or more paths exist in a cached YAML file using said ID." +
+@Name("Does YAML Path Have Value")
+@Description("Checks if one or more values exist at a path in a cached YAML file using said ID." +
 		"\n  - First input is the path." +
 		"\n  - Second input is the ID." +
-		"\n  - If multiple paths are checked at once it will return false on the first one found to not exist.")
+		"\n  - If multiple paths are checked at once it will return false on the first one found to not contain a value.")
 @Examples({
 		"set skript-yaml value \"test.test\" from \"config\" to \"test\"",
-		"set skript-yaml value \"test2.test2\" from \"config\" to \"test\"",
 		" ",
-		"yaml path \"test.test\" and \"test2.test2\" in \"config\" exists:",
-		"\tbroadcast \"this works\"",
-		"yaml path \"test.test\" and \"boop.boop\" in \"config\" exists:",
-		"\tbroadcast \"this will fail\""
+		"yaml path \"test.test\" in \"config\" has value:",
+		"\tbroadcast \"value exists\"",
 })
-@Since("1.0.3")
-public class CondYamlExists extends Condition {
+@Since("1.1.0")
+public class CondNodeHasValue extends Condition {
 
 	static {
-		Skript.registerCondition(CondYamlExists.class, 
-				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% exists", 
-				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) exist");
+		Skript.registerCondition(CondNodeHasValue.class, 
+				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% has value", 
+				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) have value");
 	}
 
 	private Expression<String> path;
@@ -50,12 +47,13 @@ public class CondYamlExists extends Condition {
 				if (!SkriptYaml.YAML_STORE.containsKey(name.getSingle(event)))
 					return false;
 				if (path.isSingle())
-					return SkriptYaml.YAML_STORE.get(name.getSingle(event)).getAllKeys().contains(path.getSingle(event));
+					return (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getProperty(path.getSingle(event)) != null);
+				
 				else {
 					String[] paths = (String[]) path.getAll(event);
 					boolean check;
 					for (String p : paths) {
-						check = (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getAllKeys().contains(p));
+						check = (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getProperty(p) != null);
 						if (!check) {
 							return false;
 						}
@@ -68,7 +66,7 @@ public class CondYamlExists extends Condition {
 
 	@Override
 	public String toString(final @Nullable Event event, final boolean debug) {
-		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does" : " do") + " not exist" : "exist");
+		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does not have a value" : " do not have values") + " " : "has a value");
 	}
 
 	@SuppressWarnings({"unchecked"})

@@ -128,7 +128,35 @@ set yaml value "boop.beep" from "config" to "bop"
 
 set {_list::*} to all yaml nodes of "config"
 broadcast "%{_list::*}%"
+```
+---
 
+### Expression (Yaml comment/header)
+Gets, sets, deletes comments or the header of a cached yaml file
+  - Headers don't contain '#' so add it yourself if you want it
+  - Comments can only be at root level ie. 'root' not 'root.something'
+  - Both header and comments accept list variables for input
+  - This expression does not save to file
+
+#### Syntax
+
+`[the] comment[s] (of|from) [y[a]ml] node[s] %strings% (of|in|from) %string%"`
+
+`[the] (comment[s] (at|on) [the] top of |header (of|from)) %string%`
+
+#### Example
+
+```
+set the comments of yaml node "test" from "config" to "First line" and "Second line"
+delete the comments of yaml node "test" from "config"
+
+set {_header::*} to "First line" and "Second line"
+set the comments at the top of "config" to {_header::*}
+delete  the comments at the top of "config"
+
+set the header of "config" to "First line" and "Second line"
+delete  the header of "config"
+set the header of "config" to {_header::*}
 ```
 ---
 
@@ -165,6 +193,29 @@ yaml path "test.test" and "test2.test2" in "config" exists:
     broadcast "this works"
 yaml path "test.test" and "boop.boop" in "config" exists:
     broadcast "this will fail"
+```
+
+---
+
+### Condition (Does yaml path have value)
+Checks if one or more values exist at a path in a cached YAML file using said ID.
+  - First input is the path
+  - Second input is the id
+  - If multiple paths are checked at once it will return false on the first one found to not contain a value.
+
+#### Syntax
+
+`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% has value`
+
+`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) have value`
+
+#### Example
+
+```
+set skript-yaml value "test.test" from "config" to "test"
+
+yaml path \"test.test\" in \"config\" has value:
+    broadcast "has value"
 ```
 ---
 

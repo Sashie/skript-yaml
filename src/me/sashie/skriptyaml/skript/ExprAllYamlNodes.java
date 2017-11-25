@@ -1,10 +1,9 @@
 package me.sashie.skriptyaml.skript;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
@@ -19,6 +18,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("All YAML Nodes")
 @Description("Gets a list of all nodes of a cached YAML file.")
@@ -65,9 +65,10 @@ public class ExprAllYamlNodes extends SimpleExpression<String> {
 			return null;
 		}
 
-		FileConfiguration config = SkriptYaml.YAML_STORE.get(name).file;
+		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
-		Set<String> nodes = config.getKeys(true);
+		List<String> nodes = config.getAllKeys();
+
 		return nodes.toArray(new String[nodes.size()]);
 	}
 
