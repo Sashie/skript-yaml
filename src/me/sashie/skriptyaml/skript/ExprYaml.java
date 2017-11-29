@@ -81,15 +81,21 @@ public class ExprYaml extends SimpleExpression<Object> {
 		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
-		
+
 		if (!config.getAllKeys().contains(path)) {
 			return null;
 		}
+		
 		if (state == States.VALUE) {
-			return CollectionUtils.array(config.getProperty(path));
+			Object o = config.getProperty(path);
+			if (o != null)
+				return CollectionUtils.array(o);
+			return null;
 		} else if (state == States.NODES) {
-			List<String> nodes = config.getAllKeys();	//TODO check if this will still null out like Issue #2
-			return nodes.toArray(new String[nodes.size()]);
+			List<String> nodes = config.getAllKeys();	//TODO check if this will still null out like Issue #2	check 'CondIsSet' in Skript
+			if (nodes != null)
+				return nodes.toArray(new String[nodes.size()]);
+			return null;
 		} else if (state == States.NODES_KEYS) {
 			List<String> nodesKeys = config.getKeys(path);
 			if (nodesKeys == null)

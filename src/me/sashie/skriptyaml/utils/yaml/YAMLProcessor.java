@@ -19,11 +19,22 @@
 
 package me.sashie.skriptyaml.utils.yaml;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.emitter.ScalarAnalysis;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.reader.UnicodeReader;
@@ -31,10 +42,6 @@ import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
 import me.sashie.skriptyaml.utils.StringUtil;
-
-import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * YAML configuration loader. To use this class, construct it with path to
@@ -135,6 +142,10 @@ public class YAMLProcessor extends YAMLNode {
             if (header.length() > 0) {
                 header.append(LINE_BREAK);
             }
+            if (line.startsWith("#"))
+            	header.append("#");
+            else
+            	header.append("## ");
             header.append(line);
         }
 
@@ -215,12 +226,33 @@ public class YAMLProcessor extends YAMLNode {
     }
 
     @SuppressWarnings("unchecked")
+	private void recursiveKeySearch(String path, Object o) {
+    	for (Map.Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
+			allKeys.add(path + "." + entry.getKey());
+			if (entry.getValue() instanceof Map) {
+				recursiveKeySearch(path + "." + entry.getKey(), entry.getValue());
+			}
+		}
+    }
+
+    @SuppressWarnings("unchecked")
     private void read(Object input) throws YAMLProcessorException {
         try {
             if (null == input) {
                 root = new LinkedHashMap<String, Object>();
             } else {
                 root = new LinkedHashMap<String, Object>((Map<String, Object>) input);
+
+                for (String path : root.keySet()) {
+                	Object o = getProperty(path);
+            		if (o == null) {
+            			continue;
+            		} else if (o instanceof Map) {
+            			recursiveKeySearch(path, o);
+            		} else {
+            			allKeys.add(path);
+            		}
+                }
             }
         } catch (ClassCastException e) {
             throw new YAMLProcessorException("Root document must be a key-value structure");
@@ -306,27 +338,12 @@ public class YAMLProcessor extends YAMLNode {
         return new YAMLNode(new LinkedHashMap<String, Object>(), writeDefaults);
     }
 
-    //TODO check if this is really needed anymore(on older versions of mc)
-    // This will be included in snakeyaml 1.10, but until then we have to do it manually.
     private class FancyDumperOptions extends DumperOptions {
-    	
     	@Override
     	public void setDefaultScalarStyle(ScalarStyle defaultStyle) {
     		
     		super.setDefaultScalarStyle(ScalarStyle.LITERAL);
     	}
-    	/*
-        @Override
-        public DumperOptions.ScalarStyle calculateScalarStyle(ScalarAnalysis analysis,
-                                                              DumperOptions.ScalarStyle style) {
-            if (format == YAMLFormat.EXTENDED
-                    && (analysis.scalar.contains("\n") || analysis.scalar.contains("\r"))) {
-                return ScalarStyle.LITERAL;
-            } else {
-                return super.calculateScalarStyle(analysis, style);
-            }
-        }
-        */
     }
 
     private static class FancyRepresenter extends Representer {

@@ -35,7 +35,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		" ",
 		"set {_header::*} to \"First line\" and \"Second line\"",
 		"set the comments at the top of \"config\" to {_header::*}",
-		"delete  the comments at the top of \"config\"",
+		"delete the comments at the top of \"config\"",
 		" ",
 		"set the header of \"config\" to {_header::*}"
 })
@@ -91,9 +91,9 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
-		if (!config.getAllKeys().contains(path)) {
-			return null;
-		}
+		//if (!config.getAllKeys().contains(path)) {
+		//	return null;
+		//}
 
 		if (state == States.COMMENT) {
 			String comment = config.getComment(path);

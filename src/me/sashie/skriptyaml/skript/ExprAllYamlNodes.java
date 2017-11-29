@@ -68,8 +68,9 @@ public class ExprAllYamlNodes extends SimpleExpression<String> {
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		List<String> nodes = config.getAllKeys();
-
-		return nodes.toArray(new String[nodes.size()]);
+		if (nodes != null)
+			return nodes.toArray(new String[nodes.size()]);
+		return null;
 	}
 
 	@Override

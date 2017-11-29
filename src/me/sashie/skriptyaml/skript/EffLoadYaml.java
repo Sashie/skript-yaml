@@ -78,15 +78,21 @@ public class EffLoadYaml extends AsyncEffect {
 
 		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
 
-		if (null != id) {
-			SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);
-		} else {
-			String n = yamlFile.getName();
-			int pos = n.lastIndexOf(".");
-			if (pos > 0) {
-			    n = n.substring(0, pos);
+		try {
+			yaml.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (null != id) {
+				SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);
+			} else {
+				String n = yamlFile.getName();
+				int pos = n.lastIndexOf(".");
+				if (pos > 0) {
+				    n = n.substring(0, pos);
+				}
+				SkriptYaml.YAML_STORE.put(n, yaml);
 			}
-			SkriptYaml.YAML_STORE.put(n, yaml);
 		}
 	}
 

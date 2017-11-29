@@ -194,7 +194,7 @@ createYMLFile("plugins/MyAwesomePlugin/boop.yml", "list: listName:50;3.14;true;f
 
 [yaml-tests.sk](https://github.com/Sashie/skript-yaml/blob/master/res/yaml-tests.sk)
 
-  - Same as above test made by @Rezz converted to skript-yaml by @Pickachu920
+  - Old test made by @Rezz converted to skript-yaml by @Pickachu920
   
 ---
 

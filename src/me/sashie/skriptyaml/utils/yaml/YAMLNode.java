@@ -20,13 +20,19 @@
 package me.sashie.skriptyaml.utils.yaml;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.util.Vector;
+
+import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.variables.SerializedVariable;
 
 /**
  * Represents a configuration node.
@@ -99,6 +105,63 @@ public class YAMLNode {
 			}
 
 			if (i == parts.length - 1) {
+
+				if (o.toString().contains("__skriptclass__")) {
+					YAMLNode n = getNode(path + ".__skriptclass__");
+					if (n == null) {
+						return null;
+					}
+					for (Object o2 : ((Map<String, Object>) o).values()) {
+						for (Map.Entry<String, Object> o3 : ((Map<String, Object>) o2).entrySet()) {
+							
+							if (o3.getKey().equals("vector")) {
+								n = getNode(path + ".__skriptclass__." + o3.getKey());
+								if (n == null) {
+									return null;
+								}
+
+								Double x = n.getDouble("x");
+								Double y = n.getDouble("y");
+								Double z = n.getDouble("z");
+
+								if (x == null || y == null || z == null) {
+									return null;
+								}
+
+								return new Vector(x, y, z);
+							} else if (o3.getKey().equals("location")) {
+								n = getNode(path + ".__skriptclass__." + o3.getKey());
+								if (n == null) {
+									return null;
+								}
+
+								String w = n.getString("world");
+								Double x = n.getDouble("x");
+								Double y = n.getDouble("y");
+								Double z = n.getDouble("z");
+								Double yaw = n.getDouble("yaw");
+								Double pitch = n.getDouble("pitch");
+
+								if (w == null | x == null || y == null || z == null || yaw == null || pitch == null) {
+									return null;
+								} 
+
+								return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
+							}
+
+							return Classes.deserialize(o3.getKey(), Base64.getDecoder().decode((String) o3.getValue()));
+						}
+					}
+				}
+
+/*
+				if (o instanceof String) {
+					if (((String) o).contains("__skriptclass__" )) {
+						String[] ps = ((String) o).split(" \\| ");
+						return Classes.deserialize(ps[1], Base64.getDecoder().decode(ps[2]));
+					}
+				}
+*/
 				return o;
 			}
 
@@ -123,11 +186,44 @@ public class YAMLNode {
 	private Object prepareSerialization(Object value) {
 		if (value instanceof Vector) {
 			Map<String, Double> out = new LinkedHashMap<String, Double>();
+			Map<String, Map<String, Double>> out2 = new LinkedHashMap<String, Map<String, Double>>();
+			Map<String, Map<String, Map<String, Double>>> out3 = new LinkedHashMap<String, Map<String, Map<String, Double>>>();
 			Vector vec = (Vector) value;
 			out.put("x", vec.getX());
 			out.put("y", vec.getY());
 			out.put("z", vec.getZ());
-			return out;
+			out2.put("vector", out);
+			out3.put("__skriptclass__", out2);
+			return out3;
+		} else if (value instanceof Location) {
+			Map<String, Object> out = new LinkedHashMap<String, Object>();
+			Map<String, Map<String, Object>> out2 = new LinkedHashMap<String, Map<String, Object>>();
+			Map<String, Map<String, Map<String, Object>>> out3 = new LinkedHashMap<String, Map<String, Map<String, Object>>>();
+			Location loc = (Location) value;
+			out.put("world", loc.getWorld().getName());
+			out.put("x", loc.getX());
+			out.put("y", loc.getY());
+			out.put("z", loc.getZ());
+			out.put("yaw", (double) loc.getYaw());
+			out.put("pitch", (double) loc.getPitch());
+			out2.put("location", out);
+			out3.put("__skriptclass__", out2);
+			return out3;
+		} else if (!(value instanceof Vector || value instanceof Location || value instanceof String || value instanceof Number
+				|| value instanceof Boolean || value instanceof Map || value instanceof List)) {
+
+			SerializedVariable.Value val = Classes.serialize(value);
+			if (val == null) {
+				return null;
+			}
+
+			Map<String, String> out = new LinkedHashMap<String, String>();
+			Map<String, Map<String, String>> out2 = new LinkedHashMap<String, Map<String, String>>();
+			out.put(val.type, Base64.getEncoder().encodeToString(val.data));
+			out2.put("__skriptclass__", out);
+			return out2;
+
+			//return "__skriptclass__" + " | " + val.type + " | " + Base64.getEncoder().encodeToString(val.data);
 		}
 
 		return value;
@@ -156,18 +252,14 @@ public class YAMLNode {
 		String[] parts = path.split("\\.");
 		Map<String, Object> node = root;
 
-		if (!allKeys.contains(parts[0]))
-			allKeys.add(parts[0]);
-		if (!allKeys.contains(path))
-			allKeys.add(path);
-
 		for (int i = 0; i < parts.length; i++) {
 			Object o = node.get(parts[i]);
 
 			// Found our target!
 			if (i == parts.length - 1) {
 				node.put(parts[i], value);
-
+				if (!allKeys.contains(path))
+					allKeys.add(path);
 				return;
 			}
 
@@ -200,7 +292,7 @@ public class YAMLNode {
 	}
 
 	/**
-	 * Gets a string at a location. This will either return an String or null, with
+	 * Gets a string at a location. This will either return a String or null, with
 	 * null meaning that no configuration value exists at that location. If the
 	 * object at the particular location is not actually a string, it will be
 	 * converted to its string representation.
@@ -215,53 +307,6 @@ public class YAMLNode {
 			return null;
 		}
 		return o.toString();
-	}
-
-	/**
-	 * Gets a vector at a location. This will either return an Vector or a null. If
-	 * the object at the particular location is not actually a string, it will be
-	 * converted to its string representation.
-	 * 
-	 * @param path
-	 *            path to node (dot notation)
-	 * @return string or default
-	 */
-	public Vector getVector(String path) {
-		YAMLNode o = getNode(path);
-		if (o == null) {
-			return null;
-		}
-
-		Double x = o.getDouble("x");
-		Double y = o.getDouble("y");
-		Double z = o.getDouble("z");
-
-		if (x == null || y == null || z == null) {
-			return null;
-		}
-
-		return new Vector(x, y, z);
-	}
-
-	/**
-	 * Gets a string at a location. This will either return an Vector or the default
-	 * value. If the object at the particular location is not actually a string, it
-	 * will be converted to its string representation.
-	 * 
-	 * @param path
-	 *            path to node (dot notation)
-	 * @param def
-	 *            default value
-	 * @return string or default
-	 */
-	public Vector getVector(String path, Vector def) {
-		Vector v = getVector(path);
-		if (v == null) {
-			if (writeDefaults)
-				setProperty(path, def);
-			return def;
-		}
-		return v;
 	}
 
 	/**
@@ -573,37 +618,6 @@ public class YAMLNode {
 			if (tetsu != null) {
 				list.add(tetsu);
 			}
-		}
-
-		return list;
-	}
-
-	/**
-	 * Gets a list of vectors. Non-valid entries will not be in the list. There will
-	 * be no null slots. If the list is not defined, the default will be returned.
-	 * 'null' can be passed for the default and an empty list will be returned
-	 * instead. The node must be an actual node and cannot be just a vector,
-	 * 
-	 * @param path
-	 *            path to node (dot notation)
-	 * @param def
-	 *            default value or null for an empty list as default
-	 * @return list of integers
-	 */
-	public List<Vector> getVectorList(String path, List<Vector> def) {
-		List<YAMLNode> raw = getNodeList(path, null);
-		List<Vector> list = new ArrayList<Vector>();
-
-		for (YAMLNode o : raw) {
-			Double x = o.getDouble("x");
-			Double y = o.getDouble("y");
-			Double z = o.getDouble("z");
-
-			if (x == null || y == null || z == null) {
-				continue;
-			}
-
-			list.add(new Vector(x, y, z));
 		}
 
 		return list;
