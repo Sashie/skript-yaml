@@ -76,15 +76,15 @@ public class ExprYaml extends SimpleExpression<Object> {
 		final String path = this.node.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
+			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
 			return null;
 		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
-		if (!config.getAllKeys().contains(path)) {
-			return null;
-		}
+		//if (!config.getAllKeys().contains(path)) {
+		//	return null;
+		//}
 		
 		if (state == States.VALUE) {
 			Object o = config.getProperty(path);
@@ -93,9 +93,9 @@ public class ExprYaml extends SimpleExpression<Object> {
 			return null;
 		} else if (state == States.NODES) {
 			List<String> nodes = config.getAllKeys();	//TODO check if this will still null out like Issue #2	check 'CondIsSet' in Skript
-			if (nodes != null)
-				return nodes.toArray(new String[nodes.size()]);
-			return null;
+			if (nodes == null)
+				return null;
+			return nodes.toArray(new String[nodes.size()]);
 		} else if (state == States.NODES_KEYS) {
 			List<String> nodesKeys = config.getKeys(path);
 			if (nodesKeys == null)
@@ -103,6 +103,8 @@ public class ExprYaml extends SimpleExpression<Object> {
 			return nodesKeys.toArray(new String[nodesKeys.size()]);
 		} else if (state == States.LIST) {
 			List<?> items = config.getList(path);
+			if (items == null)
+				return null;
 			return items.toArray();
 		}
 		return null;

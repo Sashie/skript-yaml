@@ -2,6 +2,8 @@ package me.sashie.skriptyaml.skript;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
@@ -38,22 +40,46 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 })
 @Since("1.0.0")
 public class EffLoadYaml extends AsyncEffect {
-
+//[(1¦non[(-| )]relative)]
 	static {
-		Skript.registerEffect(EffLoadYaml.class, "[re]load [y[a]ml] %string% [as %-string%]");
+		Skript.registerEffect(EffLoadYaml.class, "[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% [as %-string%]");
 	}
 
 	private Expression<String> file;
 	private Expression<String> id;
+	private int mark = 0;
+
+	private String checkSeparator(String check) {
+		if (check.contains("/")) {
+			return check.replaceAll("/", Matcher.quoteReplacement(File.separator));
+		}
+		return check;
+	}
+
+	private String checkRoot(String check) {
+		Path root = Paths.get("").normalize().toAbsolutePath().getRoot();
+		if (root != null) {
+			for(File r : File.listRoots()) {
+			    if (!check.toLowerCase().startsWith(r.getPath().toLowerCase()))
+			    	continue;
+			    else
+			    	return check;
+			}
+			return root + check;
+		}
+		return File.separator + check;
+	}
 
 	@Override
 	protected void execute(@Nullable Event event) {
-		final String name = this.file.getSingle(event);
-
-		String server = (new File("").getAbsolutePath()) + File.separator;
-		File yamlFile = new File(server + name);
-		if (name.contains("/")) {
-			yamlFile = new File(server + name.replaceAll("/", Matcher.quoteReplacement(File.separator)));
+		final String name = checkSeparator(this.file.getSingle(event));
+		
+		File yamlFile = null;
+		if (mark == 1) {
+			yamlFile = new File(checkRoot(name));
+		} else {
+			Path server = Paths.get("").normalize().toAbsolutePath();
+			yamlFile = new File(server + File.separator + name);
 		}
 
 		if (!yamlFile.exists()) {
@@ -72,7 +98,9 @@ public class EffLoadYaml extends AsyncEffect {
 					yamlFile.createNewFile();
 				}
 			} catch (IOException error) {
-				error.printStackTrace();
+				SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ")");
+				return;
+				//error.printStackTrace();
 			}
 		}
 
@@ -106,6 +134,8 @@ public class EffLoadYaml extends AsyncEffect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
 		file = (Expression<String>) exprs[0];
 		id = (Expression<String>) exprs[1];
+		if (parser.mark == 1)
+			mark = 1;
 		return true;
 	}
 }

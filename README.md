@@ -8,17 +8,24 @@ Rather then checking the file each time this addon caches the yaml file to memor
 
 ### Effect (Load yaml)
 Loads a yaml file into memory
-  - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml")
+  - Using the optional `[non[(-| )]relative]` allows for root directory access
+  - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml") (see example for root directories)
   - The second input allows you to choose your own id for this file
-  - If the second input isn't used then the files name minus the extention is used as the id for example 'config.yml' becomes 'config'
+  - If the second input isn't used then the files name minus the extension is used as the id for example 'config.yml' becomes 'config'
 
 #### Syntax
 
-`[re]load [y[a]ml] %string% [as %-string%]`
+`[re]load [non[(-| )]relative] [y[a]ml] %string% [as %-string%]`
 
 #### Example
 
 ```
+#Root directory
+	#If the server is on drive D:\(on windows) for example then that would be the root path
+	load non-relative yaml "RootFolder/MyAwesomePlugin/config.yml"
+	#Otherwise you can specify a drive
+	load non-relative yaml "C:/RootFolder/MyAwesomePlugin/config.yml"
+
 #Both examples produce the same id for use in other effects/expressions
 load yaml "plugins/MyAwesomePlugin/config.yml"
 load yaml "plugins/MyAwesomePlugin/config.yml" as "config"

@@ -85,7 +85,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 		final String path = this.paths.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
+			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
 			return null;
 		}
 
