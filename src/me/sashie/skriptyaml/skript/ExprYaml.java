@@ -2,6 +2,8 @@ package me.sashie.skriptyaml.skript;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -21,6 +23,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("YAML")
@@ -41,11 +44,10 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string%",
-				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% without string checks");
+				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]");
 	}
 
-	private int matchedPattern;
+	private boolean checks = false;
 	private Expression<String> node, file;
 
 	private static enum States {
@@ -66,7 +68,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b) + (matchedPattern == 0 ? "" : " without string checks");
+		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b) + (!checks ? "" : " without string checks");
 	}
 
 	@Override
@@ -92,10 +94,14 @@ public class ExprYaml extends SimpleExpression<Object> {
 				return CollectionUtils.array(o);
 			return null;
 		} else if (state == States.NODES) {
-			List<String> nodes = config.getAllKeys();	//TODO check if this will still null out like Issue #2	check 'CondIsSet' in Skript
+			if (path.equals("")) {
+				Set<String> rootNodes = config.getMap().keySet();
+				return rootNodes.toArray(new String[rootNodes.size()]);
+			}
+			Map<String, YAMLNode> nodes = config.getNodes(path); 
 			if (nodes == null)
 				return null;
-			return nodes.toArray(new String[nodes.size()]);
+			return nodes.keySet().toArray(new String[nodes.size()]);
 		} else if (state == States.NODES_KEYS) {
 			List<String> nodesKeys = config.getKeys(path);
 			if (nodesKeys == null)
@@ -164,7 +170,7 @@ public class ExprYaml extends SimpleExpression<Object> {
 	}
 
 	private Object parseString(Object delta) {
-		if (matchedPattern == 0 && String.class.isAssignableFrom(delta.getClass())) {
+		if (!checks && String.class.isAssignableFrom(delta.getClass())) {
 			String s = ((String) delta);
 			//if (s.matches("true|false")) {
 			//	config.set(path, Boolean.valueOf(s));
@@ -342,7 +348,8 @@ public class ExprYaml extends SimpleExpression<Object> {
 		
 		node = (Expression<String>) e[0];
 		file = (Expression<String>) e[1];
-		this.matchedPattern = matchedPattern;
+		if (parse.expr.toLowerCase().endsWith(" without string checks"))
+			this.checks = true;
 		return true;
 	}
 }

@@ -252,14 +252,17 @@ public class YAMLNode {
 		String[] parts = path.split("\\.");
 		Map<String, Object> node = root;
 
+		if (!allKeys.contains(parts[0]))
+			allKeys.add(parts[0]);
+		if (!allKeys.contains(path))
+			allKeys.add(path);
+
 		for (int i = 0; i < parts.length; i++) {
 			Object o = node.get(parts[i]);
 
 			// Found our target!
 			if (i == parts.length - 1) {
 				node.put(parts[i], value);
-				if (!allKeys.contains(path))
-					allKeys.add(path);
 				return;
 			}
 
@@ -693,6 +696,8 @@ public class YAMLNode {
 			for (Map.Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
 				if (entry.getValue() instanceof Map) {
 					nodes.put(entry.getKey(), new YAMLNode((Map<String, Object>) entry.getValue(), writeDefaults));
+				} else {
+					nodes.put(entry.getKey(), null);
 				}
 			}
 

@@ -27,7 +27,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 @Description("Gets, sets, deletes comments or the header of a cached yaml file" +
 		"\n  - Headers don't contain '#' so add it yourself if you want it" +
 		"\n  - Comments can only be at root level ie. 'root' not 'root.something'" +
-		"\n  - Both header and comments accept list variables for input" +
+		"\n  - Both comment and header expressions can be set to multiple elements" +
 		"\n  - This expression does not save to file")
 @Examples({
 		"set the comments of yaml node \"test\" from \"config\" to \"First line\" and \"Second line\"",
@@ -39,13 +39,6 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		" ",
 		"set the header of \"config\" to {_header::*}"
 })
-/*
- 	#set the comments of yaml node "version" from "example" to "beep" and "boop"
-	#delete the comments of yaml node "version" from "example"
-	
-	#set the comments at the top of "example" to "hey" and "cool"
-	#delete  the comments at the top of "example"
- */
 @Since("1.1.0")
 public class ExprYamlComments extends SimpleExpression<Object> {
 

@@ -101,8 +101,6 @@ set yaml list "list.name" from "config" to {_list::*}
 
 set {_test} to yaml value "test1.test2" from "config"
 broadcast "%{_test}%"
-
-#similar syntax as skQuery and skellett
 ```
 ---
 
@@ -128,7 +126,7 @@ broadcast "%{_list::*}%"
 Gets, sets, deletes comments or the header of a cached yaml file
   - Headers don't contain '#' so add it yourself if you want it
   - Comments can only be at root level ie. 'root' not 'root.something'
-  - Both header and comments accept list variables for input
+  - Both comment and header expressions can be set to multiple elements
   - This expression does not save to file
 
 #### Syntax

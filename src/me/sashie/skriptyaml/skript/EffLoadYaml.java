@@ -40,7 +40,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 })
 @Since("1.0.0")
 public class EffLoadYaml extends AsyncEffect {
-//[(1¦non[(-| )]relative)]
+
 	static {
 		Skript.registerEffect(EffLoadYaml.class, "[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% [as %-string%]");
 	}
