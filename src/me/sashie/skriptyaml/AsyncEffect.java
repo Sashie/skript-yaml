@@ -39,7 +39,7 @@ public abstract class AsyncEffect extends DelayFork {
 		      SKRIPT_EXECUTION.lock();
 				try {
 					if (getNext() != null) {
-						TriggerItem.walk(getNext(), e);
+						walk(getNext(), e);
 					}
 				} finally {
 					SKRIPT_EXECUTION.unlock();

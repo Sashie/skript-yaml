@@ -29,10 +29,12 @@ import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.util.Vector;
 
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
+import me.sashie.skriptyaml.SkriptYaml;
 
 /**
  * Represents a configuration node.
@@ -74,6 +76,79 @@ public class YAMLNode {
 		root.clear();
 	}
 
+	@SuppressWarnings("unchecked")
+	private Object deserialize(String path, Object o) {
+		if (o.toString().contains("__skriptclass__")) {
+			YAMLNode n = getNode(path + ".__skriptclass__");
+			if (n == null) {
+				return null;
+			}
+			for (Object o2 : ((Map<String, Object>) o).values()) {
+				for (Map.Entry<String, Object> o3 : ((Map<String, Object>) o2).entrySet()) {
+					
+					if (o3.getKey().equals("vector")) {
+						n = getNode(path + ".__skriptclass__." + o3.getKey());
+						if (n == null) {
+							return null;
+						}
+
+						Double x = n.getDouble("x");
+						Double y = n.getDouble("y");
+						Double z = n.getDouble("z");
+
+						if (x == null || y == null || z == null) {
+							return null;
+						}
+
+						return new Vector(x, y, z);
+					} else if (o3.getKey().equals("location")) {
+						n = getNode(path + ".__skriptclass__." + o3.getKey());
+						if (n == null) {
+							return null;
+						}
+
+						String w = n.getString("world");
+						Double x = n.getDouble("x");
+						Double y = n.getDouble("y");
+						Double z = n.getDouble("z");
+						Double yaw = n.getDouble("yaw");
+						Double pitch = n.getDouble("pitch");
+
+						if (w == null | x == null || y == null || z == null || yaw == null || pitch == null) {
+							return null;
+						}
+
+						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
+					} else if (o3.getKey().equals("location")) {
+						n = getNode(path + ".__skriptclass__." + o3.getKey());
+						if (n == null) {
+							return null;
+						}
+
+						String w = n.getString("world");
+						Double x = n.getDouble("x");
+						Double y = n.getDouble("y");
+						Double z = n.getDouble("z");
+						Double yaw = n.getDouble("yaw");
+						Double pitch = n.getDouble("pitch");
+
+						if (w == null | x == null || y == null || z == null || yaw == null || pitch == null) {
+							return null;
+						}
+
+						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
+					} else {
+						
+						SkriptYaml.error(o3.getKey() + "  :  " + Base64.getDecoder().decode((String) o3.getValue()));
+						
+						return Classes.deserialize(o3.getKey(), Base64.getDecoder().decode((String) o3.getValue()));
+					}
+				}
+			}
+		}
+		return o;
+	}
+
 	/**
 	 * Gets a property at a location. This will either return an Object or null,
 	 * with null meaning that no configuration value exists at that location. This
@@ -91,7 +166,8 @@ public class YAMLNode {
 			if (val == null) {
 				return null;
 			}
-			return val;
+			
+			return deserialize(path, val);
 		}
 
 		String[] parts = path.split("\\.");
@@ -105,55 +181,6 @@ public class YAMLNode {
 			}
 
 			if (i == parts.length - 1) {
-
-				if (o.toString().contains("__skriptclass__")) {
-					YAMLNode n = getNode(path + ".__skriptclass__");
-					if (n == null) {
-						return null;
-					}
-					for (Object o2 : ((Map<String, Object>) o).values()) {
-						for (Map.Entry<String, Object> o3 : ((Map<String, Object>) o2).entrySet()) {
-							
-							if (o3.getKey().equals("vector")) {
-								n = getNode(path + ".__skriptclass__." + o3.getKey());
-								if (n == null) {
-									return null;
-								}
-
-								Double x = n.getDouble("x");
-								Double y = n.getDouble("y");
-								Double z = n.getDouble("z");
-
-								if (x == null || y == null || z == null) {
-									return null;
-								}
-
-								return new Vector(x, y, z);
-							} else if (o3.getKey().equals("location")) {
-								n = getNode(path + ".__skriptclass__." + o3.getKey());
-								if (n == null) {
-									return null;
-								}
-
-								String w = n.getString("world");
-								Double x = n.getDouble("x");
-								Double y = n.getDouble("y");
-								Double z = n.getDouble("z");
-								Double yaw = n.getDouble("yaw");
-								Double pitch = n.getDouble("pitch");
-
-								if (w == null | x == null || y == null || z == null || yaw == null || pitch == null) {
-									return null;
-								} 
-
-								return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
-							}
-
-							return Classes.deserialize(o3.getKey(), Base64.getDecoder().decode((String) o3.getValue()));
-						}
-					}
-				}
-
 /*
 				if (o instanceof String) {
 					if (((String) o).contains("__skriptclass__" )) {
@@ -162,7 +189,7 @@ public class YAMLNode {
 					}
 				}
 */
-				return o;
+				return deserialize(path, o);
 			}
 
 			try {
@@ -669,14 +696,42 @@ public class YAMLNode {
 	@Nullable
 	@SuppressWarnings("unchecked")
 	public YAMLNode getNode(String path) {
-		Object raw = getProperty(path);
-		if (raw instanceof Map) {
-			return new YAMLNode((Map<String, Object>) raw, writeDefaults);
+		if (!path.contains(".")) {
+			Object val = root.get(path);
+			if (val == null) {
+				return null;
+			}
+			return new YAMLNode((Map<String, Object>) val, writeDefaults);
+		}
+
+		String[] parts = path.split("\\.");
+		Map<String, Object> node = root;
+
+		for (int i = 0; i < parts.length; i++) {
+			Object o = node.get(parts[i]);
+
+			if (o == null) {
+				return null;
+			}
+
+			if (i == parts.length - 1) {
+				if (o instanceof Map) {
+					return new YAMLNode((Map<String, Object>) o, writeDefaults);
+				} else {
+					return null;
+				}
+			}
+
+			try {
+				node = (Map<String, Object>) o;
+			} catch (ClassCastException e) {
+				return null;
+			}
 		}
 
 		return null;
 	}
-
+	
 	/**
 	 * Get a list of nodes at a location. If the map at the particular location does
 	 * not exist or it is not a map, null will be returned.
