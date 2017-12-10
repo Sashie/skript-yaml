@@ -29,7 +29,6 @@ import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.util.Vector;
 
 import ch.njol.skript.registrations.Classes;
@@ -701,7 +700,11 @@ public class YAMLNode {
 			if (val == null) {
 				return null;
 			}
-			return new YAMLNode((Map<String, Object>) val, writeDefaults);
+			if (val instanceof Map) {
+				return new YAMLNode((Map<String, Object>) val, writeDefaults);
+			} else {
+				return null;
+			}
 		}
 
 		String[] parts = path.split("\\.");
