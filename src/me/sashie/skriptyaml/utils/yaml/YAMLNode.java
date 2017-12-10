@@ -118,24 +118,6 @@ public class YAMLNode {
 						}
 
 						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
-					} else if (o3.getKey().equals("location")) {
-						n = getNode(path + ".__skriptclass__." + o3.getKey());
-						if (n == null) {
-							return null;
-						}
-
-						String w = n.getString("world");
-						Double x = n.getDouble("x");
-						Double y = n.getDouble("y");
-						Double z = n.getDouble("z");
-						Double yaw = n.getDouble("yaw");
-						Double pitch = n.getDouble("pitch");
-
-						if (w == null | x == null || y == null || z == null || yaw == null || pitch == null) {
-							return null;
-						}
-
-						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
 					} else {
 						
 						SkriptYaml.error(o3.getKey() + "  :  " + Base64.getDecoder().decode((String) o3.getValue()));
