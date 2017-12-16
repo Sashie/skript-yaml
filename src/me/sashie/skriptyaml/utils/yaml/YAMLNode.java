@@ -33,7 +33,7 @@ import org.bukkit.util.Vector;
 
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
-import me.sashie.skriptyaml.SkriptYaml;
+
 
 /**
  * Represents a configuration node.
@@ -119,8 +119,6 @@ public class YAMLNode {
 
 						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
 					} else {
-						
-						SkriptYaml.error(o3.getKey() + "  :  " + Base64.getDecoder().decode((String) o3.getValue()));
 						
 						return Classes.deserialize(o3.getKey(), Base64.getDecoder().decode((String) o3.getValue()));
 					}
@@ -234,6 +232,12 @@ public class YAMLNode {
 			//return "__skriptclass__" + " | " + val.type + " | " + Base64.getEncoder().encodeToString(val.data);
 		}
 
+//		if (value instanceof String) {
+//			if(((String) value).contains("\t")) {
+//				return ((String) value).replaceAll("\t", "    ");
+//			}
+//		}
+		
 		return value;
 	}
 
