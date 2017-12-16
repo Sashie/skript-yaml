@@ -231,12 +231,6 @@ public class YAMLNode {
 
 			//return "__skriptclass__" + " | " + val.type + " | " + Base64.getEncoder().encodeToString(val.data);
 		}
-
-//		if (value instanceof String) {
-//			if(((String) value).contains("\t")) {
-//				return ((String) value).replaceAll("\t", "    ");
-//			}
-//		}
 		
 		return value;
 	}
