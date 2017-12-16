@@ -30,6 +30,13 @@ public final class StringUtil {
     private StringUtil() {
     }
 
+    public static String replaceTabs(String text) {
+    	if(text.contains("\t")) {
+    		return text.replaceAll("\t", "    ");
+		}
+    	return text;
+    }
+
     /**
      * Trim a string if it is longer than a certain length.
      *  
@@ -50,7 +57,7 @@ public final class StringUtil {
      * 
      * @param str the string array
      * @param delimiter the delimiter
-     * @param initialIndex the initial index to start form
+     * @param initialIndex the initial index to start from
      * @return a new string
      */
     public static String joinString(String[] str, String delimiter, int initialIndex) {

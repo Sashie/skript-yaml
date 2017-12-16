@@ -137,8 +137,8 @@ public class YAMLProcessor extends YAMLNode {
      */
     public void setHeader(String... headerLines) {
         StringBuilder header = new StringBuilder();
-
         for (String line : headerLines) {
+        	
             if (header.length() > 0) {
                 header.append(LINE_BREAK);
             }
@@ -146,7 +146,7 @@ public class YAMLProcessor extends YAMLNode {
             	header.append("#");
             else
             	header.append("## ");
-            header.append(line);
+            header.append(StringUtil.replaceTabs(line));
         }
 
         setHeader(header.toString());
@@ -161,7 +161,7 @@ public class YAMLProcessor extends YAMLNode {
      * @param header header to prepend
      */
     public void setHeader(String header) {
-        this.header = header;
+        this.header = StringUtil.replaceTabs(header);
     }
 
     /**
@@ -300,7 +300,7 @@ public class YAMLProcessor extends YAMLNode {
                 }
             }
             String s = StringUtil.joinString(comment, LINE_BREAK);
-            comments.put(key, s);
+            comments.put(key, StringUtil.replaceTabs(s));
         } else {
             comments.remove(key);
         }
