@@ -12,7 +12,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import me.sashie.skriptyaml.AsyncEffect;
+import me.sashie.skriptyaml.AsyncEffectOld;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
@@ -22,7 +22,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"save yaml \"config\""
 })
 @Since("1.0.0")
-public class EffSaveYaml extends AsyncEffect {
+public class EffSaveYaml extends AsyncEffectOld {
 
 	static {
 		Skript.registerEffect(EffSaveYaml.class, "save [y[a]ml] %string%");

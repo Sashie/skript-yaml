@@ -18,7 +18,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import me.sashie.skriptyaml.AsyncEffect;
+import me.sashie.skriptyaml.AsyncEffectOld;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
@@ -39,7 +39,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"\tbroadcast \"%yaml value \"\"version\"\" from \"\"plugins/MyAwesomePlugin/config.yml\"\"%\""
 })
 @Since("1.0.0")
-public class EffLoadYaml extends AsyncEffect {
+public class EffLoadYaml extends AsyncEffectOld {
 
 	static {
 		Skript.registerEffect(EffLoadYaml.class, "[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% [as %-string%]");
