@@ -267,6 +267,9 @@ public class YAMLProcessor extends YAMLNode {
         return new FileOutputStream(file);
     }
 
+    public File getFile() {
+    	return file;
+    }
     /**
      * Returns a root-level comment.
      *
