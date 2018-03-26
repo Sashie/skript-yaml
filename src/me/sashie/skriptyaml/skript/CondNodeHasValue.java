@@ -32,8 +32,8 @@ public class CondNodeHasValue extends Condition {
 
 	static {
 		Skript.registerCondition(CondNodeHasValue.class, 
-				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% has value", 
-				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) have value");
+				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% has [a] value[s]", 
+				"[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) have [a] value[s]");
 	}
 
 	private Expression<String> path;

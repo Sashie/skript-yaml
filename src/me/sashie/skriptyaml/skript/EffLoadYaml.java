@@ -111,7 +111,7 @@ public class EffLoadYaml extends AsyncEffectOld {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (null != id) {
+			if (id != null) {
 				SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);
 			} else {
 				String n = yamlFile.getName();

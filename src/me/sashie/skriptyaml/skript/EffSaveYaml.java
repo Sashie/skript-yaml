@@ -9,10 +9,10 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import me.sashie.skriptyaml.AsyncEffectOld;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
@@ -22,7 +22,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"save yaml \"config\""
 })
 @Since("1.0.0")
-public class EffSaveYaml extends AsyncEffectOld {
+public class EffSaveYaml extends Effect {
 
 	static {
 		Skript.registerEffect(EffSaveYaml.class, "save [y[a]ml] %string%");
@@ -41,7 +41,7 @@ public class EffSaveYaml extends AsyncEffectOld {
 		}
 		
 		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
-		yaml.save();//.save(yaml.path);
+		yaml.save();
 	}
 
 	@Override
