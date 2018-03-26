@@ -37,6 +37,16 @@ load yaml "plugins/MyAwesomePlugin/config.yml" as "config"
 	broadcast "%yaml value "version" from "plugins/MyAwesomePlugin/config.yml"%"
 ```
 
+
+---
+
+### Effect (Delete yaml)
+Unloads a yaml file from memory and deletes the file
+
+#### Syntax
+
+`delete [y[a]ml] %string%`
+
 ---
 
 ### Effect (Unload yaml)
@@ -159,6 +169,15 @@ Checks if one or more yaml files are loaded into memory using said id
 `y[a]ml[s] %strings% (is|are) loaded`
 
 `y[a]ml[s] %strings% ((are|is) not|(is|are)n[']t) loaded`
+
+---
+
+### Condition (Is yaml empty)
+Only checks if there are any nodes or not
+
+#### Syntax
+
+`[skript-]y[a]ml %string% is[(n't| not)] empty`
 
 ---
 
