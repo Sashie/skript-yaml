@@ -40,6 +40,29 @@ load yaml "plugins/MyAwesomePlugin/config.yml" as "config"
 
 ---
 
+### Effect (Load all YAML from directory)
+Loads a directory YAML files into memory.
+  - The input is a directory (ie. \"plugins/MyAwesomePlugin/\").
+  - If for example a file in that directory is named test.yml then the output ID would be 'plugins/MyAwesomePlugin/test.yml'
+  - Using the optional filename ID would output `test.yml`"
+
+#### Syntax
+
+`[re]load all [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% [using [the] filename as [the] id]`
+
+#### Example
+
+```
+#This isn't something you would really want to do, or is it?
+load all yaml from directory \"plugins/skript-yaml/test\"
+	loop all of the currently loaded yaml files:
+		loop yaml nodes \"\" from loop-value-1:
+			loop yaml nodes loop-value-2 from loop-value-1:
+				broadcast yaml value \"%loop-value-2%.%loop-value-3%\" from loop-value-1
+```
+
+---
+
 ### Effect (Delete yaml)
 Unloads a yaml file from memory and deletes the file
 
@@ -68,7 +91,7 @@ Saves the current cached yaml elements to file
 
 #### Syntax
 
-`save [y[a]ml] %string%`
+`save [y[a]ml] %string% [(1¦without extra lines between nodes)]`
 
 #### Example
 
@@ -103,7 +126,7 @@ Gets, sets, removes values/nodes etc.. of a cached yaml file
 
 `[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]`
 
-#### Example
+#### Examples
 
 ```
 set yaml value "test1.test2" from "config" to "test3"
@@ -111,6 +134,19 @@ set yaml list "list.name" from "config" to {_list::*}
 
 set {_test} to yaml value "test1.test2" from "config"
 broadcast "%{_test}%"
+```
+```
+on script load:
+	load yaml "plugins/skript-yaml/teleport.yml" as "plugins/skript-yaml/teleport.yml"
+	
+command /savetp:
+	trigger:
+		set yaml value "%player%.location" from "plugins/skript-yaml/teleport.yml" to location of player
+		save yaml "plugins/skript-yaml/teleport.yml"
+
+command /tp:
+	trigger:
+		teleport player to yaml value "%player%.location" from "plugins/skript-yaml/teleport.yml"
 ```
 ---
 
@@ -141,9 +177,9 @@ Gets, sets, deletes comments or the header of a cached yaml file
 
 #### Syntax
 
-`[the] comment[s] (of|from) [y[a]ml] node[s] %strings% (of|in|from) %string%"`
+`[the] comment[s] (of|from) [y[a]ml] node[s] %strings% (of|in|from) %string%" [(1¦with [an] extra line)]`
 
-`[the] (comment[s] (at|on) [the] top of |header (of|from)) %string%`
+`[the] (comment[s] (at|on) [the] top of |header (of|from)) %string% [(1¦with [an] extra line)]`
 
 #### Example
 

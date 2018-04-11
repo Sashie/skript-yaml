@@ -11,13 +11,14 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("Save YAML")
-@Description("Saves the current cached YAML elements to file.")
+@Description("Saves the current cached YAML elements to file." +
+		"\n\t - Option to remove extra lines between nodes")
 @Examples({
 		"save yaml \"config\""
 })
@@ -25,11 +26,11 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 public class EffSaveYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffSaveYaml.class, "save [y[a]ml] %string%");
-		//Skript.registerEffect(EffSaveYaml.class, "save y[a]ml [file] %string% [to path %-string%]"); This is debatable
+		Skript.registerEffect(EffSaveYaml.class, "save [y[a]ml] %string% [(1¦without extra lines between nodes)]");
 	}
 
 	private Expression<String> file;
+	private int mark;
 
 	@Override
 	protected void execute(@Nullable Event event) {
@@ -41,7 +42,7 @@ public class EffSaveYaml extends Effect {
 		}
 		
 		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
-		yaml.save();
+		yaml.save(this.mark == 1 ? false : true);
 	}
 
 	@Override
@@ -51,8 +52,9 @@ public class EffSaveYaml extends Effect {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
 		file = (Expression<String>) exprs[0];
+		this.mark = parse.mark;
 		return true;
 	}
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
@@ -16,10 +15,11 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.AsyncEffectOld;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
@@ -47,36 +47,15 @@ public class EffLoadYaml extends AsyncEffectOld {
 
 	private Expression<String> file;
 	private Expression<String> id;
-	private int mark = 0;
-
-	private String checkSeparator(String check) {
-		if (check.contains("/")) {
-			return check.replaceAll("/", Matcher.quoteReplacement(File.separator));
-		}
-		return check;
-	}
-
-	private String checkRoot(String check) {
-		Path root = Paths.get("").normalize().toAbsolutePath().getRoot();
-		if (root != null) {
-			for(File r : File.listRoots()) {
-			    if (!check.toLowerCase().startsWith(r.getPath().toLowerCase()))
-			    	continue;
-			    else
-			    	return check;
-			}
-			return root + check;
-		}
-		return File.separator + check;
-	}
+	private int mark;
 
 	@Override
 	protected void execute(@Nullable Event event) {
-		final String name = checkSeparator(this.file.getSingle(event));
+		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
 		
 		File yamlFile = null;
 		if (mark == 1) {
-			yamlFile = new File(checkRoot(name));
+			yamlFile = new File(StringUtil.checkRoot(name));
 		} else {
 			Path server = Paths.get("").normalize().toAbsolutePath();
 			yamlFile = new File(server + File.separator + name);
@@ -100,7 +79,6 @@ public class EffLoadYaml extends AsyncEffectOld {
 			} catch (IOException error) {
 				SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ")");
 				return;
-				//error.printStackTrace();
 			}
 		}
 
@@ -114,12 +92,7 @@ public class EffLoadYaml extends AsyncEffectOld {
 			if (id != null) {
 				SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);
 			} else {
-				String n = yamlFile.getName();
-				int pos = n.lastIndexOf(".");
-				if (pos > 0) {
-				    n = n.substring(0, pos);
-				}
-				SkriptYaml.YAML_STORE.put(n, yaml);
+				SkriptYaml.YAML_STORE.put(StringUtil.stripExtention(yamlFile.getName()), yaml);
 			}
 		}
 	}
@@ -131,11 +104,10 @@ public class EffLoadYaml extends AsyncEffectOld {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
 		file = (Expression<String>) exprs[0];
 		id = (Expression<String>) exprs[1];
-		if (parser.mark == 1)
-			mark = 1;
+		this.mark = parse.mark;
 		return true;
 	}
 }

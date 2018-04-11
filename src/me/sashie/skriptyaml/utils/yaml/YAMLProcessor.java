@@ -77,6 +77,7 @@ public class YAMLProcessor extends YAMLNode {
     protected final Yaml yaml;
     protected final File file;
     protected String header = null;
+    protected boolean extraHeaderLine;
     protected YAMLFormat format;
 
     /*
@@ -84,7 +85,7 @@ public class YAMLProcessor extends YAMLNode {
      * Comments support based on ZerothAngel's AnnotatedYAMLConfiguration
      * Comments are only supported with YAMLFormat.EXTENDED
      */
-    private final Map<String, String> comments = new HashMap<String, String>();
+    private final Map<String, YAMLComment> comments = new HashMap<String, YAMLComment>();
 
     public YAMLProcessor(File file, boolean writeDefaults, YAMLFormat format) {
         super(new LinkedHashMap<String, Object>(), writeDefaults);
@@ -162,6 +163,7 @@ public class YAMLProcessor extends YAMLNode {
      */
     public void setHeader(String header) {
         this.header = StringUtil.replaceTabs(header);
+        
     }
 
     /**
@@ -174,11 +176,20 @@ public class YAMLProcessor extends YAMLNode {
     }
 
     /**
+     * Set an extra line for the header
+     *
+     * @param extraHeaderLine add an extra line for the header?
+     */
+    public void setExtraHeaderLine(boolean extraHeaderLine) {
+        this.extraHeaderLine = extraHeaderLine;
+    }
+
+    /**
      * Saves the configuration to disk. All errors are clobbered.
      *
      * @return true if it was successful
      */
-    public boolean save() {
+    public boolean save(boolean extraLines) {
         OutputStream stream = null;
 
         File parent = file.getParentFile();
@@ -194,20 +205,27 @@ public class YAMLProcessor extends YAMLNode {
             if (header != null) {
                 writer.append(header);
                 writer.append(LINE_BREAK);
+                if (extraHeaderLine)
+                	writer.append(LINE_BREAK);
             }
             if (comments.isEmpty() || format != YAMLFormat.EXTENDED) {
+            	if (extraLines)
+                	writer.append(LINE_BREAK);
                 yaml.dump(root, writer);
             } else {
                 // Iterate over each root-level property and dump
                 for (Entry<String, Object> entry : root.entrySet()) {
+                	// make an extra line between nodes if true
+                	if (extraLines)
+                    	writer.append(LINE_BREAK);
                     // Output comment, if present
-                    String comment = comments.get(entry.getKey());
+                	YAMLComment comment = comments.get(entry.getKey());
                     if (comment != null) {
-                        writer.append(LINE_BREAK);
-                        writer.append(comment);
+                    	if (comment.hasExtraLine())
+                    		writer.append(LINE_BREAK);
+                        writer.append(comment.getComment());
                         writer.append(LINE_BREAK);
                     }
-
                     // Dump property
                     yaml.dump(Collections.singletonMap(entry.getKey(), entry.getValue()), writer);
                 }
@@ -277,12 +295,12 @@ public class YAMLProcessor extends YAMLNode {
      * @return the comment or {@code null}
      */
     public String getComment(String key) {
-        return comments.get(key);
+        return comments.get(key).getComment();
     }
 
-    public void setComment(String key, String comment) {
+    public void setComment(String key, boolean extraLine, String comment) {
         if (comment != null) {
-            setComment(key, comment.split("\\r?\\n"));
+            setComment(key, extraLine, comment.split("\\r?\\n"));
         } else {
             comments.remove(key);
         }
@@ -295,7 +313,7 @@ public class YAMLProcessor extends YAMLNode {
      * @param comment the comment. May be {@code null}, in which case the comment
      *   is removed.
      */
-    public void setComment(String key, String... comment) {
+    public void setComment(String key, boolean extraLine, String... comment) {
         if (comment != null && comment.length > 0) {
             for (int i = 0; i < comment.length; ++i) {
                 if (!comment[i].matches("^" + COMMENT_CHAR + " ?")) {
@@ -303,7 +321,7 @@ public class YAMLProcessor extends YAMLNode {
                 }
             }
             String s = StringUtil.joinString(comment, LINE_BREAK);
-            comments.put(key, StringUtil.replaceTabs(s));
+            comments.put(key, new YAMLComment(StringUtil.replaceTabs(s), extraLine));
         } else {
             comments.remove(key);
         }
@@ -314,7 +332,7 @@ public class YAMLProcessor extends YAMLNode {
      *
      * @return map of root-level comments
      */
-    public Map<String, String> getComments() {
+    public Map<String, YAMLComment> getComments() {
         return Collections.unmodifiableMap(comments);
     }
 
@@ -323,7 +341,7 @@ public class YAMLProcessor extends YAMLNode {
      *
      * @param comments comment map
      */
-    public void setComments(Map<String, String> comments) {
+    public void setComments(Map<String, YAMLComment> comments) {
         this.comments.clear();
         if (comments != null) {
             this.comments.putAll(comments);

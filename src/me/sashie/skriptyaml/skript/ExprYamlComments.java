@@ -28,7 +28,9 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"\n  - Headers don't contain '#' so add it yourself if you want it" +
 		"\n  - Comments can only be at root level ie. 'root' not 'root.something'" +
 		"\n  - Both comment and header expressions can be set to multiple elements" +
-		"\n  - This expression does not save to file")
+		"\n  - This expression does not save to file" +
+		"\n  - Option to have an extra line or not depending if you use comment or header" +
+		"\n  - Any 'extra lines' are removed when deleting comments/headers")
 @Examples({
 		"set the comments of yaml node \"test\" from \"config\" to \"First line\" and \"Second line\"",
 		"delete the comments of yaml node \"test\" from \"config\"",
@@ -44,11 +46,12 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYamlComments.class, Object.class, ExpressionType.SIMPLE,
-				"[the] comment[s] (of|from) [y[a]ml] node[s] %strings% (of|in|from) %string%",
-				"[the] (comment[s] (at|on) [the] top of |header (of|from)) %string%");
+				"[the] comment[s] (of|from) [y[a]ml] node[s] %strings% (of|in|from) %string% [(1¦with [an] extra line)]",
+				"[the] (comment[s] (at|on) [the] top of |header (of|from)) %string% [(1¦with [an] extra line)]");
 	}
 
 	private Expression<String> paths, file;
+	private int mark;
 
 	private static enum States {
 		COMMENT, HEADER
@@ -83,10 +86,6 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
-
-		//if (!config.getAllKeys().contains(path)) {
-		//	return null;
-		//}
 
 		if (state == States.COMMENT) {
 			String comment = config.getComment(path);
@@ -127,27 +126,29 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 				for (String p : paths) {
 					if (!p.contains(".")) {
 						if (config.getMap().containsKey(p))
-							config.setComment(p, toStringArray(delta, comments));
+							config.setComment(p, this.mark == 1 ? true : false, toStringArray(delta, comments));
 						else
 							SkriptYaml.warn("'" + p + "' is not a valid path in '" + name + "'");
 					} else {
-						SkriptYaml.warn("Comments can only be added to root paths");
+						SkriptYaml.warn("Comments can only be added to root paths not '" + p + "' in '" + name + "'" );
 					}
 				}
 			} else if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 				for (String p : paths) {
 					if (config.getMap().containsKey(p)) {
 						String n = null;
-						config.setComment(p, n);
+						config.setComment(p, false, n);
 					}
 				}
 			}
 		} else if (state == States.HEADER) {
 			if (mode == ChangeMode.SET) {
 				config.setHeader(toStringArray(delta, new String[delta.length]));
+				config.setExtraHeaderLine(this.mark == 1 ? true : false);
 			} else if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 				String n = null;
 				config.setHeader(n);
+				config.setExtraHeaderLine(false);
 			}
 		}
 	}
@@ -178,6 +179,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 			state = States.HEADER;
 			file = (Expression<String>) e[0];
 		}
+		this.mark = parse.mark;
 		return true;
 	}
 }

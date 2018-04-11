@@ -19,8 +19,12 @@
 
 package me.sashie.skriptyaml.utils;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * String utilities.
@@ -37,10 +41,37 @@ public final class StringUtil {
     	return text;
     }
 
+    public static String checkSeparator(String check) {
+		if (check.contains("/")) {
+			return check.replaceAll("/", Matcher.quoteReplacement(File.separator));
+		}
+		return check;
+	}
+
+    public static String checkRoot(String check) {
+		Path root = Paths.get("").normalize().toAbsolutePath().getRoot();
+		if (root != null) {
+			for(File r : File.listRoots()) {
+			    if (!check.toLowerCase().startsWith(r.getPath().toLowerCase()))
+			    	continue;
+			    else
+			    	return check;
+			}
+			return root + check;
+		}
+		return File.separator + check;
+	}
+
+    public static String stripExtention(String strip) {
+		int pos = strip.lastIndexOf(".");
+		if (pos > 0) 
+			return strip.substring(0, pos);
+		return strip;
+    }
     /**
      * Trim a string if it is longer than a certain length.
      *  
-     * @param str the stirng
+     * @param str the string
      * @param len the length to trim to
      * @return a new string
      */

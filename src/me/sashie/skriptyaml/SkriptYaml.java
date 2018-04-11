@@ -37,7 +37,7 @@ public class SkriptYaml extends JavaPlugin {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			new MetricsLite(this);
 			/*
 			Metrics metrics = new Metrics(this);

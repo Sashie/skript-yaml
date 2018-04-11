@@ -1,5 +1,6 @@
 package me.sashie.skriptyaml.skript;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +20,11 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.registrations.Converters;
+import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import me.sashie.skriptyaml.SimpleExpressionFork;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.yaml.YAMLNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
@@ -40,7 +43,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"broadcast \"%{_test}%\""
 })
 @Since("1.0.0")
-public class ExprYaml extends SimpleExpression<Object> {
+public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
@@ -56,9 +59,42 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 	private States state;
 
+	private final ExprYaml<?> source;
+	private final Class<T> superType;
+
+	@SuppressWarnings("unchecked")
+	public ExprYaml() {
+		this(null, (Class<? extends T>) Object.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	private ExprYaml(ExprYaml<?> source, Class<? extends T>... types) {
+		this.source = source;
+		if (source != null) {
+			this.node = source.node;
+			this.file = source.file;
+			this.state = source.state;
+			this.checks = source.checks;
+		}
+		this.superType = (Class<T>) Utils.getSuperType(types);
+	}
+	
 	@Override
-	public Class<? extends Object> getReturnType() {
-		return Object.class;
+	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
+		return new ExprYaml<>(this, to);
+	}
+
+	@Override
+	public Expression<?> getSource() {
+		return source == null ? this : source;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Class<? extends T> getReturnType() {
+		if (state == States.NODES)
+			return (Class<? extends T>) String.class;
+		return superType;
 	}
 
 	@Override
@@ -71,12 +107,12 @@ public class ExprYaml extends SimpleExpression<Object> {
 		return "yaml " + state.toString().toLowerCase() + " " + this.node.toString(event, b) + " from " + this.file.toString(event, b) + (!checks ? "" : " without string checks");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	@Nullable
-	protected Object[] get(Event event) {
+	protected T[] get(Event event) {
 		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
-
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
 			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
 			return null;
@@ -84,56 +120,98 @@ public class ExprYaml extends SimpleExpression<Object> {
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
-		//if (!config.getAllKeys().contains(path)) {
-		//	return null;
-		//}
-		
 		if (state == States.VALUE) {
 			Object o = config.getProperty(path);
-			if (o != null)
-				return CollectionUtils.array(o);
+			if (o != null) {
+				try {
+					return convertToArray(o, (Class<T>) o.getClass());
+				} catch (ClassCastException e) {
+					return (T[]) Array.newInstance((Class<T>) o.getClass(), 0);
+				}
+			}
 			return null;
 		} else if (state == States.NODES) {
 			if (path.equals("")) {
 				Set<String> rootNodes = config.getMap().keySet();
-				return rootNodes.toArray(new String[rootNodes.size()]);
+				return lazyConvert(rootNodes.toArray(new String[rootNodes.size()]));
 			}
 			Map<String, YAMLNode> nodes = config.getNodes(path); 
-			if (nodes == null)
+			if (nodes == null) {
 				return null;
-			return nodes.keySet().toArray(new String[nodes.size()]);
+			}
+			return lazyConvert(nodes.keySet().toArray(new String[nodes.size()]));
 		} else if (state == States.NODES_KEYS) {
 			List<String> nodesKeys = config.getKeys(path);
 			if (nodesKeys == null)
 				return null;
-			return nodesKeys.toArray(new String[nodesKeys.size()]);
+			return lazyConvert(nodesKeys.toArray(new String[nodesKeys.size()]));
 		} else if (state == States.LIST) {
 			List<?> items = config.getList(path);
 			if (items == null)
 				return null;
-			return items.toArray();
+			//TODO
+			try {
+				return convertArray(items.toArray(), superType);
+			} catch (ClassCastException e) {
+				return (T[]) Array.newInstance(superType, 0);
+			}
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public final static <T> T[] lazyConvert(Object[] original) {
+		try {
+			return convertArray(original, (Class<T>) String.class);
+		} catch (ClassCastException e) {
+			return (T[]) Array.newInstance((Class<T>) String.class, 0);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public final static <T> T[] convertToArray(Object original, Class<T> to) throws ClassCastException {
+		T[] end = (T[]) Array.newInstance(to, 1);
+		T converted = Converters.convert(original, to);
+		if (converted != null) {
+			end[0] = converted;
+		} else {
+			throw new ClassCastException();
+		}
+		return end;
+	}
+
+	//This method is found at ch.njol.util.coll.CollectionUtils but is here because it hasn't been introduced in a released version of Skript as of this update
+	@SuppressWarnings("unchecked")
+	public final static <T> T[] convertArray(Object[] original, Class<T> to) throws ClassCastException {
+		T[] end = (T[]) Array.newInstance(to, original.length);
+		for (int i = 0; i < original.length; i++) {
+			T converted = Converters.convert(original[i], to);
+			if (converted != null) {
+				end[i] = converted;
+			} else {
+				throw new ClassCastException();
+			}
+		}
+		return end;
 	}
 
 	@Override
 	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
 		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
-		
+
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
 			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
 			return;
 		}
-		
+
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
-		
+
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 			config.removeProperty(path);
 			return;
 		}
-		
-		//TODO add possible warning if setting a value or list with the same path
+
 		if (state == States.VALUE) {
 			if (mode == ChangeMode.SET) 
 				config.setProperty(path, parseString(delta[0]));
@@ -345,7 +423,6 @@ public class ExprYaml extends SimpleExpression<Object> {
 			state = States.NODES_KEYS;
 		else if (parse.mark == 4)
 			state = States.LIST;
-		
 		node = (Expression<String>) e[0];
 		file = (Expression<String>) e[1];
 		if (parse.expr.toLowerCase().endsWith(" without string checks"))

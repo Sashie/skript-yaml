@@ -10,5 +10,4 @@ public abstract class DelayFork extends Delay {
 	public static void addDelayedEvent(Event event) {
 		delayed.add(event);
 	}
-
 }
