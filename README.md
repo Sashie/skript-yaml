@@ -54,11 +54,11 @@ Loads a directory YAML files into memory.
 
 ```
 #This isn't something you would really want to do, or is it?
-load all yaml from directory \"plugins/skript-yaml/test\"
+load all yaml from directory "plugins/skript-yaml/test"
 	loop all of the currently loaded yaml files:
-		loop yaml nodes \"\" from loop-value-1:
+		loop yaml nodes "" from loop-value-1:
 			loop yaml nodes loop-value-2 from loop-value-1:
-				broadcast yaml value \"%loop-value-2%.%loop-value-3%\" from loop-value-1
+				broadcast yaml value "%loop-value-2%.%loop-value-3%" from loop-value-1
 ```
 
 ---
