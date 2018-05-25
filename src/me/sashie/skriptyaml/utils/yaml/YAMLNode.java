@@ -28,12 +28,13 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.Vector;
 
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
-
 
 /**
  * Represents a configuration node.
@@ -43,6 +44,7 @@ public class YAMLNode {
 	protected Map<String, Object> root;
 	protected List<String> allKeys;
 	private boolean writeDefaults;
+	private final String SKRIPT_CLASS = "__skriptclass__";
 
 	public YAMLNode(Map<String, Object> root, boolean writeDefaults) {
 		this.root = root;
@@ -60,7 +62,7 @@ public class YAMLNode {
 	}
 
 	/**
-	 * Return the all paths/nodes.
+	 * Return all paths/nodes.
 	 *
 	 * @return the map
 	 */
@@ -75,36 +77,42 @@ public class YAMLNode {
 		root.clear();
 	}
 
+	/**
+	 * This is only here for backwards compatibility with old serialized skriptclass objects
+	 * 
+	 * @param path
+	 *            the path to the object
+	 * @param o
+	 *            the value to deserialize
+	 * @return the new object
+	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	private Object deserialize(String path, Object o) {
-		if (o.toString().contains("__skriptclass__")) {
-			YAMLNode n = getNode(path + ".__skriptclass__");
-			if (n == null) {
+		if (o.toString().contains(SKRIPT_CLASS)) {	// TODO look at snakeyaml tags
+			YAMLNode n = getNode(path + "." + SKRIPT_CLASS);
+			if (n == null)
 				return null;
-			}
 			for (Object o2 : ((Map<String, Object>) o).values()) {
 				for (Map.Entry<String, Object> o3 : ((Map<String, Object>) o2).entrySet()) {
-					
+
 					if (o3.getKey().equals("vector")) {
-						n = getNode(path + ".__skriptclass__." + o3.getKey());
-						if (n == null) {
+						n = getNode(path + "." + SKRIPT_CLASS + "." + o3.getKey());
+						if (n == null)
 							return null;
-						}
 
 						Double x = n.getDouble("x");
 						Double y = n.getDouble("y");
 						Double z = n.getDouble("z");
 
-						if (x == null || y == null || z == null) {
+						if (x == null || y == null || z == null)
 							return null;
-						}
 
 						return new Vector(x, y, z);
 					} else if (o3.getKey().equals("location")) {
-						n = getNode(path + ".__skriptclass__." + o3.getKey());
-						if (n == null) {
+						n = getNode(path + "." + SKRIPT_CLASS + "." + o3.getKey());
+						if (n == null)
 							return null;
-						}
 
 						String w = n.getString("world");
 						Double x = n.getDouble("x");
@@ -113,21 +121,29 @@ public class YAMLNode {
 						Double yaw = n.getDouble("yaw");
 						Double pitch = n.getDouble("pitch");
 
-						if (w == null | x == null || y == null || z == null || yaw == null || pitch == null) {
+						if (w == null | x == null || y == null || z == null || yaw == null || pitch == null)
 							return null;
-						}
 
 						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
 					} else {
-						
 						return Classes.deserialize(o3.getKey(), Base64.getDecoder().decode((String) o3.getValue()));
 					}
 				}
 			}
 		}
+		
+		return o;
+		//return deserialize(o);
+	}
+/*
+	private Object deserialize(Object o) {
+		if (o instanceof String && ((String) o).startsWith("__skriptclass__ ")) {
+			String[] split = ((String) o).replace("__skriptclass__ ", "").split(" \\| ");
+			return Classes.deserialize(split[0], Base64.getDecoder().decode(split[1]));
+		}
 		return o;
 	}
-
+*/
 	/**
 	 * Gets a property at a location. This will either return an Object or null,
 	 * with null meaning that no configuration value exists at that location. This
@@ -145,8 +161,9 @@ public class YAMLNode {
 			if (val == null) {
 				return null;
 			}
-			
+
 			return deserialize(path, val);
+			//return val;
 		}
 
 		String[] parts = path.split("\\.");
@@ -160,15 +177,8 @@ public class YAMLNode {
 			}
 
 			if (i == parts.length - 1) {
-/*
-				if (o instanceof String) {
-					if (((String) o).contains("__skriptclass__" )) {
-						String[] ps = ((String) o).split(" \\| ");
-						return Classes.deserialize(ps[1], Base64.getDecoder().decode(ps[2]));
-					}
-				}
-*/
 				return deserialize(path, o);
+				//return o;
 			}
 
 			try {
@@ -183,55 +193,34 @@ public class YAMLNode {
 
 	/**
 	 * Prepare a value for serialization, in case it's not a native type (and we
-	 * don't want to serialize objects as YAML objects).
+	 * don't want to serialize objects as YAML represented objects).
 	 * 
 	 * @param value
 	 *            the value to serialize
 	 * @return the new object
 	 */
-	private Object prepareSerialization(Object value) {
-		if (value instanceof Vector) {
-			Map<String, Double> out = new LinkedHashMap<String, Double>();
-			Map<String, Map<String, Double>> out2 = new LinkedHashMap<String, Map<String, Double>>();
-			Map<String, Map<String, Map<String, Double>>> out3 = new LinkedHashMap<String, Map<String, Map<String, Double>>>();
-			Vector vec = (Vector) value;
-			out.put("x", vec.getX());
-			out.put("y", vec.getY());
-			out.put("z", vec.getZ());
-			out2.put("vector", out);
-			out3.put("__skriptclass__", out2);
-			return out3;
-		} else if (value instanceof Location) {
-			Map<String, Object> out = new LinkedHashMap<String, Object>();
-			Map<String, Map<String, Object>> out2 = new LinkedHashMap<String, Map<String, Object>>();
-			Map<String, Map<String, Map<String, Object>>> out3 = new LinkedHashMap<String, Map<String, Map<String, Object>>>();
-			Location loc = (Location) value;
-			out.put("world", loc.getWorld().getName());
-			out.put("x", loc.getX());
-			out.put("y", loc.getY());
-			out.put("z", loc.getZ());
-			out.put("yaw", (double) loc.getYaw());
-			out.put("pitch", (double) loc.getPitch());
-			out2.put("location", out);
-			out3.put("__skriptclass__", out2);
-			return out3;
-		} else if (!(value instanceof Vector || value instanceof Location || value instanceof String || value instanceof Number
-				|| value instanceof Boolean || value instanceof Map || value instanceof List)) {
-
+	private Object serialize(Object value) {
+		if (!(SkriptYamlRepresenter.contains(value) || value instanceof ConfigurationSerializable || value instanceof Number || value instanceof Map || value instanceof List)) {
 			SerializedVariable.Value val = Classes.serialize(value);
-			if (val == null) {
+			if (val == null)
 				return null;
-			}
 
-			Map<String, String> out = new LinkedHashMap<String, String>();
-			Map<String, Map<String, String>> out2 = new LinkedHashMap<String, Map<String, String>>();
-			out.put(val.type, Base64.getEncoder().encodeToString(val.data));
-			out2.put("__skriptclass__", out);
-			return out2;
-
-			//return "__skriptclass__" + " | " + val.type + " | " + Base64.getEncoder().encodeToString(val.data);
+			// workaround for class 'ch.njol.skript.expressions.ExprTool$1$2'
+			if (val.type.equals("itemstack"))	
+				return Classes.deserialize(val.type, val.data);	// returns ItemStack instead of SkriptClass
+/*
+			StringBuilder sb = new StringBuilder("__skriptclass__ ");
+			sb.append(val.type);
+			sb.append(" | ");
+			sb.append(Base64.getEncoder().encodeToString(val.data));
+			sb.append(" | ");
+			sb.append(value.getClass().toString());	//TODO this is for debug atm
+			
+			return sb.toString();
+*/
+			// return "__skriptclass__ " + val.type + " | " + Base64.getEncoder().encodeToString(val.data) + " | " + value.getClass().toString();
+			return new SkriptClass(val.type, val.data);
 		}
-		
 		return value;
 	}
 
@@ -246,8 +235,32 @@ public class YAMLNode {
 	 */
 	@SuppressWarnings("unchecked")
 	public void setProperty(String path, Object value) {
-		value = prepareSerialization(value);
+		if (value instanceof List)
+			setList(path, (ArrayList<Object>) value);
+		else {
+			set(path, serialize(value));
+		}
+	}
 
+	/**
+	 * Set the list at a location. This will override existing configuration
+	 * data to have it conform to key/value mappings.
+	 * 
+	 * @param path
+	 *            the path
+	 * @param value
+	 *            the new value
+	 */
+	public void setList(String path, List<Object> value) {
+		List<Object> list = new ArrayList<Object>();
+		for (Object o : value)
+			list.add(serialize(o));
+
+		set(path, list);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void set(String path, Object value) {
 		if (!path.contains(".")) {
 			root.put(path, value);
 			if (!allKeys.contains(path))
@@ -281,7 +294,6 @@ public class YAMLNode {
 
 			node = (Map<String, Object>) o;
 		}
-		
 	}
 
 	/**
@@ -315,7 +327,8 @@ public class YAMLNode {
 		if (o == null) {
 			return null;
 		}
-		return o.toString();
+		//return o.toString();
+		return ChatColor.translateAlternateColorCodes('&', o.toString());
 	}
 
 	/**
@@ -473,13 +486,33 @@ public class YAMLNode {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<String> getKeys(String path) {
-		if (path == null)
+		if (path == null || path.equals(""))
 			return new ArrayList<String>(root.keySet());
 		Object o = getProperty(path);
 		if (o == null) {
 			return null;
 		} else if (o instanceof Map) {
 			return new ArrayList<String>(((Map<String, Object>) o).keySet());
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Get a Map at a location. If the map at the particular location does
+	 * not exist or it is not a map, null will be returned.
+	 * 
+	 * @param path
+	 *            path to node (dot notation)
+	 * @return map
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getMap(String path) {
+		Object o = getProperty(path);
+		if (o == null) {
+			return null;
+		} else if (o instanceof Map) {
+			return (Map<String, Object>) o;
 		} else {
 			return null;
 		}
@@ -714,7 +747,7 @@ public class YAMLNode {
 
 		return null;
 	}
-	
+
 	/**
 	 * Get a list of nodes at a location. If the map at the particular location does
 	 * not exist or it is not a map, null will be returned.
@@ -753,7 +786,7 @@ public class YAMLNode {
 	 * @return an integer or null
 	 */
 	@Nullable
-	private static Integer castInt(Object o) {
+	public static Integer castInt(Object o) {
 		if (o == null) {
 			return null;
 		} else if (o instanceof Number) {
@@ -810,17 +843,18 @@ public class YAMLNode {
 	public void removeProperty(String path) {
 		if (allKeys.contains(path))
 			allKeys.remove(path);
-		for (int i = allKeys.size() - 1; i >= 0; i--)
+		for (int i = allKeys.size() - 1; i >= 0; i--) {
 			if (allKeys.get(i).contains(path + "."))
 				allKeys.remove(i);
-/*
+		}
+		/*
 		for (Iterator<String> iterator = allKeys.iterator(); iterator.hasNext();) {
 			String key = iterator.next();
 			if (key.contains(path + ".")) {
 				iterator.remove();
 			}
 		}
-*/
+		 */
 		if (!path.contains(".")) {
 			root.remove(path);
 			return;

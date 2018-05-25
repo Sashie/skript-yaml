@@ -48,6 +48,21 @@ public final class StringUtil {
 		return check;
 	}
 
+	public static String checkLastSeparator(String check) {
+		if (check.contains("/")) {
+			if (!check.endsWith("/")) {
+				return check + "/";
+			}
+		} else if (check.contains("\\")) {
+			if (!check.endsWith("\\")) {
+				return check + "\\";
+			}
+		} else if (!check.contains("/") || !check.contains("\\")) {
+			return check + Matcher.quoteReplacement(File.separator);
+		}
+		return check;
+	}
+
     public static String checkRoot(String check) {
 		Path root = Paths.get("").normalize().toAbsolutePath().getRoot();
 		if (root != null) {

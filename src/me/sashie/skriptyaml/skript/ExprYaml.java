@@ -47,7 +47,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]");
+				"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]");
 	}
 
 	private boolean checks = false;
@@ -135,11 +135,15 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				Set<String> rootNodes = config.getMap().keySet();
 				return lazyConvert(rootNodes.toArray(new String[rootNodes.size()]));
 			}
-			Map<String, YAMLNode> nodes = config.getNodes(path); 
-			if (nodes == null) {
+			YAMLNode node = config.getNode(path);
+			if (node == null)
 				return null;
+			Map<String, Object> nodes = node.getMap();
+			List<String> keys = new ArrayList<String>();
+			for (String key : nodes.keySet()) {
+				keys.add(path + "." + key);
 			}
-			return lazyConvert(nodes.keySet().toArray(new String[nodes.size()]));
+			return lazyConvert(keys.toArray(new String[keys.size()]));
 		} else if (state == States.NODES_KEYS) {
 			List<String> nodesKeys = config.getKeys(path);
 			if (nodesKeys == null)
@@ -180,7 +184,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		return end;
 	}
 
-	//This method is found at ch.njol.util.coll.CollectionUtils but is here because it hasn't been introduced in a released version of Skript as of this update
+	//This method is found at ch.njol.util.coll.CollectionUtils but is here for backwards compatibility with older Skript versions
 	@SuppressWarnings("unchecked")
 	public final static <T> T[] convertArray(Object[] original, Class<T> to) throws ClassCastException {
 		T[] end = (T[]) Array.newInstance(to, original.length);
@@ -213,7 +217,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		}
 
 		if (state == States.VALUE) {
-			if (mode == ChangeMode.SET) 
+			if (mode == ChangeMode.SET)
 				config.setProperty(path, parseString(delta[0]));
 		} else if (state == States.NODES_KEYS) {
 			if (mode == ChangeMode.ADD)
@@ -222,20 +226,23 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				config.setProperty(path + "." + (delta[0] == null ? "" : delta[0]), null);
 		} else if (state == States.LIST) {
 			ArrayList<Object> objects = (ArrayList<Object>) config.getList(path);
+
 			if (mode == ChangeMode.ADD) {
 				if (objects == null)
-					config.setProperty(path, arrayToList(new ArrayList<Object>(), delta));
-				else
-					arrayToList(objects, delta);
+					config.setList(path, arrayToList(new ArrayList<Object>(), delta));
+				else 
+					config.setList(path, arrayToList(objects, delta));
+					//arrayToList(objects, delta);
 			} else if (mode == ChangeMode.REMOVE) {
 				for (Object o : delta)
 					objects.remove(parseString(o));
 			} else if (mode == ChangeMode.SET) {
 				if (objects == null) {
-					config.setProperty(path, arrayToList(new ArrayList<Object>(), delta));
+					config.setList(path, arrayToList(new ArrayList<Object>(), delta));
 				} else {
 					objects.clear();
-					arrayToList(objects, delta);
+					config.setList(path, arrayToList(objects, delta));
+					//arrayToList(objects, delta);
 				}
 			}
 		}

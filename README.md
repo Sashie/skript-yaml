@@ -72,6 +72,17 @@ Unloads a yaml file from memory and deletes the file
 
 ---
 
+### Effect (Delete all or any loaded yaml from directory)
+Unloads a directory of yaml files from memory and deletes them
+
+#### Syntax
+
+`delete all [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%`
+
+`delete (all|any) loaded [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% [using [the] filename as [the] id]`
+
+---
+
 ### Effect (Unload yaml)
 Unloads a yaml file from memory
 
@@ -116,15 +127,16 @@ broadcast "%{_list::*}%"
 ---
 
 ### Expression (Yaml)
-Gets, sets, removes values/nodes etc.. of a cached yaml file
+Gets, sets, removes values/node keys etc.. of a cached yaml file
   - Requires the id used/created from the load effect
   - This expression does not save to file
   - Lists accept list variables for input
   - Using 'without string checks' optional is a tiny bit faster but doesn't check/convert strings for numbers or booleans
+  - Using '(node|path) list' only gets a list of nodes at that path (full names like 'rootnode.subnode' are returned)
 
 #### Syntax
 
-`[[skript-]y[a]ml] (1¦value|2¦(node|path)[s]|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]`
+`[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] keys|4¦list) %string% (of|in|from) %string% [without string checks]`
 
 #### Examples
 
@@ -236,6 +248,31 @@ set skript-yaml value "test.test" from "config" to "test"
 
 yaml path \"test.test\" in \"config\" has value:
     broadcast "has value"
+```
+---
+
+### Condition (Does yaml path exist)
+Checks if one or more paths exist in a cached yaml file using said id
+  - First input is the path
+  - Second input is the id
+  - If multiple paths are checked at once it will return false on the first one found to not exist
+
+#### Syntax
+
+`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% exists`
+
+`[skript-]y[a]ml [(node|path)[s]] %strings% (of|in|from) %string% does(n't| not) exist`
+
+#### Example
+
+```
+set skript-yaml value "test.test" from "config" to "test"
+set skript-yaml value "test2.test2" from "config" to "test"
+
+yaml path "test.test" and "test2.test2" in "config" exists:
+    broadcast "this works"
+yaml path "test.test" and "boop.boop" in "config" exists:
+    broadcast "this will fail"
 ```
 ---
 

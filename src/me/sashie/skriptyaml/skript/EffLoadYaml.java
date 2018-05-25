@@ -14,10 +14,10 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import me.sashie.skriptyaml.AsyncEffectOld;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
@@ -39,7 +39,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"\tbroadcast \"%yaml value \"\"version\"\" from \"\"plugins/MyAwesomePlugin/config.yml\"\"%\""
 })
 @Since("1.0.0")
-public class EffLoadYaml extends AsyncEffectOld {
+public class EffLoadYaml extends Effect {
 
 	static {
 		Skript.registerEffect(EffLoadYaml.class, "[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% [as %-string%]");
@@ -62,9 +62,6 @@ public class EffLoadYaml extends AsyncEffectOld {
 		}
 
 		if (!yamlFile.exists()) {
-			//SkriptYaml.warn("No yaml file by the name '" + yamlFile.getName() + "' exists at that location");
-			//return;
-			//SkriptYaml.warn("No yaml by the name '" + yamlFile.getName() + "' exists at that location, generating one...");
 			try {
 				if (!yamlFile.exists()) {
 					File folder;
