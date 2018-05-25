@@ -89,7 +89,7 @@ public class YAMLNode {
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	private Object deserialize(String path, Object o) {
-		if (o.toString().contains(SKRIPT_CLASS)) {	// TODO look at snakeyaml tags
+		if (o.toString().contains(SKRIPT_CLASS)) {
 			YAMLNode n = getNode(path + "." + SKRIPT_CLASS);
 			if (n == null)
 				return null;
