@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
@@ -26,6 +27,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import me.sashie.skriptyaml.SimpleExpressionFork;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
@@ -123,6 +125,8 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		if (state == States.VALUE) {
 			Object o = config.getProperty(path);
 			if (o != null) {
+				if (!checks && String.class.isAssignableFrom(o.getClass()))
+					o = ChatColor.translateAlternateColorCodes('&', ((String) o));
 				try {
 					return convertToArray(o, (Class<T>) o.getClass());
 				} catch (ClassCastException e) {
@@ -223,7 +227,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 			if (mode == ChangeMode.ADD)
 				config.addNode(path);
 			else if (mode == ChangeMode.REMOVE)
-				config.setProperty(path + "." + (delta[0] == null ? "" : delta[0]), null);
+				config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
 		} else if (state == States.LIST) {
 			ArrayList<Object> objects = (ArrayList<Object>) config.getList(path);
 
@@ -256,9 +260,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	private Object parseString(Object delta) {
 		if (!checks && String.class.isAssignableFrom(delta.getClass())) {
-			String s = ((String) delta);
-			//if (s.matches("true|false")) {
-			//	config.set(path, Boolean.valueOf(s));
+			String s = StringUtil.translateColorCodes(((String) delta));
 			if (s.matches("true|false|yes|no|on|off")) {
 				return s.matches("true|yes|on");
 			} else if (s.matches("(-)?\\d+")) {

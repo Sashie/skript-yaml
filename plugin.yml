@@ -1,6 +1,6 @@
 name: skript-yaml
 author: Sashie
 description: The proper way to do yaml in skript
-version: 1.2.1
+version: 1.2.2
 main: me.sashie.skriptyaml.SkriptYaml
 depend: [Skript]

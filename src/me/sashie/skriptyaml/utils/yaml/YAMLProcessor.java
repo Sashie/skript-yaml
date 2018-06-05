@@ -299,7 +299,9 @@ public class YAMLProcessor extends YAMLNode {
 				if (extraHeaderLine)
 					writer.append(LINE_BREAK);
 			}
-			String firstKey = root.keySet().toArray(new String[root.size()])[0];
+			String firstKey = "";
+			if (!root.keySet().isEmpty())
+				firstKey = root.keySet().toArray(new String[root.size()])[0];
 			if (comments.isEmpty() || format != YAMLFormat.EXTENDED) {
 				if (extraLines && header != null)
 					writer.append(LINE_BREAK);

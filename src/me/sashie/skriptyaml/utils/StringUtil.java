@@ -31,17 +31,17 @@ import java.util.regex.Matcher;
  */
 public final class StringUtil {
 
-    private StringUtil() {
-    }
+	private StringUtil() {
+	}
 
-    public static String replaceTabs(String text) {
-    	if(text.contains("\t")) {
-    		return text.replaceAll("\t", "    ");
+	public static String replaceTabs(String text) {
+		if (text.contains("\t")) {
+			return text.replaceAll("\t", "    ");
 		}
-    	return text;
-    }
+		return text;
+	}
 
-    public static String checkSeparator(String check) {
+	public static String checkSeparator(String check) {
 		if (check.contains("/")) {
 			return check.replaceAll("/", Matcher.quoteReplacement(File.separator));
 		}
@@ -63,295 +63,339 @@ public final class StringUtil {
 		return check;
 	}
 
-    public static String checkRoot(String check) {
+	public static String checkRoot(String check) {
 		Path root = Paths.get("").normalize().toAbsolutePath().getRoot();
 		if (root != null) {
-			for(File r : File.listRoots()) {
-			    if (!check.toLowerCase().startsWith(r.getPath().toLowerCase()))
-			    	continue;
-			    else
-			    	return check;
+			for (File r : File.listRoots()) {
+				if (!check.toLowerCase().startsWith(r.getPath().toLowerCase()))
+					continue;
+				else
+					return check;
 			}
 			return root + check;
 		}
 		return File.separator + check;
 	}
 
-    public static String stripExtention(String strip) {
+	public static String stripExtention(String strip) {
 		int pos = strip.lastIndexOf(".");
-		if (pos > 0) 
+		if (pos > 0)
 			return strip.substring(0, pos);
 		return strip;
-    }
-    /**
-     * Trim a string if it is longer than a certain length.
-     *  
-     * @param str the string
-     * @param len the length to trim to
-     * @return a new string
-     */
-    public static String trimLength(String str, int len) {
-        if (str.length() > len) {
-            return str.substring(0, len);
-        }
+	}
 
-        return str;
-    }
+	public static String translateColorCodes(String textToTranslate) {
+		char[] b = textToTranslate.toCharArray();
 
-    /**
-     * Join an array of strings into a string.
-     * 
-     * @param str the string array
-     * @param delimiter the delimiter
-     * @param initialIndex the initial index to start from
-     * @return a new string
-     */
-    public static String joinString(String[] str, String delimiter, int initialIndex) {
-        if (str.length == 0) {
-            return "";
-        }
-        StringBuilder buffer = new StringBuilder(str[initialIndex]);
-        for (int i = initialIndex + 1; i < str.length; ++i) {
-            buffer.append(delimiter).append(str[i]);
-        }
-        return buffer.toString();
-    }
+		for (int i = 0; i < b.length - 1; ++i) {
+			if (b[i] == '§' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
+				b[i] = '&';
+				b[i + 1] = Character.toLowerCase(b[i + 1]);
+			}
+		}
 
-    /**
-     * Join an array of strings into a string.
-     * 
-     * @param str the string array
-     * @param delimiter the delimiter
-     * @param initialIndex the initial index to start form
-     * @param quote the character to put around each entry
-     * @return a new string
-     */
-    public static String joinQuotedString(String[] str, String delimiter,
-            int initialIndex, String quote) {
-        if (str.length == 0) {
-            return "";
-        }
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(quote);
-        buffer.append(str[initialIndex]);
-        buffer.append(quote);
-        for (int i = initialIndex + 1; i < str.length; ++i) {
-            buffer.append(delimiter).append(quote).append(str[i]).append(quote);
-        }
-        return buffer.toString();
-    }
+		return new String(b);
+	}
 
-    /**
-     * Join an array of strings into a string.
-     * 
-     * @param str the string array
-     * @param delimiter the delimiter
-     * @return a new string
-     */
-    public static String joinString(String[] str, String delimiter) {
-        return joinString(str, delimiter, 0);
-    }
+	/**
+	 * Trim a string if it is longer than a certain length.
+	 * 
+	 * @param str
+	 *            the string
+	 * @param len
+	 *            the length to trim to
+	 * @return a new string
+	 */
+	public static String trimLength(String str, int len) {
+		if (str.length() > len) {
+			return str.substring(0, len);
+		}
 
-    /**
-     * Join an array of strings into a string.
-     * 
-     * @param str an array of objects
-     * @param delimiter the delimiter
-     * @param initialIndex the initial index to start form
-     * @return a new string
-     */
-    public static String joinString(Object[] str, String delimiter, int initialIndex) {
-        if (str.length == 0) {
-            return "";
-        }
-        StringBuilder buffer = new StringBuilder(str[initialIndex].toString());
-        for (int i = initialIndex + 1; i < str.length; ++i) {
-            buffer.append(delimiter).append(str[i]);
-        }
-        return buffer.toString();
-    }
+		return str;
+	}
 
-    /**
-     * Join an array of strings into a string.
-     * 
-     * @param str a list of integers
-     * @param delimiter the delimiter
-     * @param initialIndex the initial index to start form
-     * @return a new string
-     */
-    public static String joinString(int[] str, String delimiter, int initialIndex) {
-        if (str.length == 0) {
-            return "";
-        }
-        StringBuilder buffer = new StringBuilder(Integer.toString(str[initialIndex]));
-        for (int i = initialIndex + 1; i < str.length; ++i) {
-            buffer.append(delimiter).append(Integer.toString(str[i]));
-        }
-        return buffer.toString();
-    }
+	/**
+	 * Join an array of strings into a string.
+	 * 
+	 * @param str
+	 *            the string array
+	 * @param delimiter
+	 *            the delimiter
+	 * @param initialIndex
+	 *            the initial index to start from
+	 * @return a new string
+	 */
+	public static String joinString(String[] str, String delimiter, int initialIndex) {
+		if (str.length == 0) {
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder(str[initialIndex]);
+		for (int i = initialIndex + 1; i < str.length; ++i) {
+			buffer.append(delimiter).append(str[i]);
+		}
+		return buffer.toString();
+	}
 
-    /**
-     * Join an list of strings into a string.
-     *
-     * @param str a list of strings
-     * @param delimiter the delimiter
-     * @param initialIndex the initial index to start form
-     * @return a new string
-     */
-    public static String joinString(Collection<?> str, String delimiter,int initialIndex) {
-        if (str.isEmpty()) {
-            return "";
-        }
-        StringBuilder buffer = new StringBuilder();
-        int i = 0;
-        for (Object o : str) {
-            if (i >= initialIndex) {
-                if (i > 0) {
-                    buffer.append(delimiter);
-                }
+	/**
+	 * Join an array of strings into a string.
+	 * 
+	 * @param str
+	 *            the string array
+	 * @param delimiter
+	 *            the delimiter
+	 * @param initialIndex
+	 *            the initial index to start form
+	 * @param quote
+	 *            the character to put around each entry
+	 * @return a new string
+	 */
+	public static String joinQuotedString(String[] str, String delimiter, int initialIndex, String quote) {
+		if (str.length == 0) {
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(quote);
+		buffer.append(str[initialIndex]);
+		buffer.append(quote);
+		for (int i = initialIndex + 1; i < str.length; ++i) {
+			buffer.append(delimiter).append(quote).append(str[i]).append(quote);
+		}
+		return buffer.toString();
+	}
 
-                buffer.append(o);
-            }
-            ++i;
-        }
-        return buffer.toString();
-    }
+	/**
+	 * Join an array of strings into a string.
+	 * 
+	 * @param str
+	 *            the string array
+	 * @param delimiter
+	 *            the delimiter
+	 * @return a new string
+	 */
+	public static String joinString(String[] str, String delimiter) {
+		return joinString(str, delimiter, 0);
+	}
 
-    /**
-     * <p>Find the Levenshtein distance between two Strings.</p>
-     *
-     * <p>This is the number of changes needed to change one String into
-     * another, where each change is a single character modification (deletion,
-     * insertion or substitution).</p>
-     *
-     * <p>The previous implementation of the Levenshtein distance algorithm
-     * was from <a href="http://www.merriampark.com/ld.htm">http://www.merriampark.com/ld.htm</a></p>
-     *
-     * <p>Chas Emerick has written an implementation in Java, which avoids an OutOfMemoryError
-     * which can occur when my Java implementation is used with very large strings.<br>
-     * This implementation of the Levenshtein distance algorithm
-     * is from <a href="http://www.merriampark.com/ldjava.htm">http://www.merriampark.com/ldjava.htm</a></p>
-     *
-     * <pre>
-     * StringUtil.getLevenshteinDistance(null, *)             = IllegalArgumentException
-     * StringUtil.getLevenshteinDistance(*, null)             = IllegalArgumentException
-     * StringUtil.getLevenshteinDistance("","")               = 0
-     * StringUtil.getLevenshteinDistance("","a")              = 1
-     * StringUtil.getLevenshteinDistance("aaapppp", "")       = 7
-     * StringUtil.getLevenshteinDistance("frog", "fog")       = 1
-     * StringUtil.getLevenshteinDistance("fly", "ant")        = 3
-     * StringUtil.getLevenshteinDistance("elephant", "hippo") = 7
-     * StringUtil.getLevenshteinDistance("hippo", "elephant") = 7
-     * StringUtil.getLevenshteinDistance("hippo", "zzzzzzzz") = 8
-     * StringUtil.getLevenshteinDistance("hello", "hallo")    = 1
-     * </pre>
-     *
-     * @param s  the first String, must not be null
-     * @param t  the second String, must not be null
-     * @return result distance
-     * @throws IllegalArgumentException if either String input {@code null}
-     */
-    public static int getLevenshteinDistance(String s, String t) {
-        if (s == null || t == null) {
-            throw new IllegalArgumentException("Strings must not be null");
-        }
+	/**
+	 * Join an array of strings into a string.
+	 * 
+	 * @param str
+	 *            an array of objects
+	 * @param delimiter
+	 *            the delimiter
+	 * @param initialIndex
+	 *            the initial index to start form
+	 * @return a new string
+	 */
+	public static String joinString(Object[] str, String delimiter, int initialIndex) {
+		if (str.length == 0) {
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder(str[initialIndex].toString());
+		for (int i = initialIndex + 1; i < str.length; ++i) {
+			buffer.append(delimiter).append(str[i]);
+		}
+		return buffer.toString();
+	}
 
-        /*
-         * The difference between this impl. and the previous is that, rather
-         * than creating and retaining a matrix of size s.length()+1 by
-         * t.length()+1, we maintain two single-dimensional arrays of length
-         * s.length()+1. The first, d, is the 'current working' distance array
-         * that maintains the newest distance cost counts as we iterate through
-         * the characters of String s. Each time we increment the index of
-         * String t we are comparing, d is copied to p, the second int[]. Doing
-         * so allows us to retain the previous cost counts as required by the
-         * algorithm (taking the minimum of the cost count to the left, up one,
-         * and diagonally up and to the left of the current cost count being
-         * calculated). (Note that the arrays aren't really copied anymore, just
-         * switched...this is clearly much better than cloning an array or doing
-         * a System.arraycopy() each time through the outer loop.)
-         * 
-         * Effectively, the difference between the two implementations is this
-         * one does not cause an out of memory condition when calculating the LD
-         * over two very large strings.
-         */
+	/**
+	 * Join an array of strings into a string.
+	 * 
+	 * @param str
+	 *            a list of integers
+	 * @param delimiter
+	 *            the delimiter
+	 * @param initialIndex
+	 *            the initial index to start form
+	 * @return a new string
+	 */
+	public static String joinString(int[] str, String delimiter, int initialIndex) {
+		if (str.length == 0) {
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder(Integer.toString(str[initialIndex]));
+		for (int i = initialIndex + 1; i < str.length; ++i) {
+			buffer.append(delimiter).append(Integer.toString(str[i]));
+		}
+		return buffer.toString();
+	}
 
-        int n = s.length(); // length of s
-        int m = t.length(); // length of t
+	/**
+	 * Join an list of strings into a string.
+	 *
+	 * @param str
+	 *            a list of strings
+	 * @param delimiter
+	 *            the delimiter
+	 * @param initialIndex
+	 *            the initial index to start form
+	 * @return a new string
+	 */
+	public static String joinString(Collection<?> str, String delimiter, int initialIndex) {
+		if (str.isEmpty()) {
+			return "";
+		}
+		StringBuilder buffer = new StringBuilder();
+		int i = 0;
+		for (Object o : str) {
+			if (i >= initialIndex) {
+				if (i > 0) {
+					buffer.append(delimiter);
+				}
 
-        if (n == 0) {
-            return m;
-        } else if (m == 0) {
-            return n;
-        }
+				buffer.append(o);
+			}
+			++i;
+		}
+		return buffer.toString();
+	}
 
-        int[] p = new int[n + 1]; // 'previous' cost array, horizontally
-        int[] d = new int[n + 1]; // cost array, horizontally
-        int[] _d; // placeholder to assist in swapping p and d
+	/**
+	 * <p>
+	 * Find the Levenshtein distance between two Strings.
+	 * </p>
+	 *
+	 * <p>
+	 * This is the number of changes needed to change one String into another, where
+	 * each change is a single character modification (deletion, insertion or
+	 * substitution).
+	 * </p>
+	 *
+	 * <p>
+	 * The previous implementation of the Levenshtein distance algorithm was from
+	 * <a href=
+	 * "http://www.merriampark.com/ld.htm">http://www.merriampark.com/ld.htm</a>
+	 * </p>
+	 *
+	 * <p>
+	 * Chas Emerick has written an implementation in Java, which avoids an
+	 * OutOfMemoryError which can occur when my Java implementation is used with
+	 * very large strings.<br>
+	 * This implementation of the Levenshtein distance algorithm is from <a href=
+	 * "http://www.merriampark.com/ldjava.htm">http://www.merriampark.com/ldjava.htm</a>
+	 * </p>
+	 *
+	 * <pre>
+	 * StringUtil.getLevenshteinDistance(null, *)             = IllegalArgumentException
+	 * StringUtil.getLevenshteinDistance(*, null)             = IllegalArgumentException
+	 * StringUtil.getLevenshteinDistance("","")               = 0
+	 * StringUtil.getLevenshteinDistance("","a")              = 1
+	 * StringUtil.getLevenshteinDistance("aaapppp", "")       = 7
+	 * StringUtil.getLevenshteinDistance("frog", "fog")       = 1
+	 * StringUtil.getLevenshteinDistance("fly", "ant")        = 3
+	 * StringUtil.getLevenshteinDistance("elephant", "hippo") = 7
+	 * StringUtil.getLevenshteinDistance("hippo", "elephant") = 7
+	 * StringUtil.getLevenshteinDistance("hippo", "zzzzzzzz") = 8
+	 * StringUtil.getLevenshteinDistance("hello", "hallo")    = 1
+	 * </pre>
+	 *
+	 * @param s
+	 *            the first String, must not be null
+	 * @param t
+	 *            the second String, must not be null
+	 * @return result distance
+	 * @throws IllegalArgumentException
+	 *             if either String input {@code null}
+	 */
+	public static int getLevenshteinDistance(String s, String t) {
+		if (s == null || t == null) {
+			throw new IllegalArgumentException("Strings must not be null");
+		}
 
-        // indexes into strings s and t
-        int i; // iterates through s
-        int j; // iterates through t
+		/*
+		 * The difference between this impl. and the previous is that, rather than
+		 * creating and retaining a matrix of size s.length()+1 by t.length()+1, we
+		 * maintain two single-dimensional arrays of length s.length()+1. The first, d,
+		 * is the 'current working' distance array that maintains the newest distance
+		 * cost counts as we iterate through the characters of String s. Each time we
+		 * increment the index of String t we are comparing, d is copied to p, the
+		 * second int[]. Doing so allows us to retain the previous cost counts as
+		 * required by the algorithm (taking the minimum of the cost count to the left,
+		 * up one, and diagonally up and to the left of the current cost count being
+		 * calculated). (Note that the arrays aren't really copied anymore, just
+		 * switched...this is clearly much better than cloning an array or doing a
+		 * System.arraycopy() each time through the outer loop.)
+		 * 
+		 * Effectively, the difference between the two implementations is this one does
+		 * not cause an out of memory condition when calculating the LD over two very
+		 * large strings.
+		 */
 
-        char tj; // jth character of t
+		int n = s.length(); // length of s
+		int m = t.length(); // length of t
 
-        int cost; // cost
+		if (n == 0) {
+			return m;
+		} else if (m == 0) {
+			return n;
+		}
 
-        for (i = 0; i <= n; ++i) {
-            p[i] = i;
-        }
+		int[] p = new int[n + 1]; // 'previous' cost array, horizontally
+		int[] d = new int[n + 1]; // cost array, horizontally
+		int[] _d; // placeholder to assist in swapping p and d
 
-        for (j = 1; j <= m; ++j) {
-            tj = t.charAt(j - 1);
-            d[0] = j;
+		// indexes into strings s and t
+		int i; // iterates through s
+		int j; // iterates through t
 
-            for (i = 1; i <= n; ++i) {
-                cost = s.charAt(i - 1) == tj ? 0 : 1;
-                // minimum of cell to the left+1, to the top+1, diagonally left
-                // and up +cost
-                d[i] = Math.min(Math.min(d[i - 1] + 1, p[i] + 1), p[i - 1]
-                        + cost);
-            }
+		char tj; // jth character of t
 
-            // copy current distance counts to 'previous row' distance counts
-            _d = p;
-            p = d;
-            d = _d;
-        }
+		int cost; // cost
 
-        // our last action in the above loop was to switch d and p, so p now
-        // actually has the most recent cost counts
-        return p[n];
-    }
+		for (i = 0; i <= n; ++i) {
+			p[i] = i;
+		}
 
-    public static <T extends Enum<?>> T lookup(Map<String, T> lookup, String name, boolean fuzzy) {
-        String testName = name.replaceAll("[ _]", "").toLowerCase();
+		for (j = 1; j <= m; ++j) {
+			tj = t.charAt(j - 1);
+			d[0] = j;
 
-        T type = lookup.get(testName);
-        if (type != null) {
-            return type;
-        }
+			for (i = 1; i <= n; ++i) {
+				cost = s.charAt(i - 1) == tj ? 0 : 1;
+				// minimum of cell to the left+1, to the top+1, diagonally left
+				// and up +cost
+				d[i] = Math.min(Math.min(d[i - 1] + 1, p[i] + 1), p[i - 1] + cost);
+			}
 
-        if (!fuzzy) {
-            return null;
-        }
+			// copy current distance counts to 'previous row' distance counts
+			_d = p;
+			p = d;
+			d = _d;
+		}
 
-        int minDist = -1;
+		// our last action in the above loop was to switch d and p, so p now
+		// actually has the most recent cost counts
+		return p[n];
+	}
 
-        for (Map.Entry<String, T> entry : lookup.entrySet()) {
-            final String key = entry.getKey();
-            if (key.charAt(0) != testName.charAt(0)) {
-                continue;
-            }
+	public static <T extends Enum<?>> T lookup(Map<String, T> lookup, String name, boolean fuzzy) {
+		String testName = name.replaceAll("[ _]", "").toLowerCase();
 
-            int dist = getLevenshteinDistance(key, testName);
+		T type = lookup.get(testName);
+		if (type != null) {
+			return type;
+		}
 
-            if ((dist < minDist || minDist == -1) && dist < 2) {
-                minDist = dist;
-                type = entry.getValue();
-            }
-        }
+		if (!fuzzy) {
+			return null;
+		}
 
-        return type;
-    }
+		int minDist = -1;
+
+		for (Map.Entry<String, T> entry : lookup.entrySet()) {
+			final String key = entry.getKey();
+			if (key.charAt(0) != testName.charAt(0)) {
+				continue;
+			}
+
+			int dist = getLevenshteinDistance(key, testName);
+
+			if ((dist < minDist || minDist == -1) && dist < 2) {
+				minDist = dist;
+				type = entry.getValue();
+			}
+		}
+
+		return type;
+	}
 }
