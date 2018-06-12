@@ -33,13 +33,17 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 import org.yaml.snakeyaml.representer.Representer;
 
+import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.variables.SerializedVariable;
 import me.sashie.skriptyaml.utils.StringUtil;
 
 /**
@@ -101,6 +105,7 @@ public class YAMLProcessor extends YAMLNode {
 		DumperOptions options = new FancyDumperOptions();
 		options.setIndent(4);
 		options.setDefaultFlowStyle(format.getStyle());
+		options.setTimeZone(TimeZone.getDefault());
 
 		Representer representer = new SkriptYamlRepresenter();
 		representer.setDefaultFlowStyle(format.getStyle());
@@ -308,7 +313,7 @@ public class YAMLProcessor extends YAMLNode {
 				for (Entry<String, Object> entry : root.entrySet()) {
 					if (extraLines && !entry.getKey().equals(firstKey))
 						writer.append(LINE_BREAK);
-					yaml.dump(Collections.singletonMap(entry.getKey(), entry.getValue()), writer);
+					yaml.dump(Collections.singletonMap(entry.getKey(), serialize(entry.getValue())), writer);
 				}
 				// yaml.dump(root, writer);
 			} else {
@@ -328,7 +333,7 @@ public class YAMLProcessor extends YAMLNode {
 						writer.append(LINE_BREAK);
 					}
 					// Dump property
-					yaml.dump(Collections.singletonMap(entry.getKey(), entry.getValue()), writer);
+					yaml.dump(Collections.singletonMap(entry.getKey(), serialize(entry.getValue())), writer);
 				}
 			}
 			return true;
@@ -343,6 +348,51 @@ public class YAMLProcessor extends YAMLNode {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Prepare a value for serialization, in case it's not a native type (and we
+	 * don't want to serialize objects as YAML represented objects).
+	 * 
+	 * @param value
+	 *            the value to serialize
+	 * @return the new object
+	 */
+	@SuppressWarnings("unchecked")
+	private Object serialize(Object value) {
+		if (value instanceof LinkedHashMap) {
+			Map<String, Object> map = new HashMap<>();
+			for(String key : ((Map<String, Object>) value).keySet())
+			    map.put(key, serialize(((Map<String, Object>) value).get(key)));
+			return map;
+		} else if (value instanceof List) {
+			List<Object> list = new ArrayList<Object>();
+			for (Object o : (List<Object>) value)
+				list.add(serialize(o));
+			return list;
+		} else if (!(SkriptYamlRepresenter.contains(value) || value instanceof ConfigurationSerializable || value instanceof Number || value instanceof Map || value instanceof List)) {
+			SerializedVariable.Value val = Classes.serialize(value);
+			if (val == null)
+				return null;
+
+			// workaround for class 'ch.njol.skript.expressions.ExprTool$1$2'
+			if (val.type.equals("itemstack"))	
+				return Classes.deserialize(val.type, val.data);	// returns ItemStack instead of SkriptClass
+
+			return new SkriptClass(val.type, val.data);
+/*
+			StringBuilder sb = new StringBuilder("__skriptclass__ ");
+			sb.append(val.type);
+			sb.append(" | ");
+			sb.append(Base64.getEncoder().encodeToString(val.data));
+			sb.append(" | ");
+			sb.append(value.getClass().toString());	//TODO this is for debug atm
+			
+			return sb.toString();
+*/
+			// return "__skriptclass__ " + val.type + " | " + Base64.getEncoder().encodeToString(val.data) + " | " + value.getClass().toString();
+		}
+		return value;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -233,20 +233,18 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 			if (mode == ChangeMode.ADD) {
 				if (objects == null)
-					config.setList(path, arrayToList(new ArrayList<Object>(), delta));
+					config.setProperty(path, arrayToList(new ArrayList<Object>(), delta));
 				else 
-					config.setList(path, arrayToList(objects, delta));
-					//arrayToList(objects, delta);
+					config.setProperty(path, arrayToList(objects, delta));
 			} else if (mode == ChangeMode.REMOVE) {
 				for (Object o : delta)
 					objects.remove(parseString(o));
 			} else if (mode == ChangeMode.SET) {
 				if (objects == null) {
-					config.setList(path, arrayToList(new ArrayList<Object>(), delta));
+					config.setProperty(path, arrayToList(new ArrayList<Object>(), delta));
 				} else {
 					objects.clear();
-					config.setList(path, arrayToList(objects, delta));
-					//arrayToList(objects, delta);
+					config.setProperty(path, arrayToList(objects, delta));
 				}
 			}
 		}

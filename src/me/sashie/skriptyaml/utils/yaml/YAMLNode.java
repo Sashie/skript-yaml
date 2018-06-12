@@ -30,11 +30,9 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.Vector;
 
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.variables.SerializedVariable;
 
 /**
  * Represents a configuration node.
@@ -44,7 +42,6 @@ public class YAMLNode {
 	protected Map<String, Object> root;
 	protected List<String> allKeys;
 	private boolean writeDefaults;
-	private final String SKRIPT_CLASS = "__skriptclass__";
 
 	public YAMLNode(Map<String, Object> root, boolean writeDefaults) {
 		this.root = root;
@@ -89,15 +86,15 @@ public class YAMLNode {
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	private Object deserialize(String path, Object o) {
-		if (o.toString().contains(SKRIPT_CLASS)) {
-			YAMLNode n = getNode(path + "." + SKRIPT_CLASS);
+		if (o.toString().contains("__skriptclass__")) {
+			YAMLNode n = getNode(path + ".__skriptclass__");
 			if (n == null)
 				return null;
 			for (Object o2 : ((Map<String, Object>) o).values()) {
 				for (Map.Entry<String, Object> o3 : ((Map<String, Object>) o2).entrySet()) {
 
 					if (o3.getKey().equals("vector")) {
-						n = getNode(path + "." + SKRIPT_CLASS + "." + o3.getKey());
+						n = getNode(path + ".__skriptclass__." + o3.getKey());
 						if (n == null)
 							return null;
 
@@ -110,7 +107,7 @@ public class YAMLNode {
 
 						return new Vector(x, y, z);
 					} else if (o3.getKey().equals("location")) {
-						n = getNode(path + "." + SKRIPT_CLASS + "." + o3.getKey());
+						n = getNode(path + ".__skriptclass__." + o3.getKey());
 						if (n == null)
 							return null;
 
@@ -192,39 +189,6 @@ public class YAMLNode {
 	}
 
 	/**
-	 * Prepare a value for serialization, in case it's not a native type (and we
-	 * don't want to serialize objects as YAML represented objects).
-	 * 
-	 * @param value
-	 *            the value to serialize
-	 * @return the new object
-	 */
-	private Object serialize(Object value) {
-		if (!(SkriptYamlRepresenter.contains(value) || value instanceof ConfigurationSerializable || value instanceof Number || value instanceof Map || value instanceof List)) {
-			SerializedVariable.Value val = Classes.serialize(value);
-			if (val == null)
-				return null;
-
-			// workaround for class 'ch.njol.skript.expressions.ExprTool$1$2'
-			if (val.type.equals("itemstack"))	
-				return Classes.deserialize(val.type, val.data);	// returns ItemStack instead of SkriptClass
-/*
-			StringBuilder sb = new StringBuilder("__skriptclass__ ");
-			sb.append(val.type);
-			sb.append(" | ");
-			sb.append(Base64.getEncoder().encodeToString(val.data));
-			sb.append(" | ");
-			sb.append(value.getClass().toString());	//TODO this is for debug atm
-			
-			return sb.toString();
-*/
-			// return "__skriptclass__ " + val.type + " | " + Base64.getEncoder().encodeToString(val.data) + " | " + value.getClass().toString();
-			return new SkriptClass(val.type, val.data);
-		}
-		return value;
-	}
-
-	/**
 	 * Set the property at a location. This will override existing configuration
 	 * data to have it conform to key/value mappings.
 	 * 
@@ -235,32 +199,6 @@ public class YAMLNode {
 	 */
 	@SuppressWarnings("unchecked")
 	public void setProperty(String path, Object value) {
-		if (value instanceof List)
-			setList(path, (ArrayList<Object>) value);
-		else {
-			set(path, serialize(value));
-		}
-	}
-
-	/**
-	 * Set the list at a location. This will override existing configuration
-	 * data to have it conform to key/value mappings.
-	 * 
-	 * @param path
-	 *            the path
-	 * @param value
-	 *            the new value
-	 */
-	public void setList(String path, List<Object> value) {
-		List<Object> list = new ArrayList<Object>();
-		for (Object o : value)
-			list.add(serialize(o));
-
-		set(path, list);
-	}
-
-	@SuppressWarnings("unchecked")
-	private void set(String path, Object value) {
 		if (!path.contains(".")) {
 			root.put(path, value);
 			if (!allKeys.contains(path))
