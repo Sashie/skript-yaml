@@ -173,7 +173,6 @@ public class YAMLProcessor extends YAMLNode {
 
 			read(yaml.load(builder.toString()));
 		} catch (YAMLProcessorException e) {
-//SkriptYaml.error("FUCK YOU CATCH BLOCK");	//TODO
 			root = new LinkedHashMap<String, Object>();
 		} finally {
 			try {
