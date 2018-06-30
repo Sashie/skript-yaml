@@ -33,8 +33,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
@@ -173,6 +173,7 @@ public class YAMLProcessor extends YAMLNode {
 
 			read(yaml.load(builder.toString()));
 		} catch (YAMLProcessorException e) {
+//SkriptYaml.error("FUCK YOU CATCH BLOCK");	//TODO
 			root = new LinkedHashMap<String, Object>();
 		} finally {
 			try {
@@ -361,15 +362,13 @@ public class YAMLProcessor extends YAMLNode {
 	@SuppressWarnings("unchecked")
 	private Object serialize(Object value) {
 		if (value instanceof LinkedHashMap) {
-			Map<String, Object> map = new HashMap<>();
-			for(String key : ((Map<String, Object>) value).keySet())
-			    map.put(key, serialize(((Map<String, Object>) value).get(key)));
-			return map;
+			for(Entry<String, Object> entry : ((Map<String, Object>) value).entrySet())
+				((Map<String, Object>) value).replace(entry.getKey(), entry.getValue(), serialize(entry.getValue()));
+			return value;
 		} else if (value instanceof List) {
-			List<Object> list = new ArrayList<Object>();
-			for (Object o : (List<Object>) value)
-				list.add(serialize(o));
-			return list;
+			for (int i = 0; i < ((List<Object>) value).size(); i++)
+				((List<Object>) value).set(i, serialize(((List<Object>) value).get(i)));
+			return value;
 		} else if (!(SkriptYamlRepresenter.contains(value) || value instanceof ConfigurationSerializable || value instanceof Number || value instanceof Map || value instanceof List)) {
 			SerializedVariable.Value val = Classes.serialize(value);
 			if (val == null)
@@ -406,13 +405,25 @@ public class YAMLProcessor extends YAMLNode {
 	}
 
 	@SuppressWarnings("unchecked")
+	private Object rootKeysToString(Object input) {
+		if (input instanceof Map) {
+			Map<String,Object> map = new LinkedHashMap<String, Object>();
+			for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) input).entrySet()) {			
+				map.put(entry.getKey().toString(), rootKeysToString(entry.getValue()));
+			}
+			return map;
+		}
+		return input;
+	}
+
+	@SuppressWarnings("unchecked")
 	private void read(Object input) throws YAMLProcessorException {
 		try {
 			if (input == null) {
 				root = new LinkedHashMap<String, Object>();
 			} else {
-				root = new LinkedHashMap<String, Object>((Map<String, Object>) input);
-
+				root = new LinkedHashMap<String, Object>((Map<String, Object>) rootKeysToString(input));
+				
 				for (String path : root.keySet()) {
 					Object o = getProperty(path);
 					if (o == null) {

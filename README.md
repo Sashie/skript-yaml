@@ -8,6 +8,7 @@ Rather then checking the file each time this addon caches the yaml file to memor
 
 ### Effect (Load yaml)
 Loads a yaml file into memory
+  - If the file doesn't exist it will be created for you, no need to use other addons to create a file!
   - Using the optional `[non[(-| )]relative]` allows for root directory access
   - The first input is the yaml file path(ie. "plugins/MyAwesomePlugin/config.yml") (see example for root directories)
   - The second input allows you to choose your own id for this file

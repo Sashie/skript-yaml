@@ -2,6 +2,7 @@ package me.sashie.skriptyaml.skript;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,10 +155,9 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				return null;
 			return lazyConvert(nodesKeys.toArray(new String[nodesKeys.size()]));
 		} else if (state == States.LIST) {
-			List<?> items = config.getList(path);
+			List<Object> items = config.getList(path);
 			if (items == null)
 				return null;
-			//TODO
 			try {
 				return convertArray(items.toArray(), superType);
 			} catch (ClassCastException e) {
@@ -229,11 +229,11 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 			else if (mode == ChangeMode.REMOVE)
 				config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
 		} else if (state == States.LIST) {
-			ArrayList<Object> objects = (ArrayList<Object>) config.getList(path);
+			List<Object> objects = config.getList(path);
 
 			if (mode == ChangeMode.ADD) {
 				if (objects == null)
-					config.setProperty(path, arrayToList(new ArrayList<Object>(), delta));
+					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta));
 				else 
 					config.setProperty(path, arrayToList(objects, delta));
 			} else if (mode == ChangeMode.REMOVE) {
@@ -241,7 +241,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 					objects.remove(parseString(o));
 			} else if (mode == ChangeMode.SET) {
 				if (objects == null) {
-					config.setProperty(path, arrayToList(new ArrayList<Object>(), delta));
+					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta));
 				} else {
 					objects.clear();
 					config.setProperty(path, arrayToList(objects, delta));
@@ -250,7 +250,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		}
 	}
 
-	private ArrayList<Object> arrayToList(ArrayList<Object> list, Object[] array) {
+	private List<Object> arrayToList(List<Object> list, Object[] array) {
 		for (Object o : array)
 			list.add(parseString(o));
 		return list;
