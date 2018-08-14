@@ -212,7 +212,7 @@ public class YAMLNode {
 		Map<String, Object> node = root;
 
 		for (int i = 0; i < parts.length; i++) {
-			String[] prevPathParts = Arrays.copyOf(parts, i+1);
+			String[] prevPathParts = Arrays.copyOf(parts, i + 1);
 			String prevPath = StringUtils.join(prevPathParts, ".");
 
 			if (!allKeys.contains(prevPath))
