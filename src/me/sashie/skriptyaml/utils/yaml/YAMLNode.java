@@ -20,6 +20,7 @@
 package me.sashie.skriptyaml.utils.yaml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import ch.njol.skript.registrations.Classes;
+import ch.njol.util.StringUtils;
 
 /**
  * Represents a configuration node.
@@ -209,12 +211,13 @@ public class YAMLNode {
 		String[] parts = path.split("\\.");
 		Map<String, Object> node = root;
 
-		if (!allKeys.contains(parts[0]))
-			allKeys.add(parts[0]);
-		if (!allKeys.contains(path))
-			allKeys.add(path);
-
 		for (int i = 0; i < parts.length; i++) {
+			String[] prevPathParts = Arrays.copyOf(parts, i + 1);
+			String prevPath = StringUtils.join(prevPathParts, ".");
+
+			if (!allKeys.contains(prevPath))
+				allKeys.add(prevPath);
+
 			Object o = node.get(parts[i]);
 
 			// Found our target!

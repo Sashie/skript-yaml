@@ -395,6 +395,7 @@ public class YAMLProcessor extends YAMLNode {
 
 	@SuppressWarnings("unchecked")
 	private void recursiveKeySearch(String path, Object o) {
+		allKeys.add(path);
 		for (Map.Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
 			allKeys.add(path + "." + entry.getKey());
 			if (entry.getValue() instanceof Map) {
