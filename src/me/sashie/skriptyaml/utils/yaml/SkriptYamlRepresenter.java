@@ -12,6 +12,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
@@ -88,7 +89,7 @@ public class SkriptYamlRepresenter extends Representer {
 			out.put("x", vec.getX());
 			out.put("y", vec.getY());
 			out.put("z", vec.getZ());
-			return representMapping(new Tag("!vector"), out, null);
+			return representMapping(new Tag("!vector"), out, FlowStyle.BLOCK);
 		}
 	}
 
@@ -103,7 +104,7 @@ public class SkriptYamlRepresenter extends Representer {
 			out.put("z", loc.getZ());
 			out.put("yaw", (double) loc.getYaw());
 			out.put("pitch", (double) loc.getPitch());
-			return representMapping(new Tag("!location"), out, null);
+			return representMapping(new Tag("!location"), out, FlowStyle.BLOCK);
 		}
 	}
 
@@ -114,7 +115,7 @@ public class SkriptYamlRepresenter extends Representer {
 			SkriptClass skriptClass = (SkriptClass) data;
 			out.put("type", skriptClass.getType());
 			out.put("data", skriptClass.getData());
-			return representMapping(new Tag("!skriptclass"), out, null);
+			return representMapping(new Tag("!skriptclass"), out, FlowStyle.BLOCK);
 		}
 	}
 
@@ -228,35 +229,35 @@ public class SkriptYamlRepresenter extends Representer {
 				buffer.append(partOfHour);
 			}
 
-			return representScalar(new Tag("!skriptdate"), buffer.toString(), null);
+			return representScalar(new Tag("!skriptdate"), buffer.toString());
 		}
 	}
 
 	private class RepresentSkriptTime implements Represent {
 		@Override
 		public Node representData(Object data) {
-			return representScalar(new Tag("!skripttime"), ((Time) data).toString(), null);
+			return representScalar(new Tag("!skripttime"), ((Time) data).toString());
 		}
 	}
 
 	private class RepresentSkriptTimespan implements Represent {
 		@Override
 		public Node representData(Object data) {
-			return representScalar(new Tag("!skripttimespan"), ((Timespan) data).toString(), null);
+			return representScalar(new Tag("!skripttimespan"), ((Timespan) data).toString());
 		}
 	}
 
 	private class RepresentSkriptColor implements Represent {
 		@Override
 		public Node representData(Object data) {
-			return representScalar(new Tag("!skriptcolor"), ((Color) data).toString(), null);
+			return representScalar(new Tag("!skriptcolor"), ((Color) data).toString());
 		}
 	}
 
 	private class RepresentSkriptWeather implements Represent {
 		@Override
 		public Node representData(Object data) {
-			return representScalar(new Tag("!skriptweather"), ((WeatherType) data).toString().toLowerCase(), null);
+			return representScalar(new Tag("!skriptweather"), ((WeatherType) data).toString().toLowerCase());
 		}
 	}
 

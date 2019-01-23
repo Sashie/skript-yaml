@@ -191,7 +191,7 @@ public class YAMLProcessor extends YAMLNode {
 	}
 
 	private void recursiveHeaderSearch(String line, List<String> header, BufferedReader input) {
-		if (line.startsWith(HEADER_PREFIX)) {
+		if (line != null && line.startsWith(HEADER_PREFIX)) {
 			header.add(line.replaceFirst(HEADER_PREFIX, ""));
 			try {
 				line = input.readLine();
@@ -205,7 +205,7 @@ public class YAMLProcessor extends YAMLNode {
 	}
 
 	private void recursiveCommentSearch(String line, List<String> comment, BufferedReader input) {
-		if (line.startsWith(COMMENT_PREFIX)) {
+		if (line != null && line.startsWith(COMMENT_PREFIX)) {
 			comment.add(line.replaceFirst(COMMENT_PREFIX, ""));
 			try {
 				line = input.readLine();
