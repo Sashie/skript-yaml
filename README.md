@@ -3,10 +3,36 @@ The proper way to do yaml in skript
 
 Rather then checking the file each time this addon caches the yaml file to memory
 
-## Syntax
+## Contents
 
+Effects
+ - [Load yaml](#effect-load-yaml)
+ - [Load all yaml from directory from directory](#effect-load-all-yaml-from-directory)
+ - [Delete yaml](#effect-delete-yaml)
+ - [Delete all or any loaded yaml from directory](#effect-delete-all-or-any-loaded-yaml-from-directory)
+ - [Unload yaml](#effect-unload-yaml)
+ - [Save yaml](#effect-save-yaml)
+ 
+Expressions
+ - [Return all cached yaml](#expression-return-all-cached-yaml)
+ - [Return all cached yaml directories](#expression-return-all-cached-yaml-directories)
+ - [Yaml](#expression-yaml)
+ - [All yaml nodes](#expression-all-yaml-nodes)
+ - [Yaml comment/header](#expression-yaml-comment-header)
+ - [Yaml loop](#expression-yaml-loop)
+ 
+ Conditions
+ - [Is yaml loaded](#condition-is-yaml-loaded)
+ - [Is yaml empty](#condition-is-yaml-empty)
+ - [Does yaml path have value](#condition-does-yaml-path-have-value)
+ - [Does yaml path exist](#condition-does-yaml-path-exist)
+ - [Is yaml path a list](#condition-does-yaml-path-have-list)
+ - [Does yaml exist](#condition-does-yaml-exist)
+
+## Effects
 
 ### Effect (Load yaml)
+
 Loads a yaml file into memory
   - If the file doesn't exist it will be created for you, no need to use other addons to create a file!
   - Using the optional `[non[(-| )]relative]` allows for root directory access
@@ -16,7 +42,11 @@ Loads a yaml file into memory
 
 #### Syntax
 
-`[re]load [non[(-| )]relative] [y[a]ml] %string% [as %-string%]`
+`[re]load [(1¦non[(-| )]relative)] [y[a]ml] %strings%`
+
+`[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% as %string%`
+
+`[re]load [(1¦non[(-| )]relative)] [y[a]ml] %strings% using [the] [file] path[s] as [the] id[s]`
 
 #### Example
 
@@ -41,7 +71,7 @@ load yaml "plugins/MyAwesomePlugin/config.yml" as "config"
 
 ---
 
-### Effect (Load all YAML from directory)
+### Effect (Load all yaml from directory)
 Loads a directory YAML files into memory.
   - The input is a directory (ie. \"plugins/MyAwesomePlugin/\").
   - If for example a file in that directory is named test.yml then the output ID would be 'plugins/MyAwesomePlugin/test.yml'
@@ -78,18 +108,19 @@ Unloads a directory of yaml files from memory and deletes them
 
 #### Syntax
 
-`delete all [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%`
+`delete (all|any) [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%`
 
 `delete (all|any) loaded [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% [using [the] filename as [the] id]`
 
 ---
 
 ### Effect (Unload yaml)
-Unloads a yaml file from memory
+Unloads one or more yaml files from memory
+ - If using the `[(1¦director(y|ies))]` option the input string must be a directory instead of an id
 
 #### Syntax
 
-`unload [y[a]ml] %string%`
+`unload [y[a]ml] [(1¦director(y|ies))] %strings%`
 
 #### Example
 
@@ -100,30 +131,56 @@ unload yaml "config"
 
 ### Effect (Save yaml)
 Saves the current cached yaml elements to file
-
+ - Using the `[with an indentation of %-number%]` option allows you to save the file with a different amount of spacing between 1 and 10
 #### Syntax
 
-`save [y[a]ml] %string% [(1¦without extra lines between nodes)]`
+`save [y[a]ml] %strings% [with an indentation of %-number%] [(1¦[and] with(out| no) extra lines between nodes)]`
 
 #### Example
 
 ```
 save yaml "config"
+
+save yaml "config" with an indentation of 2
 ```
 ---
 
+## Expressions
+
 ### Expression (Return all cached yaml)
 Returns a list of all 'cached' yaml file ids
+  - Using `from (director(y|ies) %-strings%` option gets ids from only said directories
 
 #### Syntax
 
-`[(the|all (of the|the))] [currently] loaded y[a]ml [files]`
+`[(the|all [(of the|the)])] [currently] loaded y[a]ml [files] [from (director(y|ies) %-strings%|all directories)]`
 
 #### Example
 
 ```
 set {_list::*} to the currently loaded yaml files
 broadcast "%{_list::*}%"
+
+loop the loaded yaml
+	broadcast loop-value
+
+loop the loaded yaml from directory "plugins\skript-yaml"
+	broadcast loop-value
+```
+---
+
+### Expression (Return all cached yaml directories)
+Returns a list of directories from all 'cached' yaml file ids
+
+#### Syntax
+
+`[(the|all [(of the|the)])] [currently] loaded y[a]ml directories`
+
+#### Example
+
+```
+loop the loaded yaml directories
+	broadcast loop-value
 ```
 ---
 
@@ -210,6 +267,47 @@ set the header of "config" to {_header::*}
 ```
 ---
 
+### Expression (Yaml loop)
+Loop expressions to use while looping a yaml expression
+  - Only works while using [yaml node list](#expression-yaml), [yaml node keys](#expression-yaml) and [yaml list](#expression-yaml)
+  - `loop-id` gets the id used in the yaml expression
+  - `loop-val` gets a value at that node if one exists
+  - `loop-list` gets a list at that node if one exists
+  - `loop-node` gets the full path plus key
+  - `loop-key` gets just the keys
+  - `loop-subnodes` gets any subnode from the current node (does not work on lists)
+
+
+#### Syntax
+
+`[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnode[s]|7¦iteration)`
+
+#### Example
+Yaml file:
+
+```yaml
+settings:
+  subnode1: value1
+  subnode2: value2
+node2:
+  subnode1: value1
+  subnode2: value2
+node3:
+- listValue1
+- listValue2
+
+```
+Skript file:
+
+
+```
+loop yaml node keys "node" from "config":
+	broadcast yaml value loop-node from loop-id
+```
+---
+
+## Conditions
+
 ### Condition (Is yaml loaded)
 Checks if one or more yaml files are loaded into memory using said id
 
@@ -275,6 +373,42 @@ yaml path "test.test" and "test2.test2" in "config" exists:
 yaml path "test.test" and "boop.boop" in "config" exists:
     broadcast "this will fail"
 ```
+---
+
+### Condition (Does yaml path have list)
+Checks if one or more paths contain a list in a cached yaml file using said id
+  - First input is the path
+  - Second input is the id
+  - If multiple paths are checked at once it will return false on the first one found to not exist
+
+#### Syntax
+
+`[skript-]y[a]ml [(node|path)[s]] %string% (of|in|from) %string% has [a] list`
+
+`[skript-]y[a]ml [(node|path)[s]] %string% (of|in|from) %string% does(n't| not) have [a] list`
+
+#### Example
+
+```
+if yaml node "listnode" from "example" has list:
+	loop yaml list "listnode" from "example":
+		broadcast "%loop-val%"
+
+```
+---
+
+### Condition (Does yaml exist)
+Checks if a yaml file exists
+  - You really shouldn't have to use this since the [load yaml](#effect-load-yaml) effect creates one if it doesn't already exist
+  - Input is the yaml file path
+
+
+#### Syntax
+
+`[(1¦non[(-| )]relative)] y[a]ml file %string% exists`
+
+`[(1¦non[(-| )]relative)] y[a]ml file %string% does(n't| not) exist`
+
 ---
 
 ## Skripts

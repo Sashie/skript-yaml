@@ -48,7 +48,6 @@ public class CondNodeHasValue extends Condition {
 					return false;
 				if (path.isSingle())
 					return (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getProperty(path.getSingle(event)) != null);
-				
 				else {
 					String[] paths = (String[]) path.getAll(event);
 					boolean check;

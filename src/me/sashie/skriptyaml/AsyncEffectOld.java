@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.events.bukkit.ScriptEvent;
 import ch.njol.skript.events.bukkit.SkriptStopEvent;
 import ch.njol.skript.lang.TriggerItem;
 
@@ -23,7 +24,7 @@ public abstract class AsyncEffectOld extends DelayFork {
 		debug(e, true);
 		TriggerItem next = getNext();
 		// if (e.getEventName().equals("SkriptStopEvent")) {
-		if (e.getClass().isAssignableFrom(SkriptStopEvent.class)) {	// Because a bukkit task can't be created on server stop
+		if (e.getClass().isAssignableFrom(SkriptStopEvent.class) || e.getClass().isAssignableFrom(ScriptEvent.class)) {	// Because a bukkit task can't be created on server stop
 			execute(e);
 			if (next != null)
 				TriggerItem.walk(next, e);

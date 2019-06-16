@@ -230,7 +230,6 @@ public class YAMLNode {
 				// This will override existing configuration data!
 				o = new LinkedHashMap<String, Object>();
 				node.put(parts[i], o);
-
 			}
 
 			node = (Map<String, Object>) o;

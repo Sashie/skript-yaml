@@ -14,6 +14,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.StringUtil;
 
 @Name("Delete YAML")
 @Description("Deletes a YAML file and removes it from memory.")
@@ -24,22 +25,20 @@ import me.sashie.skriptyaml.SkriptYaml;
 public class EffDeleteYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffDeleteYaml.class, "delete [y[a]ml] %string%");
+		Skript.registerEffect(EffDeleteYaml.class, "delete [y[a]ml] %strings%");
 	}
 
 	private Expression<String> file;
 
 	@Override
 	protected void execute(@Nullable Event event) {
-		final String name = this.file.getSingle(event);
-
-		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			//SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
-			return;
+		for (String name : this.file.getAll(event)) {
+			name = StringUtil.checkSeparator(name);
+			if (!SkriptYaml.YAML_STORE.containsKey(name))
+				continue;
+			SkriptYaml.YAML_STORE.get(name).getFile().delete();
+			SkriptYaml.YAML_STORE.remove(name);
 		}
-
-		SkriptYaml.YAML_STORE.get(name).getFile().delete();
-		SkriptYaml.YAML_STORE.remove(name);
 	}
 
 	@Override

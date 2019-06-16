@@ -1,0 +1,7 @@
+name: example-skript-yaml-hook
+author: Sashie
+description: Example addon
+version: 1.0
+main: my.awesome.plugin.ExampleSkriptAddon
+depend: [Skript]
+softdepend: [skript-yaml]

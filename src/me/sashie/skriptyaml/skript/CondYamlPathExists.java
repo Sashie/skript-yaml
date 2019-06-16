@@ -52,9 +52,8 @@ public class CondYamlPathExists extends Condition {
 				if (path.isSingle())
 					return SkriptYaml.YAML_STORE.get(name.getSingle(event)).getAllKeys().contains(path.getSingle(event));
 				else {
-					String[] paths = (String[]) path.getAll(event);
 					boolean check;
-					for (String p : paths) {
+					for (String p : path.getAll(event)) {
 						check = SkriptYaml.YAML_STORE.get(name.getSingle(event)).getAllKeys().contains(p);
 						if (!check) {
 							return false;

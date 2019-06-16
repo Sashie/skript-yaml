@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,11 +40,14 @@ import java.util.TimeZone;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.ConstructorException;
+import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 import org.yaml.snakeyaml.representer.Representer;
 
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
+import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.StringUtil;
 
 /**
@@ -85,6 +89,7 @@ public class YAMLProcessor extends YAMLNode {
 	private static final String HEADER_PREFIX = "## ";
 	protected final Yaml yaml;
 	protected final File file;
+	protected String id;
 	private StringBuilder builder;
 	protected String header = null;
 	protected boolean extraHeaderLine;
@@ -107,11 +112,13 @@ public class YAMLProcessor extends YAMLNode {
 		options.setDefaultFlowStyle(format.getStyle());
 		options.setTimeZone(TimeZone.getDefault());
 
-		Representer representer = new SkriptYamlRepresenter();
+		//Representer representer = new SkriptYamlRepresenter();
+		Representer representer = SkriptYaml.getInstance().getRepresenter();
 		representer.setDefaultFlowStyle(format.getStyle());
 
-		yaml = new Yaml(new SkriptYamlConstructor(), representer, options);
-
+		//yaml = new Yaml(new SkriptYamlConstructor(), representer, options);
+		yaml = new Yaml(SkriptYaml.getInstance().getConstructor(), representer, options);
+		
 		this.file = file;
 	}
 
@@ -170,8 +177,11 @@ public class YAMLProcessor extends YAMLNode {
 				else if (line.startsWith(COMMENT_PREFIX))
 					recursiveCommentSearch(line, lines, input);
 			}
-
-			read(yaml.load(builder.toString()));
+			try {
+				read(yaml.load(builder.toString()));
+			} catch (ConstructorException e) {
+				SkriptYaml.error("[Load Yaml] Snakeyaml " + e.getProblem() + " in file '" + file.getAbsolutePath() + "'");	//TODO warn about loss of data since certain nodes didnt load
+			}
 		} catch (YAMLProcessorException e) {
 			root = new LinkedHashMap<String, Object>();
 		} finally {
@@ -360,7 +370,7 @@ public class YAMLProcessor extends YAMLNode {
 	 */
 	@SuppressWarnings("unchecked")
 	private Object serialize(Object value) {
-		if (value instanceof LinkedHashMap) {
+		if (value instanceof Map) {
 			for(Entry<String, Object> entry : ((Map<String, Object>) value).entrySet())
 				((Map<String, Object>) value).replace(entry.getKey(), entry.getValue(), serialize(entry.getValue()));
 			return value;
@@ -378,17 +388,6 @@ public class YAMLProcessor extends YAMLNode {
 				return Classes.deserialize(val.type, val.data);	// returns ItemStack instead of SkriptClass
 
 			return new SkriptClass(val.type, val.data);
-/*
-			StringBuilder sb = new StringBuilder("__skriptclass__ ");
-			sb.append(val.type);
-			sb.append(" | ");
-			sb.append(Base64.getEncoder().encodeToString(val.data));
-			sb.append(" | ");
-			sb.append(value.getClass().toString());	//TODO this is for debug atm
-			
-			return sb.toString();
-*/
-			// return "__skriptclass__ " + val.type + " | " + Base64.getEncoder().encodeToString(val.data) + " | " + value.getClass().toString();
 		}
 		return value;
 	}
@@ -450,6 +449,10 @@ public class YAMLProcessor extends YAMLNode {
 
 	public File getFile() {
 		return file;
+	}
+
+	public String getParentPath() {
+		return file.getParent();
 	}
 
 	/**
@@ -527,6 +530,27 @@ public class YAMLProcessor extends YAMLNode {
 	 */
 	public static YAMLNode getEmptyNode(boolean writeDefaults) {
 		return new YAMLNode(new LinkedHashMap<String, Object>(), writeDefaults);
+	}
+
+	/**
+	 * Sets the indentation amount used when the yaml file is saved
+	 * 
+	 * @param indent
+	 *            an amount from 1 to 10
+	 */
+	public void setIndent(int indent) {
+		try {
+			Field dumperOptions = yaml.getClass().getDeclaredField("dumperOptions");
+			dumperOptions.setAccessible(true);
+			DumperOptions dump = (DumperOptions) dumperOptions.get(yaml);
+			try {
+				dump.setIndent(indent);
+			} catch (YAMLException ex) {
+				SkriptYaml.warn(ex.getMessage());
+			}
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private class FancyDumperOptions extends DumperOptions {

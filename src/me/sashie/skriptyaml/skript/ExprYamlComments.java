@@ -21,6 +21,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("YAML Comments/header")
@@ -77,7 +78,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 	@Override
 	@Nullable
 	protected Object[] get(Event event) {
-		final String name = this.file.getSingle(event);
+		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
 		final String path = this.paths.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
@@ -87,29 +88,20 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
-		if (state == States.COMMENT) {
-			String comment = config.getComment(path);
-			if (comment == null)
-				return null;
-			List<String> comments = Arrays.asList(comment.split("\\r?\\n"));
-
-			return comments.toArray(new String[comments.size()]);
-
-		} else if (state == States.HEADER) {
-			String header = config.getHeader();
-			if (header == null)
-				return null;
-			List<String> comments = Arrays.asList(header.split("\\r?\\n"));
-
-			return comments.toArray(new String[comments.size()]);
-
-		}
-		return null;
+		String s = null;
+		if (state == States.COMMENT)
+			s = config.getComment(path);
+		else if (state == States.HEADER)
+			s = config.getHeader();
+		if (s == null)
+			return null;
+		List<String> list = Arrays.asList(s.split("\\r?\\n"));
+		return list.toArray(new String[list.size()]);
 	}
 
 	@Override
 	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
-		final String name = this.file.getSingle(event);
+		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
 		String[] paths = null;
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
@@ -154,9 +146,8 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 	}
 
 	private String[] toStringArray(Object[] input, String[] output) {
-		for (int i = 0; i < input.length; i++) {
+		for (int i = 0; i < input.length; i++)
 			output[i] = (String) input[i];
-		}
 		return output;
 	}
 

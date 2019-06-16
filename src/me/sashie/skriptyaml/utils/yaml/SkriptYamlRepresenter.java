@@ -1,5 +1,7 @@
 package me.sashie.skriptyaml.utils.yaml;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
@@ -25,6 +27,8 @@ import ch.njol.skript.util.Slot;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.WeatherType;
+import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.api.RepresentedClass;
 
 public class SkriptYamlRepresenter extends Representer {
 
@@ -53,15 +57,30 @@ public class SkriptYamlRepresenter extends Representer {
 		this.multiRepresenters.put(ConfigurationSerializable.class, new RepresentConfigurationSerializable());
 
 		for (Class<?> c : representers.keySet()) {
-			if (c != null)
-				representedClasses.add(c.getSimpleName());
+			if (c != null) {
+				String name = c.getSimpleName();
+				if (!representedClasses.contains(name))
+					representedClasses.add(name);
+			}
 		}
+	}
+
+	public void register(String tag, Class<?> c, RepresentedClass<?> rc) {
+		rc.tag = tag;
+		this.representers.put(c, rc);
+		String name = c.getSimpleName();
+		if (!representedClasses.contains(name))
+			representedClasses.add(name);
 	}
 
 	public static boolean contains(Object object) {
 		if (object == null)
 			return false;
 		return representedClasses.contains(object.getClass().getSimpleName());
+	}
+
+	public boolean contains(Class<?> c) {
+		return representedClasses.contains(c.getSimpleName());
 	}
 
 	private class RepresentConfigurationSerializable extends RepresentMap {
@@ -89,7 +108,7 @@ public class SkriptYamlRepresenter extends Representer {
 			out.put("x", vec.getX());
 			out.put("y", vec.getY());
 			out.put("z", vec.getZ());
-			return representMapping(new Tag("!vector"), out, FlowStyle.BLOCK);
+			return representMapping(new Tag("!vector"), out);
 		}
 	}
 
@@ -104,7 +123,7 @@ public class SkriptYamlRepresenter extends Representer {
 			out.put("z", loc.getZ());
 			out.put("yaw", (double) loc.getYaw());
 			out.put("pitch", (double) loc.getPitch());
-			return representMapping(new Tag("!location"), out, FlowStyle.BLOCK);
+			return representMapping(new Tag("!location"), out);
 		}
 	}
 
@@ -115,10 +134,43 @@ public class SkriptYamlRepresenter extends Representer {
 			SkriptClass skriptClass = (SkriptClass) data;
 			out.put("type", skriptClass.getType());
 			out.put("data", skriptClass.getData());
-			return representMapping(new Tag("!skriptclass"), out, FlowStyle.BLOCK);
+			return representMapping(new Tag("!skriptclass"), out);
 		}
 	}
 
+	private static Method representMappingMethod;
+	static {
+		if (SkriptYaml.getInstance().getServerVersion() <= 12) {
+			try {
+				Class<?> baseRepresenterClass = Class.forName("org.yaml.snakeyaml.representer.BaseRepresenter");
+				//representMapping(Tag tag, Map<?, ?> mapping, Boolean flowStyle)
+				representMappingMethod = baseRepresenterClass.getDeclaredMethod("representMapping", Tag.class, Map.class, Boolean.class);
+				representMappingMethod.setAccessible(true);
+			} catch (SecurityException | ClassNotFoundException | NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/*
+	 * To make things backwards compatible and prevent NoSuchMethod exceptions.
+	 * (spigot updated snakeyaml in 1.13.2)
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public <T> T representMapping(Tag tag, Map<?, ?> mapping) {
+		if (SkriptYaml.getInstance().getServerVersion() >= 13) {
+			return (T) representMapping(tag, mapping, FlowStyle.BLOCK);
+		} else {
+			T node = null;
+            try {
+    			node = (T) representMappingMethod.invoke(this, tag, mapping, null);
+            } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            	e.printStackTrace();
+            }
+			return (T) node;
+		}
+	}
+	
 	private class RepresentSkriptItemType extends RepresentMap {
 		@Override
 		public Node representData(Object data) {

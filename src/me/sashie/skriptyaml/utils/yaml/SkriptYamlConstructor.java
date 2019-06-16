@@ -24,6 +24,7 @@ import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.WeatherType;
+import me.sashie.skriptyaml.api.ConstructedClass;
 
 public class SkriptYamlConstructor extends SafeConstructor {
 
@@ -41,6 +42,21 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		this.yamlConstructors.put(new Tag("!skriptweather"), new ConstructSkriptWeather());
 
 		this.yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
+	}
+	
+	public void register(String tag, ConstructedClass<?> cc) {
+		this.yamlConstructors.put(new Tag("!" + tag), cc);
+	}
+	
+/*
+	public Map<Object, Object> constructMapping(MappingNode node) {
+		Map<Object, Object> mapping = this.newMap(node);
+		this.constructMapping2ndStep(node, mapping);
+		return mapping;
+	}
+*/
+	public Map<Object, Object> constructMap(MappingNode node) {
+		return constructMapping(node);
 	}
 
 	private class ConstructCustomObject extends ConstructYamlMap {

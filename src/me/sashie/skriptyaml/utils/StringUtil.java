@@ -35,36 +35,74 @@ public final class StringUtil {
 	}
 
 	public static String replaceTabs(String text) {
-		if (text.contains("\t")) {
+		if (text.contains("\t"))
 			return text.replaceAll("\t", "    ");
-		}
 		return text;
 	}
 
 	public static String checkSeparator(String check) {
-		if (check.contains("/")) {
+		if (check.contains("/"))
 			return check.replaceAll("/", Matcher.quoteReplacement(File.separator));
-		}
 		return check;
 	}
 
 	public static String checkLastSeparator(String check) {
 		if (check.contains("/")) {
-			if (!check.endsWith("/")) {
+			if (!check.endsWith("/"))
 				return check + "/";
-			}
 		} else if (check.contains("\\")) {
-			if (!check.endsWith("\\")) {
+			if (!check.endsWith("\\"))
 				return check + "\\";
-			}
 		} else if (!check.contains("/") || !check.contains("\\")) {
 			return check + Matcher.quoteReplacement(File.separator);
 		}
 		return check;
 	}
 
+	public static String removeFirst(String remove, String from) {
+		if (from.startsWith(remove))
+			return from.replace(remove, "");
+		return from;
+	}
+
+	public static String stripLastSeparator(String check) {
+		if (check.endsWith("/") || check.endsWith("\\")) {
+			if (check.length() > 0 ) {
+			    int endIndex = check.lastIndexOf(File.separator);
+			    if (endIndex != -1)
+			    	return check.substring(0, endIndex - 1);
+			}
+		}
+		return check;
+	}
+
+	public static String stripAfterLastSeparator(String directory) {
+		if (directory != null && directory.length() > 0 ) {
+		    int endIndex = directory.lastIndexOf(File.separator);
+		    if (endIndex != -1)
+		    	return directory.substring(0, endIndex);
+		}
+		return directory;
+	}
+
+	public static String addLastNodeSeperator(String node) {
+		if (node.equals("") || node.isEmpty())
+			return node;
+		return node + ".";
+	}
+
+	public static String stripBeforeLastNode(String node) {
+		if (node != null && node.length() > 0 ) {
+		    int endIndex = node.lastIndexOf(".");
+		    if (endIndex != -1)
+		    	return node.substring(endIndex, node.length());
+		}
+		return node;
+	}
+
 	public static String checkRoot(String check) {
 		Path root = Paths.get("").normalize().toAbsolutePath().getRoot();
+		//String root = new File("").getAbsoluteFile().getAbsolutePath();
 		if (root != null) {
 			for (File r : File.listRoots()) {
 				if (!check.toLowerCase().startsWith(r.getPath().toLowerCase()))
@@ -107,10 +145,8 @@ public final class StringUtil {
 	 * @return a new string
 	 */
 	public static String trimLength(String str, int len) {
-		if (str.length() > len) {
+		if (str.length() > len)
 			return str.substring(0, len);
-		}
-
 		return str;
 	}
 

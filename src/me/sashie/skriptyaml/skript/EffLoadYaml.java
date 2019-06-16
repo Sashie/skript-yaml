@@ -2,8 +2,6 @@ package me.sashie.skriptyaml.skript;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
@@ -34,7 +32,7 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 		"load yaml \"plugins/MyAwesomePlugin/config.yml\" as \"config\"",
 		" ",
 		"#to get similar function as the other addons you would do this sort of thing with the id...",
-		"\tload yaml \"plugins/MyAwesomePlugin/config.yml\" as \"plugins/MyAwesomePlugin/config.yml\"",
+		"\tload yaml \"plugins/MyAwesomePlugin/config.yml\" as file path",
 		"\tset yaml value \"version\" from \"plugins/MyAwesomePlugin/config.yml\" to 1.0",
 		"\tbroadcast \"%yaml value \"\"version\"\" from \"\"plugins/MyAwesomePlugin/config.yml\"\"%\""
 })
@@ -42,41 +40,56 @@ import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 public class EffLoadYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffLoadYaml.class, "[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% [as %-string%]");
+		Skript.registerEffect(EffLoadYaml.class, 
+				"[re]load [(1¦non[(-| )]relative)] [y[a]ml] %strings%",
+				"[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% as %string%",
+				"[re]load [(1¦non[(-| )]relative)] [y[a]ml] %strings% using [the] [file] path[s] as [the] id[s]");
 	}
 
 	private Expression<String> file;
 	private Expression<String> id;
 	private int mark;
+	private int matchedPattern;
 
 	@Override
 	protected void execute(@Nullable Event event) {
-		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
 		
+		if (matchedPattern == 1) {
+			if (!this.file.isSingle()) {
+				SkriptYaml.warn("[Load Yaml] Input has to be single if using a custom id");
+				return;
+			}
+			load(this.file.getSingle(event), event);
+		} else {
+			for (String name : this.file.getAll(event))
+				load(name, event);
+		}
+	}
+
+	private void load(String name, Event event) {
+		name = StringUtil.checkSeparator(name);
 		File yamlFile = null;
+		String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
 		if (mark == 1) {
 			yamlFile = new File(StringUtil.checkRoot(name));
 		} else {
-			Path server = Paths.get("").normalize().toAbsolutePath();
-			yamlFile = new File(server + File.separator + name);
+			yamlFile = new File(server + name);
 		}
 
-		if (!yamlFile.exists()) {
-			try {
-				if (!yamlFile.exists()) {
-					File folder;
-					String filePath = yamlFile.getPath();
-					int index = filePath.lastIndexOf(File.separator);
-					folder = new File(filePath.substring(0, index));
-					if (index >= 0 && !folder.exists()) {
-						folder.mkdirs();
-					}
-					yamlFile.createNewFile();
+		try {
+			if (!yamlFile.exists()) {
+				File folder;
+				String filePath = yamlFile.getPath();
+				int index = filePath.lastIndexOf(File.separator);
+				folder = new File(filePath.substring(0, index));
+				if (index >= 0 && !folder.exists()) {
+					folder.mkdirs();
 				}
-			} catch (IOException error) {
-				SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ")");
-				return;
+				yamlFile.createNewFile();
 			}
+		} catch (IOException error) {
+			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ")");
+			return;
 		}
 
 		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
@@ -86,25 +99,30 @@ public class EffLoadYaml extends Effect {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (id != null) {
-				SkriptYaml.YAML_STORE.put(this.id.getSingle(event), yaml);
-			} else {
-				SkriptYaml.YAML_STORE.put(StringUtil.stripExtention(yamlFile.getName()), yaml);
-			}
+			String n = null;
+			if (matchedPattern == 0)
+				n = StringUtil.stripExtention(yamlFile.getName());
+			else if (matchedPattern == 1)
+				n = this.id.getSingle(event);
+			else if (matchedPattern == 2)
+				n = name;
+			SkriptYaml.YAML_STORE.put(n, yaml);
 		}
 	}
-
+	
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "[re]load yaml " + this.file.toString(event, b);
+		return "[re]load yaml" + (mark == 1 ? " non-relative " : " ") + this.file.toString(event, b) + (id != null ? " as " + this.id.toString(event, b) : (matchedPattern == 2 ? " using the file path as the id" : ""));
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parse) {
 		file = (Expression<String>) exprs[0];
-		id = (Expression<String>) exprs[1];
+		if (matchedPattern == 1)
+			id = (Expression<String>) exprs[1];
 		this.mark = parse.mark;
+		this.matchedPattern = matchedPattern;
 		return true;
 	}
 }
