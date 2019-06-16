@@ -40,7 +40,7 @@ import me.sashie.skriptyaml.utils.StringUtil;
 		"	message yaml value loop-node from loop-id",
 		"loop yaml node list \"node\" from \"config\":",
 		"	message yaml value loop-node from loop-id"})
-@Since("1.0")
+@Since("1.3")
 public class ExprLoopYaml extends SimpleExpression<Object> {
 	static {
 		Skript.registerExpression(ExprLoopYaml.class, Object.class, ExpressionType.SIMPLE, "[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s]|7¦iteration)");

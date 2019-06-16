@@ -26,7 +26,7 @@ import me.sashie.skriptyaml.utils.StringUtil;
 		" ",
 		"yaml file \"plugins/skript-yaml/test.yml\" doesn't exist:",
 })
-@Since("1.2.7")
+@Since("1.3")
 public class CondYamlFileExists extends Condition {
 
 	static {

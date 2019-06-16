@@ -27,7 +27,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 		"\tloop yaml list \"listnode\" from \"example\":",
 		"\t\tbroadcast \"%loop-val%\"",
 })
-@Since("1.1.0")
+@Since("1.3")
 public class CondNodeHasList extends Condition {
 
 	static {
