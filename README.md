@@ -275,12 +275,12 @@ Loop expressions to use while looping a yaml expression
   - `loop-list` gets a list at that node if one exists
   - `loop-node` gets the full path plus key
   - `loop-key` gets just the keys
-  - `loop-subnodes` gets any subnode from the current node (does not work on lists)
+  - `loop-subnodekeys` gets any subnode from the current node (does not work on lists)
 
 
 #### Syntax
 
-`[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnode[s]|7¦iteration)`
+`[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s]|7¦iteration)`
 
 #### Example
 Yaml file:
