@@ -67,13 +67,12 @@ public class EffLoadYaml extends Effect {
 	}
 
 	private void load(String name, Event event) {
-		name = StringUtil.checkSeparator(name);
 		File yamlFile = null;
 		String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
 		if (mark == 1) {
-			yamlFile = new File(StringUtil.checkRoot(name));
+			yamlFile = new File(StringUtil.checkRoot(StringUtil.checkSeparator(name)));
 		} else {
-			yamlFile = new File(server + name);
+			yamlFile = new File(server + StringUtil.checkSeparator(name));
 		}
 
 		try {

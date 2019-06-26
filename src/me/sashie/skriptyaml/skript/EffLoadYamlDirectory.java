@@ -49,20 +49,17 @@ public class EffLoadYamlDirectory extends Effect {
 	@Override
 	protected void execute(@Nullable Event event) {
 		for (String name : this.directories.getAll(event)) {
-			name = StringUtil.checkSeparator(name);
-			for (File yamlFile : SkriptYamlUtils.directoryFilter(name, mark == 1, "Load")) {
+			for (File yamlFile : SkriptYamlUtils.directoryFilter(StringUtil.checkSeparator(name), mark == 1, "Load")) {
 				YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
 				try {
 					yaml.load();
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
-					String n = null;
 					if (matchedPattern == 1)
-						n = StringUtil.stripExtention(yamlFile.getName());
+						SkriptYaml.YAML_STORE.put(StringUtil.stripExtention(yamlFile.getName()), yaml);
 					else
-						n = name + yamlFile.getName();
-					SkriptYaml.YAML_STORE.put(n, yaml);
+						SkriptYaml.YAML_STORE.put(StringUtil.checkLastSeparator(name) + yamlFile.getName(), yaml);
 				}
 			}
 		}

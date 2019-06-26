@@ -67,6 +67,9 @@ public class SkriptYaml extends JavaPlugin {
 	 * 
 	 */
 	public static void registerTag(JavaPlugin plugin, String tag, Class<?> c, RepresentedClass<?> rc, ConstructedClass<?> cc) {
+		String prefix = plugin.getName().toLowerCase() + "-";
+		if (!tag.startsWith(prefix))
+			tag = prefix + tag;
 		if (!REGISTERED_TAGS.containsKey(tag)) {
 			if (!representer.contains(c)) {
 				if (SkriptYamlUtils.getType(rc.getClass()) == c) {

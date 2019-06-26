@@ -78,7 +78,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 	@Override
 	@Nullable
 	protected Object[] get(Event event) {
-		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
+		final String name = this.file.getSingle(event);
 		final String path = this.paths.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {

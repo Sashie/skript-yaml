@@ -14,7 +14,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("Save YAML")
@@ -40,7 +39,6 @@ public class EffSaveYaml extends Effect {
 	@Override
 	protected void execute(@Nullable Event event) {
 		for (String name : this.file.getAll(event)) {
-			name = StringUtil.checkSeparator(name);
 			if (!SkriptYaml.YAML_STORE.containsKey(name))
 				continue;
 			YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);

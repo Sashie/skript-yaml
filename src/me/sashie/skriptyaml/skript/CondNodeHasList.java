@@ -37,16 +37,16 @@ public class CondNodeHasList extends Condition {
 	}
 
 	private Expression<String> path;
-	private Expression<String> name;
+	private Expression<String> file;
 
 	@Override
 	public boolean check(final Event event) {
 		return path.check(event, new Checker<String>() {
 			@Override
 			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(name.getSingle(event)))
+				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
 					return false;
-				Object o =  SkriptYaml.YAML_STORE.get(name.getSingle(event)).getProperty(path.getSingle(event));
+				Object o =  SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event));
 				return o != null ? (o instanceof List) : false;
 			}
 		}, isNegated());
@@ -54,14 +54,14 @@ public class CondNodeHasList extends Condition {
 
 	@Override
 	public String toString(final @Nullable Event event, final boolean debug) {
-		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? " is not a list " + " " : "is a list");
+		return "yaml path " + path.toString(event, debug) + " in " +  file.toString(event, debug) + (isNegated() ? " is not a list " + " " : "is a list");
 	}
 
 	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		path = (Expression<String>) exprs[0];
-		name = (Expression<String>) exprs[1];
+		file = (Expression<String>) exprs[1];
 		setNegated(matchedPattern == 1);
 		return true;
 	}

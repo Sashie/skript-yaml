@@ -37,22 +37,22 @@ public class CondNodeHasValue extends Condition {
 	}
 
 	private Expression<String> path;
-	private Expression<String> name;
+	private Expression<String> file;
 
 	@Override
 	public boolean check(final Event event) {
 		return path.check(event, new Checker<String>() {
 			@Override
 			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(name.getSingle(event)))
+				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
 					return false;
 				if (path.isSingle())
-					return (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getProperty(path.getSingle(event)) != null);
+					return (SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event)) != null);
 				else {
 					String[] paths = (String[]) path.getAll(event);
 					boolean check;
 					for (String p : paths) {
-						check = (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getProperty(p) != null);
+						check = (SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(p) != null);
 						if (!check) {
 							return false;
 						}
@@ -65,14 +65,14 @@ public class CondNodeHasValue extends Condition {
 
 	@Override
 	public String toString(final @Nullable Event event, final boolean debug) {
-		return "yaml path " + path.toString(event, debug) + " in " +  name.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does not have a value" : " do not have values") + " " : "has a value");
+		return "yaml path " + path.toString(event, debug) + " in " +  file.toString(event, debug) + (isNegated() ? (path.isSingle() ? " does not have a value" : " do not have values") + " " : "has a value");
 	}
 
 	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		path = (Expression<String>) exprs[0];
-		name = (Expression<String>) exprs[1];
+		file = (Expression<String>) exprs[1];
 		setNegated(matchedPattern == 1);
 		return true;
 	}

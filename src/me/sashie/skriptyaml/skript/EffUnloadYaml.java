@@ -44,7 +44,6 @@ public class EffUnloadYaml extends Effect {
 		if (mark == 1)
 			 server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
 		for (String name : this.file.getAll(event)) {
-			name = StringUtil.checkSeparator(name);
 			if (mark == 1) {
 				for (Iterator<Entry<String, YAMLProcessor>> it = SkriptYaml.YAML_STORE.entrySet().iterator(); it.hasNext();) {
 					String path = it.next().getValue().getParentPath();

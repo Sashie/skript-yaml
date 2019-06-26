@@ -239,7 +239,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	@Override
 	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
-		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
+		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {

@@ -18,7 +18,6 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("All YAML Nodes")
@@ -59,7 +58,7 @@ public class ExprAllYamlNodes extends SimpleExpression<String> {
 	@Nullable
 	protected String[] get(Event event) {
 
-		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
+		final String name = this.file.getSingle(event);
 
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
 			//SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");

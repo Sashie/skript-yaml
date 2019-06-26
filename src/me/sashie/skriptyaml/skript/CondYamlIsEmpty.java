@@ -32,29 +32,29 @@ public class CondYamlIsEmpty extends Condition {
 				"[skript-]y[a]ml %string% is(n't| not) empty");
 	}
 
-	private Expression<String> name;
+	private Expression<String> file;
 
 	@Override
 	public boolean check(final Event event) {
-		return name.check(event, new Checker<String>() {
+		return file.check(event, new Checker<String>() {
 			@Override
 			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(name.getSingle(event)))
+				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
 					return false;
-				return (SkriptYaml.YAML_STORE.get(name.getSingle(event)).getAllKeys().isEmpty());
+				return (SkriptYaml.YAML_STORE.get(file.getSingle(event)).getAllKeys().isEmpty());
 			}
 		}, isNegated());
 	}
 
 	@Override
 	public String toString(final @Nullable Event event, final boolean debug) {
-		return "yaml " +  name.toString(event, debug) + (isNegated() ? " is empty" : "isn't empty");
+		return "yaml " +  file.toString(event, debug) + (isNegated() ? " is empty" : "isn't empty");
 	}
 
 	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		name = (Expression<String>) exprs[0];
+		file = (Expression<String>) exprs[0];
 		setNegated(matchedPattern == 1);
 		return true;
 	}

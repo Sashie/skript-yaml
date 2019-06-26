@@ -35,21 +35,21 @@ public class CondYamlFileExists extends Condition {
 				"[(1¦non[(-| )]relative)] y[a]ml file %string% does(n't| not) exist");
 	}
 
-	private Expression<String> name;
+	private Expression<String> file;
 	private int mark;
 
 	@Override
 	public boolean check(final Event event) {
-		return name.check(event, new Checker<String>() {
+		return file.check(event, new Checker<String>() {
 			@Override
 			public boolean check(final String s) {
-				final String file = StringUtil.checkSeparator(name.getSingle(event));
+				final String f = StringUtil.checkSeparator(file.getSingle(event));
 				File yamlFile = null;
 				if (mark == 1) {
-					yamlFile = new File(StringUtil.checkRoot(file));
+					yamlFile = new File(StringUtil.checkRoot(f));
 				} else {
 					String server = new File("").getAbsoluteFile().getAbsolutePath();
-					yamlFile = new File(server + File.separator + file);
+					yamlFile = new File(server + File.separator + f);
 				}
 				if (yamlFile.exists())
 					return true;
@@ -60,13 +60,13 @@ public class CondYamlFileExists extends Condition {
 
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "yaml file " + name.toString(e, debug) + (isNegated() ? " does not exist" : " exists");
+		return "yaml file " + file.toString(e, debug) + (isNegated() ? " does not exist" : " exists");
 	}
 
 	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parse) {
-		name = (Expression<String>) exprs[0];
+		file = (Expression<String>) exprs[0];
 		setNegated(matchedPattern == 1);
 		this.mark = parse.mark;
 		return true;

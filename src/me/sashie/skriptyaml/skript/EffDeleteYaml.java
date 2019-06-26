@@ -14,7 +14,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.utils.StringUtil;
 
 @Name("Delete YAML")
 @Description("Deletes a YAML file and removes it from memory.")
@@ -33,7 +32,6 @@ public class EffDeleteYaml extends Effect {
 	@Override
 	protected void execute(@Nullable Event event) {
 		for (String name : this.file.getAll(event)) {
-			name = StringUtil.checkSeparator(name);
 			if (!SkriptYaml.YAML_STORE.containsKey(name))
 				continue;
 			SkriptYaml.YAML_STORE.get(name).getFile().delete();
