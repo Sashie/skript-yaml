@@ -52,9 +52,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks]"//,
-				//"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks]"
-				);
+				"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks]");
 	}
 
 	private boolean checks = false;
@@ -119,7 +117,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	}
 
 	public String getId(Event event) {
-		return StringUtil.checkSeparator(this.file.getSingle(event));//file.getSingle(event);
+		return file.getSingle(event);
 	}
 
 	@Override
@@ -148,7 +146,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	@SuppressWarnings("unchecked")
 	public T[] get(Event event, String path, YamlState state) {
-		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
+		final String name = this.file.getSingle(event);
 		//final String path = this.node.getSingle(event);
 		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
 			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
