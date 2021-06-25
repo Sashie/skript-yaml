@@ -17,6 +17,10 @@ import ch.njol.skript.SkriptAddon;
 import me.sashie.skriptyaml.api.ConstructedClass;
 import me.sashie.skriptyaml.api.RepresentedClass;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
+import me.sashie.skriptyaml.utils.versions.V2_3;
+import me.sashie.skriptyaml.utils.versions.V2_4;
+import me.sashie.skriptyaml.utils.versions.V2_6;
+import me.sashie.skriptyaml.utils.versions.SkriptAdapter;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlConstructor;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlRepresenter;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
@@ -28,6 +32,7 @@ public class SkriptYaml extends JavaPlugin {
 
 	private static SkriptYaml instance;
 	private int serverVersion;
+	private SkriptAdapter adapter;
 
 	private final static HashMap<String, String> REGISTERED_TAGS = new HashMap<String, String>();
 	private static SkriptYamlRepresenter representer;
@@ -108,9 +113,6 @@ public class SkriptYaml extends JavaPlugin {
 					+ Integer.parseInt(Character.toString(initServerVer.charAt(4))));
 		}
 
-		representer = new SkriptYamlRepresenter();
-		constructor = new SkriptYamlConstructor();
-
 		Plugin skript = Bukkit.getServer().getPluginManager().getPlugin("Skript");
 		if (skript != null) {
 			if (Skript.isAcceptRegistrations()) {
@@ -124,6 +126,16 @@ public class SkriptYaml extends JavaPlugin {
 				}
 			}
 
+			if ((Skript.getVersion().getMajor() >= 3 ? true : (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 6 ? true : false)))
+				adapter = new V2_6();
+			else if ((Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 4 ? true : false))
+				adapter = new V2_4();
+			else
+				adapter = new V2_3();
+
+			representer = new SkriptYamlRepresenter();
+			constructor = new SkriptYamlConstructor();
+			
 			// new MetricsLite(this);
 			Metrics metrics = new Metrics(this);
 			metrics.addCustomChart(
@@ -137,6 +149,8 @@ public class SkriptYaml extends JavaPlugin {
 			Bukkit.getPluginManager().disablePlugin(this);
 			error("Skript not found, plugin disabled.");
 		}
+
+
 	}
 /*
 	public String registeredTagsToString() {
@@ -194,6 +208,14 @@ public class SkriptYaml extends JavaPlugin {
 
 	public int getServerVersion() {
 		return serverVersion;
+	}
+
+	public SkriptAdapter getSkriptAdapter() {
+		return adapter;
+	}
+
+	public static void debug(String error) {
+		LOGGER.warning("[skript-yaml DEBUG] " + error);
 	}
 
 	public static void warn(String error) {

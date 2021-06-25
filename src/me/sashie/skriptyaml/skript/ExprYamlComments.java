@@ -18,10 +18,12 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.utils.StringUtil;
+import me.sashie.skriptyaml.debug.SkriptNode;
+import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 @Name("YAML Comments/header")
@@ -53,6 +55,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 	private Expression<String> paths, file;
 	private int mark;
+	private SkriptNode skriptNode;
 
 	private static enum States {
 		COMMENT, HEADER
@@ -72,27 +75,25 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return state.toString().toLowerCase() + (state == States.COMMENT ? " for path " + this.paths.toString(event, b) : "") + " from yaml " + this.file.toString(event, b);
+		return state.toString().toLowerCase() + (state == States.COMMENT ? " for path\node " + this.paths.toString(event, b) : "") + " from yaml " + this.file.toString(event, b);
 	}
 
 	@Override
 	@Nullable
 	protected Object[] get(Event event) {
 		final String name = this.file.getSingle(event);
-		final String path = this.paths.getSingle(event);
 
-		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
+		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
 			return null;
-		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		String s = null;
-		if (state == States.COMMENT)
-			s = config.getComment(path);
-		else if (state == States.HEADER)
-			s = config.getHeader();
+		if (state == States.COMMENT) {
+			final String path = this.paths.getSingle(event);
+			s = config.getComment(path, skriptNode);
+		} else if (state == States.HEADER)
+			s = config.getHeader(skriptNode);
 		if (s == null)
 			return null;
 		List<String> list = Arrays.asList(s.split("\\r?\\n"));
@@ -101,13 +102,11 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 	@Override
 	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
-		final String name = StringUtil.checkSeparator(this.file.getSingle(event));
+		final String name = this.file.getSingle(event);
 		String[] paths = null;
 
-		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
+		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
 			return;
-		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
@@ -120,9 +119,9 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 						if (config.getMap().containsKey(p))
 							config.setComment(p, this.mark == 1 ? true : false, toStringArray(delta, comments));
 						else
-							SkriptYaml.warn("'" + p + "' is not a valid path in '" + name + "'");
+							SkriptYaml.warn("'" + p + "' is not a valid path in '" + name + "' " + skriptNode.toString());
 					} else {
-						SkriptYaml.warn("Comments can only be added to root paths not '" + p + "' in '" + name + "'" );
+						SkriptYaml.warn("Comments can only be added to root paths not '" + p + "' in '" + name + "' " + skriptNode.toString());
 					}
 				}
 			} else if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
@@ -171,6 +170,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 			file = (Expression<String>) e[0];
 		}
 		this.mark = parse.mark;
+		this.skriptNode = new SkriptNode(SkriptLogger.getNode());
 		return true;
 	}
 }

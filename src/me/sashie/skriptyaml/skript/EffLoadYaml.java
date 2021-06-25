@@ -15,8 +15,10 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
@@ -50,13 +52,13 @@ public class EffLoadYaml extends Effect {
 	private Expression<String> id;
 	private int mark;
 	private int matchedPattern;
+	private SkriptNode skriptNode;
 
 	@Override
 	protected void execute(@Nullable Event event) {
-		
 		if (matchedPattern == 1) {
 			if (!this.file.isSingle()) {
-				SkriptYaml.warn("[Load Yaml] Input has to be single if using a custom id");
+				SkriptYaml.warn("[Load Yaml] Input has to be single if using a custom id " + skriptNode.toString());
 				return;
 			}
 			load(this.file.getSingle(event), event);
@@ -87,7 +89,7 @@ public class EffLoadYaml extends Effect {
 				yamlFile.createNewFile();
 			}
 		} catch (IOException error) {
-			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ")");
+			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ") " + skriptNode.toString());
 			return;
 		}
 
@@ -122,6 +124,7 @@ public class EffLoadYaml extends Effect {
 			id = (Expression<String>) exprs[1];
 		this.mark = parse.mark;
 		this.matchedPattern = matchedPattern;
+		this.skriptNode = new SkriptNode(SkriptLogger.getNode());
 		return true;
 	}
 }

@@ -14,7 +14,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
@@ -41,15 +40,10 @@ public class CondNodeHasList extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		return path.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
-					return false;
-				Object o =  SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event));
-				return o != null ? (o instanceof List) : false;
-			}
-		}, isNegated());
+		if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
+			return false;
+		Object o =  SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event));
+		return o != null ? (o instanceof List) ^ isNegated() : false ^ isNegated();
 	}
 
 	@Override

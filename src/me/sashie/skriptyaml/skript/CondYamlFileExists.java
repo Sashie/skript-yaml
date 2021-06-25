@@ -14,7 +14,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.utils.StringUtil;
 
@@ -40,24 +39,17 @@ public class CondYamlFileExists extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		return file.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				final String f = StringUtil.checkSeparator(file.getSingle(event));
-				File yamlFile = null;
-				if (mark == 1) {
-					yamlFile = new File(StringUtil.checkRoot(f));
-				} else {
-					String server = new File("").getAbsoluteFile().getAbsolutePath();
-					yamlFile = new File(server + File.separator + f);
-				}
-				if (yamlFile.exists())
-					return true;
-				return false;
-			}
-		}, isNegated());
+		final String f = StringUtil.checkSeparator(file.getSingle(event));
+		File yamlFile = null;
+		if (mark == 1) {
+			yamlFile = new File(StringUtil.checkRoot(f));
+		} else {
+			String server = new File("").getAbsoluteFile().getAbsolutePath();
+			yamlFile = new File(server + File.separator + f);
+		}
+		return yamlFile.exists() ^ isNegated();
 	}
-
+	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
 		return "yaml file " + file.toString(e, debug) + (isNegated() ? " does not exist" : " exists");

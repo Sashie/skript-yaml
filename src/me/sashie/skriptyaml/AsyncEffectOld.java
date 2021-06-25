@@ -22,25 +22,21 @@ public abstract class AsyncEffectOld extends DelayFork {
 	@Nullable
 	protected TriggerItem walk(Event e) {
 		debug(e, true);
-		TriggerItem next = getNext();
-		// if (e.getEventName().equals("SkriptStopEvent")) {
-		if (e.getClass().isAssignableFrom(SkriptStopEvent.class) || e.getClass().isAssignableFrom(ScriptEvent.class)) {	// Because a bukkit task can't be created on server stop
+		if (e.getClass().isAssignableFrom(SkriptStopEvent.class) || e.getClass().isAssignableFrom(ScriptEvent.class)) {	// Because a bukkit task can't be created on server stop and these are triggered then
 			execute(e);
-			if (next != null)
-				TriggerItem.walk(next, e);
+			if (getNext() != null)
+				TriggerItem.walk(getNext(), e);
 		} else {
 			DelayFork.addDelayedEvent(e);
 			Bukkit.getScheduler().runTaskAsynchronously(Skript.getInstance(), new Runnable() {
-				// @SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
 					execute(e); // Execute this effect
-					if (next != null) {
+					if (getNext() != null) {
 						Bukkit.getScheduler().runTask(Skript.getInstance(), new Runnable() {
 							@Override
 							public void run() { // Walk to next item synchronously
-								// walk(next, e);
-								TriggerItem.walk(next, e);
+								TriggerItem.walk(getNext(), e);
 
 							}
 						});

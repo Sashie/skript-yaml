@@ -24,7 +24,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 public class EffDeleteYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffDeleteYaml.class, "delete [y[a]ml] %strings%");
+		Skript.registerEffect(EffDeleteYaml.class, "delete [y[a]ml] %strings%");	//TODO add option to keep loaded in memory
 	}
 
 	private Expression<String> file;

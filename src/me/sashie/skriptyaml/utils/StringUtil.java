@@ -135,6 +135,30 @@ public final class StringUtil {
 		return new String(b);
 	}
 
+	public static Object parseString(Object delta, boolean parse) {
+		if (delta == null) 
+			return null;
+		if (!parse && String.class.isAssignableFrom(delta.getClass())) {
+			String s = StringUtil.translateColorCodes(((String) delta));
+			if (s.matches("true|false|yes|no|on|off")) {
+				return s.matches("true|yes|on");
+			} else if (s.matches("(-)?\\d+")) {
+				try {
+					return Long.parseLong(s);
+				} catch (NumberFormatException ex) {
+//TODO force people to use 'without string checks' syntax or add conversion
+//					return new BigInteger(s);
+				}
+				
+			} else if (s.matches("(-)?\\d+(\\.\\d+)")) {
+				return Double.parseDouble(s);
+			} else {
+				return s;
+			}
+		}
+		return delta;
+	}
+
 	/**
 	 * Trim a string if it is longer than a certain length.
 	 * 

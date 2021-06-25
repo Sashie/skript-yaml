@@ -17,8 +17,9 @@ Expressions
  - [Return all cached yaml](#expression-return-all-cached-yaml)
  - [Return all cached yaml directories](#expression-return-all-cached-yaml-directories)
  - [Yaml](#expression-yaml)
+ - [Yaml list value](#expression-yaml-list-value)
  - [All yaml nodes](#expression-all-yaml-nodes)
- - [Yaml comment/header](#expression-yaml-comment-header)
+ - [Yaml comment/header](#expression-yaml-comment-or-header)
  - [Yaml loop](#expression-yaml-loop)
  
  Conditions
@@ -220,6 +221,28 @@ command /tp:
 ```
 ---
 
+### Expression (Yaml list value)
+Gets, sets, removes values from a list in a cached yaml file
+  - Requires index between 1 and the size of the list
+  - Requires the id used/created from the load effect
+  - This expression does not save to file
+  - Using 'without string checks' optional is a tiny bit faster but doesn't check/convert strings for numbers or booleans
+
+#### Syntax
+
+`[[skript-]y[a]ml] (index|value) %number% (of|in|from) list %string% (of|in|from) %string% [without string checks]`
+
+#### Examples
+
+```
+set index 1 in list "test1.test2" from "config" to "test3"
+
+set {_test} to yaml index 1 in list "test1.test2" from "config"
+broadcast "%{_test}%"
+```
+
+---
+
 ### Expression (All yaml nodes)
 Gets a list of all nodes of a cached yaml file
 
@@ -238,7 +261,7 @@ broadcast "%{_list::*}%"
 ```
 ---
 
-### Expression (Yaml comment/header)
+### Expression (Yaml comment or header)
 Gets, sets, deletes comments or the header of a cached yaml file
   - Headers don't contain '#' so add it yourself if you want it
   - Comments can only be at root level ie. 'root' not 'root.something'
@@ -289,10 +312,10 @@ Yaml file:
 settings:
   subnode1: value1
   subnode2: value2
-node2:
+node:
   subnode1: value1
   subnode2: value2
-node3:
+node2:
 - listValue1
 - listValue2
 
@@ -302,7 +325,7 @@ Skript file:
 
 ```
 loop yaml node keys "node" from "config":
-	broadcast yaml value loop-node from loop-id
+	broadcast yaml value "%loop-node%" from "%loop-id%"
 ```
 ---
 

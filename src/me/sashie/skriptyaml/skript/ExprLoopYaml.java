@@ -76,7 +76,7 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 		int j = 1;
 		Loop loop = null;
 
-		for (final Loop l : ScriptLoader.currentLoops) {
+		for (final Loop l : SkriptYaml.getInstance().getSkriptAdapter().currentLoops()) {
 			if (l.getLoopedExpression() instanceof ExprYaml) {
 				if (j < i) {
 					j++;
@@ -157,16 +157,19 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 	@Nullable
 	protected <R> ConvertedExpression<Object, ? extends R> getConvertedExpr(final Class<R>... to) {
 		if (isYamlLoop && loopState != LoopState.INDEX) {
-			return new ConvertedExpression<>(this, (Class<R>) Utils.getSuperType(to), new Converter<Object, R>() {
+			Class<R> superType = (Class<R>) Utils.getSuperType(to);
+			Converter<Object, R> converter = new Converter<Object, R>() {
 				@Override
 				@Nullable
 				public R convert(final Object o) {
 					return Converters.convert(o, to);
 				}
-			});
+			};
+			return SkriptYaml.getInstance().getSkriptAdapter().getConvertedExpr(this, superType, converter);
 		} else {
 			return super.getConvertedExpr(to);
 		}
+		//return null;
 	}
 
 	@Override

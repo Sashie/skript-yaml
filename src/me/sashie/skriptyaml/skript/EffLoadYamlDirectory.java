@@ -15,8 +15,10 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
@@ -45,11 +47,15 @@ public class EffLoadYamlDirectory extends Effect {
 	private Expression<String> directories;
 	private int mark;
 	private int matchedPattern;
+	private SkriptNode skriptNode;
 
 	@Override
 	protected void execute(@Nullable Event event) {
 		for (String name : this.directories.getAll(event)) {
-			for (File yamlFile : SkriptYamlUtils.directoryFilter(StringUtil.checkSeparator(name), mark == 1, "Load")) {
+			File[] directoryFilter = SkriptYamlUtils.directoryFilter(StringUtil.checkSeparator(name), mark == 1, "Load", skriptNode);
+			if (directoryFilter == null) 
+				return;
+			for (File yamlFile : directoryFilter) {
 				YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
 				try {
 					yaml.load();
@@ -76,6 +82,7 @@ public class EffLoadYamlDirectory extends Effect {
 		directories = (Expression<String>) exprs[0];
 		this.mark = parse.mark;
 		this.matchedPattern = matchedPattern;
+		this.skriptNode = new SkriptNode(SkriptLogger.getNode());
 		return true;
 	}
 }

@@ -30,6 +30,8 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import me.sashie.skriptyaml.SimpleExpressionFork;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
+import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
@@ -53,17 +55,17 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
 				"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks]");
+		//"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks] [using %-object% as default]"
 	}
 
 	private boolean checks = false;
 	private Expression<String> node, file;
+	private SkriptNode skriptNode;
 
-	public static enum YamlState {
+	public enum YamlState {
 		VALUE, NODES, NODE_KEYS, LIST
 	}
 
-	YAMLProcessor config;
-	
 	private YamlState state;
 
 	private final ExprYaml<?> source;
@@ -82,10 +84,11 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 			this.file = source.file;
 			this.state = source.state;
 			this.checks = source.checks;
+			this.skriptNode = source.skriptNode;
 		}
 		this.superType = (Class<T>) Utils.getSuperType(types);
 	}
-	
+
 	@Override
 	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
 		return new ExprYaml<>(this, to);
@@ -95,7 +98,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	public Expression<?> getSource() {
 		return source == null ? this : source;
 	}
-	
+
 	@Override
 	public Class<? extends T> getReturnType() {
 		return getReturnType(state);
@@ -147,11 +150,9 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	@SuppressWarnings("unchecked")
 	public T[] get(Event event, String path, YamlState state) {
 		final String name = this.file.getSingle(event);
-		//final String path = this.node.getSingle(event);
-		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
+
+		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
 			return null;
-		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
@@ -161,7 +162,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				if (!checks && String.class.isAssignableFrom(o.getClass()))
 					o = ChatColor.translateAlternateColorCodes('&', ((String) o));
 				try {
-					return convertToArray(o, (Class<T>) o.getClass());
+					return SkriptYamlUtils.convertToArray(o, (Class<T>) o.getClass());
 				} catch (ClassCastException e) {
 					return (T[]) Array.newInstance((Class<T>) o.getClass(), 0);
 				}
@@ -208,18 +209,6 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public final static <T> T[] convertToArray(Object original, Class<T> to) throws ClassCastException {
-		T[] end = (T[]) Array.newInstance(to, 1);
-		T converted = Converters.convert(original, to);
-		if (converted != null) {
-			end[0] = converted;
-		} else {
-			throw new ClassCastException();
-		}
-		return end;
-	}
-
 	//This method is found at ch.njol.util.coll.CollectionUtils but is here for backwards compatibility with older Skript versions
 	@SuppressWarnings("unchecked")
 	public final static <T> T[] convertArray(Object[] original, Class<T> to) throws ClassCastException {
@@ -240,10 +229,8 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
 
-		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded");
+		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
 			return;
-		}
 
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
@@ -254,7 +241,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 		if (state == YamlState.VALUE) {
 			if (mode == ChangeMode.SET)
-				config.setProperty(path, parseString(delta[0]));
+				config.setProperty(path, StringUtil.parseString(delta[0], checks));
 		} else if (state == YamlState.NODE_KEYS) {
 			if (mode == ChangeMode.ADD)
 				config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
@@ -271,7 +258,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 					config.setProperty(path, arrayToList(objects, delta));
 			} else if (mode == ChangeMode.REMOVE) {
 				for (Object o : delta)
-					objects.remove(parseString(o));
+					objects.remove(StringUtil.parseString(o, checks));
 			} else if (mode == ChangeMode.SET) {
 				if (objects == null) {
 					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta));
@@ -285,30 +272,8 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	private List<Object> arrayToList(List<Object> list, Object[] array) {
 		for (Object o : array)
-			list.add(parseString(o));
+			list.add(StringUtil.parseString(o, checks));
 		return list;
-	}
-
-	private Object parseString(Object delta) {
-		if (!checks && String.class.isAssignableFrom(delta.getClass())) {
-			String s = StringUtil.translateColorCodes(((String) delta));
-			if (s.matches("true|false|yes|no|on|off")) {
-				return s.matches("true|yes|on");
-			} else if (s.matches("(-)?\\d+")) {
-				try {
-					return Long.parseLong(s);
-				} catch (NumberFormatException ex) {
-//TODO force people to use 'without string checks' syntax or add conversion
-//					return new BigInteger(s);
-				}
-				
-			} else if (s.matches("(-)?\\d+(\\.\\d+)")) {
-				return Double.parseDouble(s);
-			} else {
-				return s;
-			}
-		}
-		return delta;
 	}
 
 /*TODO	Test for speed later
@@ -473,6 +438,8 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		file = (Expression<String>) e[1];
 		if (parse.expr.toLowerCase().endsWith(" without string checks"))
 			this.checks = true;
+		this.skriptNode = new SkriptNode(SkriptLogger.getNode());
+
 		return true;
 	}
 
@@ -481,18 +448,5 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		return state != YamlState.VALUE && (s.equalsIgnoreCase("index") || s.equalsIgnoreCase("value")
 				|| s.equalsIgnoreCase("id") || s.equalsIgnoreCase("val") || s.equalsIgnoreCase("list")
 				|| s.equalsIgnoreCase("node") || s.equalsIgnoreCase("key") || s.toLowerCase().startsWith("subnodekey"));
-	}
-
-	private boolean isInLoop() {
-		Node node = SkriptLogger.getNode();
-		if (node == null) {
-			return false;
-		}
-		String key = node.getKey();
-		//int ln = node.getLine();
-		if (key == null) {
-			return false;
-		}
-		return key.startsWith("loop ");
 	}
 }

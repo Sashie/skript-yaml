@@ -13,9 +13,11 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.AsyncEffectOld;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 
@@ -34,33 +36,32 @@ import me.sashie.skriptyaml.utils.StringUtil;
 public class EffDeleteYamlFromDirectory extends AsyncEffectOld {
 
 	static {
-		Skript.registerEffect(EffDeleteYamlFromDirectory.class, 
-				"delete (all|any) [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
-				"delete (all|any) loaded [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
-				"delete (all|any) loaded [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% using [the] filename as [the] id");
+		Skript.registerEffect(EffDeleteYamlFromDirectory.class,
+				"delete (all|any) [loaded] [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
+				"delete (all|any) [loaded] [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% using [the] filename as [the] id");
 	}
 
 	private Expression<String> directories;
 	private int mark;
 	private int matchedPattern;
+	private SkriptNode skriptNode;
 
 	@Override
 	protected void execute(@Nullable Event event) {
 		for (String name : this.directories.getAll(event)) {
-			for (File yamlFile : SkriptYamlUtils.directoryFilter(StringUtil.checkSeparator(name), mark == 1, "Delete")) {
+			File[] directoryFilter = SkriptYamlUtils.directoryFilter(StringUtil.checkSeparator(name), mark == 1, "Delete", skriptNode);
+			if (directoryFilter == null) 
+				return;
+			for (File yamlFile : directoryFilter) {
+				String n = null;
 				if (matchedPattern == 0) {
-					yamlFile.delete();
-				} else {
-					String n = null;
-					if (matchedPattern == 1) {
-						n = StringUtil.checkLastSeparator(name) + yamlFile.getName();
-					} else if (matchedPattern == 2) {
-						n = StringUtil.stripExtention(yamlFile.getName());
-					}
-					if (SkriptYaml.YAML_STORE.containsKey(n)) {
-						SkriptYaml.YAML_STORE.get(n).getFile().delete();
-						SkriptYaml.YAML_STORE.remove(n);
-					}
+					n = StringUtil.checkLastSeparator(name) + yamlFile.getName();
+				} else if (matchedPattern == 1) {
+					n = StringUtil.stripExtention(yamlFile.getName());
+				}
+				if (SkriptYaml.YAML_STORE.containsKey(n)) {
+					SkriptYaml.YAML_STORE.get(n).getFile().delete();
+					SkriptYaml.YAML_STORE.remove(n);
 				}
 			}
 		}
@@ -77,6 +78,7 @@ public class EffDeleteYamlFromDirectory extends AsyncEffectOld {
 		directories = (Expression<String>) exprs[0];
 		this.mark = parse.mark;
 		this.matchedPattern = matchedPattern;
+		this.skriptNode = new SkriptNode(SkriptLogger.getNode());
 		return true;
 	}
 }

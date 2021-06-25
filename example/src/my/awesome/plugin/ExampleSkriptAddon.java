@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.sashie.skriptyaml.ExampleClass;
 import me.sashie.skriptyaml.SkriptYaml;
 
 public class ExampleSkriptAddon extends JavaPlugin {
@@ -35,7 +36,7 @@ public class ExampleSkriptAddon extends JavaPlugin {
 				if (SkriptYaml.isTagRegistered("example")) {
 					
 					SkriptYaml.registerTag(this, "example", ExampleClass.class, new ExampleRepresentedClass(), new ExampleConstructedClass());
-					
+					//config.setProperty(path + "potatotest", new ExampleClass("boop1", "beep2", null));
 					Bukkit.broadcastMessage("skript-yaml found, hooks enabled.");
 				}
 			}

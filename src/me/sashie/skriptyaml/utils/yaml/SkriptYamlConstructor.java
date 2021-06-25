@@ -19,11 +19,11 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import ch.njol.skript.util.Color;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.WeatherType;
+import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.ConstructedClass;
 
 public class SkriptYamlConstructor extends SafeConstructor {
@@ -42,19 +42,13 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		this.yamlConstructors.put(new Tag("!skriptweather"), new ConstructSkriptWeather());
 
 		this.yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
+
 	}
 	
 	public void register(String tag, ConstructedClass<?> cc) {
 		this.yamlConstructors.put(new Tag("!" + tag), cc);
 	}
-	
-/*
-	public Map<Object, Object> constructMapping(MappingNode node) {
-		Map<Object, Object> mapping = this.newMap(node);
-		this.constructMapping2ndStep(node, mapping);
-		return mapping;
-	}
-*/
+
 	public Map<Object, Object> constructMap(MappingNode node) {
 		return constructMapping(node);
 	}
@@ -143,7 +137,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 			"^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)(?:(?:[Tt]|[ \t]+)([0-9][0-9]?):([0-9][0-9]):([0-9][0-9])(?:\\.([0-9]*))?(?:[ \t]*(?:Z|([-+][0-9][0-9]?)(?::([0-9][0-9])?)?))?)?$");
 	private final static Pattern YMD_REGEXP = Pattern.compile("^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)$");
 
-	public static class ConstructSkriptDate extends AbstractConstruct {
+	public class ConstructSkriptDate extends AbstractConstruct {
 		private Calendar calendar;
 
 		public Calendar getCalendar() {
@@ -211,7 +205,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		}
 	}
 
-	public static class ConstructSkriptTime extends AbstractConstruct {
+	public class ConstructSkriptTime extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
 			ScalarNode scalar = (ScalarNode) node;
@@ -220,7 +214,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		}
 	}
 
-	public static class ConstructSkriptTimespan extends AbstractConstruct {
+	public class ConstructSkriptTimespan extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
 			ScalarNode scalar = (ScalarNode) node;
@@ -229,16 +223,16 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		}
 	}
 
-	public static class ConstructSkriptColor extends AbstractConstruct {
+	public class ConstructSkriptColor extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
 			ScalarNode scalar = (ScalarNode) node;
 			String nodeValue = scalar.getValue();
-			return Color.byName(nodeValue);
+			return SkriptYaml.getInstance().getSkriptAdapter().colorFromName(nodeValue);
 		}
 	}
 
-	public static class ConstructSkriptWeather extends AbstractConstruct {
+	public class ConstructSkriptWeather extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
 			ScalarNode scalar = (ScalarNode) node;

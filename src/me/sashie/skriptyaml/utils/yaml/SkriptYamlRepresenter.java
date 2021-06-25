@@ -14,14 +14,15 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
 import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.util.Color;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Slot;
 import ch.njol.skript.util.Time;
@@ -31,6 +32,24 @@ import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.RepresentedClass;
 
 public class SkriptYamlRepresenter extends Representer {
+
+	private static Method representMappingMethod;
+	private static Method representScalarMethod;
+
+	static {		
+		if (SkriptYaml.getInstance().getServerVersion() <= 12) {
+			try {
+				Class<?> baseRepresenterClass = BaseRepresenter.class;//Class.forName("org.yaml.snakeyaml.representer.BaseRepresenter");
+				//representMapping(Tag tag, Map<?, ?> mapping, Boolean flowStyle)
+				representMappingMethod = baseRepresenterClass.getDeclaredMethod("representMapping", Tag.class, Map.class, Boolean.class);
+				representMappingMethod.setAccessible(true);
+				representScalarMethod = baseRepresenterClass.getDeclaredMethod("representScalar", Tag.class, String.class, Character.class);
+				representScalarMethod.setAccessible(true);
+			} catch (SecurityException | NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private static List<String> representedClasses = new ArrayList<>();
 
@@ -42,13 +61,15 @@ public class SkriptYamlRepresenter extends Representer {
 			}
 		};
 
+		this.representers.put(String.class, new RepresentString());
+
 		this.representers.put(SkriptClass.class, new RepresentSkriptClass());
 		this.representers.put(ItemType.class, new RepresentSkriptItemType());
 		this.representers.put(Slot.class, new RepresentSkriptSlot());
 		this.representers.put(Date.class, new RepresentSkriptDate());
 		this.representers.put(Time.class, new RepresentSkriptTime());
 		this.representers.put(Timespan.class, new RepresentSkriptTimespan());
-		this.representers.put(Color.class, new RepresentSkriptColor());
+		this.representers.put(SkriptYaml.getInstance().getSkriptAdapter().getColorClass(), new RepresentSkriptColor());
 		this.representers.put(WeatherType.class, new RepresentSkriptWeather());
 
 		this.representers.put(Vector.class, new RepresentVector());
@@ -81,6 +102,31 @@ public class SkriptYamlRepresenter extends Representer {
 
 	public boolean contains(Class<?> c) {
 		return representedClasses.contains(c.getSimpleName());
+	}
+
+	//** bypassing snakeyamls RepresentString class **/
+	private class RepresentString implements Represent {
+		public Node representData(Object data) {
+			return representScalar(data);
+		}
+	}
+
+	private Node representScalar(Object data) {
+		if (data instanceof String && data.toString().contains("&")) {	//fixing a bug with color codes not working sometimes
+			if (SkriptYaml.getInstance().getServerVersion() >= 13) {
+				return representScalar(Tag.STR, data.toString(), DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+			} else {
+				Node node = null;
+				try {
+					node = (Node) representScalarMethod.invoke(this, Tag.STR, data.toString(), '"');
+				} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+				return node;
+			}
+		} else {
+			return representScalar(Tag.STR, data.toString());
+		}
 	}
 
 	private class RepresentConfigurationSerializable extends RepresentMap {
@@ -138,20 +184,6 @@ public class SkriptYamlRepresenter extends Representer {
 		}
 	}
 
-	private static Method representMappingMethod;
-	static {
-		if (SkriptYaml.getInstance().getServerVersion() <= 12) {
-			try {
-				Class<?> baseRepresenterClass = Class.forName("org.yaml.snakeyaml.representer.BaseRepresenter");
-				//representMapping(Tag tag, Map<?, ?> mapping, Boolean flowStyle)
-				representMappingMethod = baseRepresenterClass.getDeclaredMethod("representMapping", Tag.class, Map.class, Boolean.class);
-				representMappingMethod.setAccessible(true);
-			} catch (SecurityException | ClassNotFoundException | NoSuchMethodException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	/*
 	 * To make things backwards compatible and prevent NoSuchMethod exceptions.
 	 * (spigot updated snakeyaml in 1.13.2)
@@ -162,11 +194,11 @@ public class SkriptYamlRepresenter extends Representer {
 			return (T) representMapping(tag, mapping, FlowStyle.BLOCK);
 		} else {
 			T node = null;
-            try {
-    			node = (T) representMappingMethod.invoke(this, tag, mapping, null);
-            } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            	e.printStackTrace();
-            }
+			try {
+				node = (T) representMappingMethod.invoke(this, tag, mapping, null);
+			} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
 			return (T) node;
 		}
 	}
@@ -302,7 +334,7 @@ public class SkriptYamlRepresenter extends Representer {
 	private class RepresentSkriptColor implements Represent {
 		@Override
 		public Node representData(Object data) {
-			return representScalar(new Tag("!skriptcolor"), ((Color) data).toString());
+			return representScalar(new Tag("!skriptcolor"), SkriptYaml.getInstance().getSkriptAdapter().getColorName(data));
 		}
 	}
 
@@ -312,5 +344,4 @@ public class SkriptYamlRepresenter extends Representer {
 			return representScalar(new Tag("!skriptweather"), ((WeatherType) data).toString().toLowerCase());
 		}
 	}
-
 }

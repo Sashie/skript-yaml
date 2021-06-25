@@ -256,7 +256,7 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 	 */
 	@Override
 	public boolean setTime(final int time) {
-		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (SkriptYaml.getInstance().getSkriptAdapter().hasDelayBefore() == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
@@ -265,11 +265,11 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 	}
 	
 	protected final boolean setTime(final int time, final Class<? extends Event> applicableEvent, final Expression<?>... mustbeDefaultVars) {
-		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (SkriptYaml.getInstance().getSkriptAdapter().hasDelayBefore() == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
-		if (!ScriptLoader.isCurrentEvent(applicableEvent))
+		if (!SkriptYaml.getInstance().getSkriptAdapter().isCurrentEvent(applicableEvent))
 			return false;
 		for (final Expression<?> var : mustbeDefaultVars) {
 			if (!var.isDefault()) {
@@ -281,14 +281,14 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 	}
 	
 	protected final boolean setTime(final int time, final Expression<?> mustbeDefaultVar, final Class<? extends Event>... applicableEvents) {
-		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (SkriptYaml.getInstance().getSkriptAdapter().hasDelayBefore() == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
 		if (!mustbeDefaultVar.isDefault())
 			return false;
 		for (final Class<? extends Event> e : applicableEvents) {
-			if (ScriptLoader.isCurrentEvent(e)) {
+			if (SkriptYaml.getInstance().getSkriptAdapter().isCurrentEvent(e)) {
 				this.time = time;
 				return true;
 			}

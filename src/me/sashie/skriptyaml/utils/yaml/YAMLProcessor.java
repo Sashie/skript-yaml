@@ -48,6 +48,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.StringUtil;
 
 /**
@@ -111,6 +112,7 @@ public class YAMLProcessor extends YAMLNode {
 		options.setIndent(4);
 		options.setDefaultFlowStyle(format.getStyle());
 		options.setTimeZone(TimeZone.getDefault());
+		options.setSplitLines(false);
 
 		//Representer representer = new SkriptYamlRepresenter();
 		Representer representer = SkriptYaml.getInstance().getRepresenter();
@@ -222,7 +224,7 @@ public class YAMLProcessor extends YAMLNode {
 				buildYaml(line);
 				recursiveCommentSearch(line, comment, input);
 			} catch (IOException ignored) {}
-		} else if (!line.startsWith(COMMENT_PREFIX) || !line.startsWith(HEADER_PREFIX) || !line.isEmpty() && line.contains(":")) {
+		} else if (line != null && !line.startsWith(COMMENT_PREFIX) || !line.startsWith(HEADER_PREFIX) || !line.isEmpty() && line.contains(":")) {
 			String l = line.split(":")[0];
 			if (!l.startsWith(" ")) // root level comments only
 				setComment(l, false, comment.toArray(new String[comment.size()]));
@@ -266,8 +268,11 @@ public class YAMLProcessor extends YAMLNode {
 	 *            header to prepend
 	 */
 	public void setHeader(String header) {
+		if (header == null) {
+			this.header = null;
+			return;
+		}
 		this.header = StringUtil.replaceTabs(header);
-
 	}
 
 	/**
@@ -275,8 +280,12 @@ public class YAMLProcessor extends YAMLNode {
 	 *
 	 * @return the header text
 	 */
-	public String getHeader() {
-		return header;
+	public String getHeader(SkriptNode skriptNode) {
+		if (header != null)
+			return header;
+		else
+			SkriptYaml.warn("No header found in yaml '" + file.getAbsolutePath() + "' " + skriptNode.toString());
+		return null;
 	}
 
 	/**
@@ -422,7 +431,7 @@ public class YAMLProcessor extends YAMLNode {
 				root = new LinkedHashMap<String, Object>();
 			} else {
 				root = new LinkedHashMap<String, Object>((Map<String, Object>) rootKeysToString(input));
-				
+
 				for (String path : root.keySet()) {
 					Object o = getProperty(path);
 					if (o == null) {
@@ -462,8 +471,12 @@ public class YAMLProcessor extends YAMLNode {
 	 *            the property key
 	 * @return the comment or {@code null}
 	 */
-	public String getComment(String key) {
-		return comments.get(key).getComment();
+	public String getComment(String key, SkriptNode skriptNode) {
+		if (comments.containsKey(key))
+			return comments.get(key).getComment();
+		else
+			SkriptYaml.warn("No comment found at '" + key + "' in yaml " + file.getAbsolutePath()+ " " + skriptNode.toString());
+		return null;
 	}
 
 	public void setComment(String key, boolean extraLine, String comment) {

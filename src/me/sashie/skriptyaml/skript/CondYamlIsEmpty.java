@@ -12,7 +12,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 
@@ -36,14 +35,9 @@ public class CondYamlIsEmpty extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		return file.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
-					return false;
-				return (SkriptYaml.YAML_STORE.get(file.getSingle(event)).getAllKeys().isEmpty());
-			}
-		}, isNegated());
+		if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
+			return false;
+		return SkriptYaml.YAML_STORE.get(file.getSingle(event)).getAllKeys().isEmpty() ^ isNegated();
 	}
 
 	@Override
