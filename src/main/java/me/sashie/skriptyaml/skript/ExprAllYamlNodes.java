@@ -1,11 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
@@ -19,6 +13,10 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 @Name("All YAML Nodes")
 @Description("Gets a list of all nodes of a cached YAML file.")

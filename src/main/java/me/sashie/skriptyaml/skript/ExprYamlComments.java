@@ -1,12 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -25,6 +18,11 @@ import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
 
 @Name("YAML Comments/header")
 @Description("Gets, sets, deletes comments or the header of a cached yaml file" +

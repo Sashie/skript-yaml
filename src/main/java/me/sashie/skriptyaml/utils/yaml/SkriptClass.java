@@ -1,9 +1,9 @@
 package me.sashie.skriptyaml.utils.yaml;
 
-import java.util.Base64;
-
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
+
+import java.util.Base64;
 
 public class SkriptClass {
 
@@ -13,11 +13,6 @@ public class SkriptClass {
 	public SkriptClass(String type, byte[] data) {
 		this.type = type;
 		this.data = Base64.getEncoder().encodeToString(data);
-	}
-
-	public SkriptClass(String type, String data) {
-		this.type = type;
-		this.data = data;
 	}
 
 	public SkriptClass(Object value) {
@@ -35,6 +30,10 @@ public class SkriptClass {
 	}
 
 	public Object deserialize() {
-		return Classes.deserialize(type, Base64.getDecoder().decode(this.data));
+		return SkriptClass.deserialize(this.type, this.data);
+	}
+
+	public static Object deserialize(String type, String data) {
+		return Classes.deserialize(type, Base64.getDecoder().decode(data));
 	}
 }

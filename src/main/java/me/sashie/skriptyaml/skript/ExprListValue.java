@@ -1,13 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.lang.reflect.Array;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.ChatColor;
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -28,6 +20,12 @@ import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.ChatColor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Array;
+import java.util.List;
 
 @Name("YAML list value")
 @Description("Gets, sets, removes values from a list from a cached yaml file using an index" +

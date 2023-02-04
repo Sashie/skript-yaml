@@ -1,21 +1,8 @@
 package me.sashie.skriptyaml.skript;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.ChatColor;
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.config.Node;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -35,6 +22,12 @@ import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.ChatColor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Array;
+import java.util.*;
 
 @Name("YAML")
 @Description("Gets, sets, removes values/nodes etc.. of a cached yaml file" +
@@ -235,7 +228,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
-			config.removeProperty(path);
+			config.removeProperty(path, skriptNode);
 			return;
 		}
 
@@ -247,7 +240,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
 				//config.addNode(path + (delta[0] == null ? "" : "." + delta[0]));
 			else if (mode == ChangeMode.REMOVE)
-				config.removeProperty(path + (delta[0] == null ? "" : "." + delta[0]));
+				config.removeProperty(path + (delta[0] == null ? "" : "." + delta[0]), skriptNode);
 				//config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
 		} else if (state == YamlState.LIST) {
 			List<Object> objects = config.getList(path);
@@ -257,6 +250,10 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				else 
 					config.setProperty(path, arrayToList(objects, delta));
 			} else if (mode == ChangeMode.REMOVE) {
+				if (objects == null) {
+					SkriptYaml.warn("There is no list at path '" + path + "' in yaml '" + name + "' " + skriptNode.toString());
+					return;
+				}
 				for (Object o : delta)
 					objects.remove(StringUtil.parseString(o, checks));
 			} else if (mode == ChangeMode.SET) {
@@ -442,11 +439,12 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 		return true;
 	}
-
+/*
 	@Override
 	public boolean isLoopOf(final String s) {
 		return state != YamlState.VALUE && (s.equalsIgnoreCase("index") || s.equalsIgnoreCase("value")
 				|| s.equalsIgnoreCase("id") || s.equalsIgnoreCase("val") || s.equalsIgnoreCase("list")
 				|| s.equalsIgnoreCase("node") || s.equalsIgnoreCase("key") || s.toLowerCase().startsWith("subnodekey"));
 	}
+*/
 }

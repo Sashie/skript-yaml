@@ -19,7 +19,6 @@
  */
 package me.sashie.skriptyaml;
 
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.Changer;
@@ -38,10 +37,9 @@ import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.ArrayIterator;
 import org.bukkit.event.Event;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
-
-import javax.annotation.Nullable;
 
 /**
  * An implementation of the {@link Expression} interface. You should usually extend this class to make a new expression.
@@ -202,7 +200,7 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 	}
 
 	/**
-	 * Usually, you want to override {@link SimpleExpression#getConvertedExpr(Class[])}.
+	 * Usually, you want to override .
 	 * However, it may be useful to override this method if you have an expression with a return
 	 * type that is unknown until runtime (like variables). Usually, you'll be fine with just
 	 * the default implementation. This method is final on versions below INSERT VERSION.

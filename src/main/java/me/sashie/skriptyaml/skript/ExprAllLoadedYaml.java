@@ -1,15 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
@@ -24,6 +14,14 @@ import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 @Name("Return All YAML loaded in memory")
 @Description("Returns a list of all \"cached\" yaml file IDs.")

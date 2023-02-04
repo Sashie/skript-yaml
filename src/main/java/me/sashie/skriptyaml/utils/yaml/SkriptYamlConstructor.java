@@ -1,12 +1,11 @@
 package me.sashie.skriptyaml.utils.yaml;
 
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import ch.njol.skript.util.Date;
+import ch.njol.skript.util.Time;
+import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.WeatherType;
+import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.api.ConstructedClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -19,12 +18,12 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import ch.njol.skript.util.Date;
-import ch.njol.skript.util.Time;
-import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.WeatherType;
-import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.api.ConstructedClass;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SkriptYamlConstructor extends SafeConstructor {
 
@@ -129,7 +128,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 			if (type == null || data == null)
 				return null;
 
-			return new SkriptClass(type, data).deserialize();
+			return SkriptClass.deserialize(type, data);
 		}
 	}
 

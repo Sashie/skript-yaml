@@ -1,14 +1,13 @@
 package me.sashie.skriptyaml;
 
-import javax.annotation.Nullable;
-
-import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.events.bukkit.ScriptEvent;
 import ch.njol.skript.events.bukkit.SkriptStopEvent;
 import ch.njol.skript.lang.TriggerItem;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
 
 /**
  * Effects that extend this class are ran asynchronously. Next trigger item will

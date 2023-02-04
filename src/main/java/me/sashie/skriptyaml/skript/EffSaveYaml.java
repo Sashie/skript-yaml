@@ -1,9 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -12,9 +8,14 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
 
 @Name("Save YAML")
 @Description("Saves the current cached YAML elements to file." +
@@ -35,6 +36,7 @@ public class EffSaveYaml extends Effect {
 	private Expression<String> file;
 	private Expression<Number> yamlIndent;
 	private int mark;
+	private SkriptNode skriptNode;
 
 	@Override
 	protected void execute(@Nullable Event event) {
@@ -44,7 +46,12 @@ public class EffSaveYaml extends Effect {
 			YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
 			if (yamlIndent != null)
 				yaml.setIndent(this.yamlIndent.getSingle(event).intValue());
-			yaml.save(this.mark == 1 ? false : true);
+			try {
+				yaml.save(this.mark == 1 ? false : true);
+			} catch (NullPointerException ex) {
+				SkriptYaml.warn("The yaml '" + name + "' hasnt been populated yet " + skriptNode.toString());
+			}
+			
 		}
 	}
 
@@ -59,6 +66,7 @@ public class EffSaveYaml extends Effect {
 		this.file = (Expression<String>) exprs[0];
 		this.yamlIndent = (Expression<Number>) exprs[1];
 		this.mark = parse.mark;
+		this.skriptNode = new SkriptNode(SkriptLogger.getNode());
 		return true;
 	}
 }

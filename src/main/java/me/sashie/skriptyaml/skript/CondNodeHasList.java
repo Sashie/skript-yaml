@@ -1,11 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -16,6 +10,10 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 @Name("Does YAML Path Have List")
 @Description("Checks if one or more paths contain a list in a cached YAML file using said ID." +

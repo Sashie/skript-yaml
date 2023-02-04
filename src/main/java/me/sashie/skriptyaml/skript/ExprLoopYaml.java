@@ -1,16 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.doc.Description;
@@ -19,19 +8,26 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.Loop;
+import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.ConvertedExpression;
-import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.iterator.ArrayIterator;
+import me.sashie.skriptyaml.SimpleExpressionFork;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.skript.ExprYaml.YamlState;
 import me.sashie.skriptyaml.utils.StringUtil;
+import me.sashie.skriptyaml.utils.versions.wrapper.AbstractLoop;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.Map;
 
 @Name("Yaml Loop")
 @Description("The currently looped value of a yaml expression.")
@@ -41,9 +37,9 @@ import me.sashie.skriptyaml.utils.StringUtil;
 		"loop yaml node list \"node\" from \"config\":",
 		"	message yaml value loop-node from loop-id"})
 @Since("1.3")
-public class ExprLoopYaml extends SimpleExpression<Object> {
+public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 	static {
-		Skript.registerExpression(ExprLoopYaml.class, Object.class, ExpressionType.SIMPLE, "[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s]|7¦iteration)");
+		Skript.registerExpression(ExprLoopYaml.class, Object.class, ExpressionType.SIMPLE, "[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s]|7¦iteration)[-%-*integer%]");
 	}
 
 	public static enum LoopState {
@@ -51,55 +47,42 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 	}
 
 	private String name;
-
-	private Loop loop;
+	private Expression<Integer> number;
+	
+	private AbstractLoop loop;
 
 	YamlState yamlState;
 	LoopState loopState;
 
 	boolean isYamlLoop = false;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		name = parser.expr;
-
+		number = (Expression<Integer>) vars[0];
+	
 		String s = name.split("-")[1];
 
 		int i = -1;
-
-		final Matcher m = Pattern.compile("^(.+)-(\\d+)$").matcher(s);
-		if (m.matches()) {
-			s = "" + m.group(1);
-			i = Utils.parseInt("" + m.group(2));
+		if (number != null) {
+			i = ((Literal<Integer>) number).getSingle().intValue();
 		}
 
-		int j = 1;
-		Loop loop = null;
-
-		for (final Loop l : SkriptYaml.getInstance().getSkriptAdapter().currentLoops()) {
-			if (l.getLoopedExpression() instanceof ExprYaml) {
-				if (j < i) {
-					j++;
-					continue;
-				}
-				if (loop != null) {
-					//Skript.error("There are multiple loops that match loop-" + s + ". Use loop-" + s + "-1/2/3/etc. to specify which loop's value you want.", ErrorQuality.SEMANTIC_ERROR);
-					return false;
-				}
-				loop = l;
-				if (j == i)
-					break;
-			}
-		}
+		AbstractLoop loop = SkriptYaml.getInstance().getSkriptAdapter().getLoop(i, s);
 
 		if (loop == null) {
-			//Skript.error("There's no loop that matches 'loop-" + s + "'", ErrorQuality.SEMANTIC_ERROR);
+			SkriptYaml.error("There are multiple loops that match loop-" + s + ". Use loop-" + s + "-1/2/3/etc. to specify which loop's value you want. " + getNodeMsg());
+			return false;
+		}
+
+		if (loop != null && loop.getObject() == null) {
+			SkriptYaml.error("There's no loop that matches 'loop-" + s + "' " + getNodeMsg());
 			return false;
 		}
 
 		if (loop.getLoopedExpression() instanceof ExprYaml) {
 			yamlState = ((ExprYaml<?>) loop.getLoopedExpression()).getState();
-
 			if (!yamlState.equals(YamlState.VALUE)) {
 				if (parser.mark == 7) {
 					loopState = LoopState.INDEX;
@@ -125,7 +108,7 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 			}
 			isYamlLoop = true;
 		} else {
-			SkriptYaml.error("A 'loop-" + s + "' can only be used in a yaml expression loop ie. 'loop yaml node keys \"node\" from \"config\"'" + getNodeMsg());
+			SkriptYaml.error("A 'loop-" + s + "' can only be used in a yaml expression loop ie. 'loop yaml node keys \"node\" from \"config\"' " + getNodeMsg());
 			return false;
 		}
 
@@ -134,7 +117,6 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 	}
 
 	private boolean loopStateListError(String s) {
-		//Skript.error("There's no 'loop-" + s + "' in a yaml list", ErrorQuality.SEMANTIC_ERROR);
 		SkriptYaml.error("There's no 'loop-" + s + "' in a yaml list " + getNodeMsg());
 		return false;
 	}
@@ -144,12 +126,14 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 		if (n == null) {
 			return "";
 		}
-		return "(" + n.getConfig().getFileName() + ", line " + n.getLine() + ": " + n.save().trim() + "')";
+		return "[script: " + n.getConfig().getFileName() + ", line: " + n.getLine() + " : '" + n.save().trim() + "']";
 	}
 
 	@Override
 	public boolean isSingle() {
-		return false;
+		if (loopState == LoopState.VALUE && yamlState == YamlState.LIST)
+			return true;
+		return yamlState == YamlState.VALUE;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -169,7 +153,6 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 		} else {
 			return super.getConvertedExpr(to);
 		}
-		//return null;
 	}
 
 	@Override
@@ -183,7 +166,7 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 
 	@Override
 	@Nullable
-	protected Object[] get(final Event e) {
+	protected Object[] get(final Event e) {	
 		if (isYamlLoop) {
 			final Object current = loop.getCurrent(e);
 			ExprYaml<?> yamlExpr = ((ExprYaml<?>) loop.getLoopedExpression());
@@ -244,11 +227,11 @@ public class ExprLoopYaml extends SimpleExpression<Object> {
 	@SuppressWarnings("unchecked")
 	public Number getIndex() {
 		try {
-			Field currentIterField = loop.getClass().getDeclaredField("currentIter");
+			Field currentIterField = loop.getLoopClass().getDeclaredField("currentIter");
 			currentIterField.setAccessible(true);
 			Field indexField = ArrayIterator.class.getDeclaredField("index");
 			indexField.setAccessible(true);
-			for (Iterator<?> entry : ((Map<Event, Iterator<?>>) currentIterField.get(loop)).values()) {
+			for (Iterator<?> entry : ((Map<Event, Iterator<?>>) currentIterField.get(loop.getObject())).values()) {
 				return ((int) indexField.get(entry));
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {

@@ -1,8 +1,7 @@
 package me.sashie.skriptyaml;
 
-import org.bukkit.event.Event;
-
 import ch.njol.skript.effects.Delay;
+import org.bukkit.event.Event;
 
 //Forked to provide backwards compatibility with older skript versions ie. dev25
 public abstract class DelayFork extends Delay {

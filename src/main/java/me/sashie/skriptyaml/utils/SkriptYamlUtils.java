@@ -1,13 +1,13 @@
 package me.sashie.skriptyaml.utils;
 
+import ch.njol.skript.registrations.Converters;
+import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
-
-import ch.njol.skript.registrations.Converters;
-import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.debug.SkriptNode;
 
 public class SkriptYamlUtils {
 

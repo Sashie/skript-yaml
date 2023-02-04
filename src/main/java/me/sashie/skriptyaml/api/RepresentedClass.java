@@ -1,12 +1,11 @@
 package me.sashie.skriptyaml.api;
 
-import java.util.Map;
-
+import me.sashie.skriptyaml.SkriptYaml;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 
-import me.sashie.skriptyaml.SkriptYaml;
+import java.util.Map;
 
 /**
  * Needed to register a custom tag.

@@ -1,9 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -15,6 +11,9 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
 
 @Name("Is YAML Loaded")
 @Description("Checks if one or more YAML files are loaded into memory using said ID.")

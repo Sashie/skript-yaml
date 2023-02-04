@@ -19,24 +19,11 @@
 
 package me.sashie.skriptyaml.utils.yaml;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
-
+import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.variables.SerializedVariable;
+import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
+import me.sashie.skriptyaml.utils.StringUtil;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -45,11 +32,10 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 import org.yaml.snakeyaml.representer.Representer;
 
-import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.variables.SerializedVariable;
-import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.debug.SkriptNode;
-import me.sashie.skriptyaml.utils.StringUtil;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * YAML configuration loader. To use this class, construct it with path to a
@@ -131,7 +117,7 @@ public class YAMLProcessor extends YAMLNode {
 	/**
 	 * Loads the configuration file.
 	 *
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 *             on load error
 	 */
 	public void oldLoad() throws IOException {
@@ -157,7 +143,7 @@ public class YAMLProcessor extends YAMLNode {
 	/**
 	 * Loads the configuration file with header and comments.
 	 *
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 *             on load error
 	 */
 	public void load() throws IOException {
@@ -324,8 +310,19 @@ public class YAMLProcessor extends YAMLNode {
 					writer.append(LINE_BREAK);
 			}
 			String firstKey = "";
-			if (!root.keySet().isEmpty())
+			if (!root.keySet().isEmpty()) {
+				//CopyOnWriteArraySet<String> set = new CopyOnWriteArraySet<String>(root.keySet());
+				//String[] array = set.toArray(new String[0]);
+		//		String[] array = getKeys();
+				//String[] array = Collections.synchronizedSet(root.keySet()).toArray(new String[0]);
+				//String[] array = root.keySet().toArray(new String[0]);
+		//		firstKey = array[0];
+				//firstKey = root.keySet().toArray(new String[root.size()])[0];
+				
+				
 				firstKey = root.keySet().toArray(new String[root.size()])[0];
+				
+			}
 			if (comments.isEmpty() || format != YAMLFormat.EXTENDED) {
 				if (extraLines && header != null)
 					writer.append(LINE_BREAK);
@@ -404,7 +401,7 @@ public class YAMLProcessor extends YAMLNode {
 	@SuppressWarnings("unchecked")
 	private void recursiveKeySearch(String path, Object o) {
 		allKeys.add(path);
-		for (Map.Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
+		for (Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
 			allKeys.add(path + "." + entry.getKey());
 			if (entry.getValue() instanceof Map) {
 				recursiveKeySearch(path + "." + entry.getKey(), entry.getValue());
@@ -416,7 +413,7 @@ public class YAMLProcessor extends YAMLNode {
 	private Object rootKeysToString(Object input) {
 		if (input instanceof Map) {
 			Map<String,Object> map = new LinkedHashMap<String, Object>();
-			for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) input).entrySet()) {			
+			for (Entry<Object, Object> entry : ((Map<Object, Object>) input).entrySet()) {
 				map.put(entry.getKey().toString(), rootKeysToString(entry.getValue()));
 			}
 			return map;

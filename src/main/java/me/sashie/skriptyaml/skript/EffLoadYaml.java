@@ -1,12 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -22,6 +15,11 @@ import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 
 @Name("Load YAML")
 @Description("Loads a YAML file into memory." +

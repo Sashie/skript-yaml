@@ -1,11 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.io.File;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -16,6 +10,10 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.utils.StringUtil;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.io.File;
 
 @Name("Does YAML Exist")
 @Description("Checks if a YAML file exists at a file location."

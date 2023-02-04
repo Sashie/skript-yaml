@@ -19,22 +19,13 @@
 
 package me.sashie.skriptyaml.utils.yaml;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import ch.njol.util.StringUtils;
+import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
+import org.bukkit.ChatColor;
 
 import javax.annotation.Nullable;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.util.Vector;
-
-import ch.njol.skript.registrations.Classes;
-import ch.njol.util.StringUtils;
+import java.util.*;
 
 /**
  * Represents a configuration node.
@@ -77,73 +68,6 @@ public class YAMLNode {
 	}
 
 	/**
-	 * This is only here for backwards compatibility with old serialized skriptclass objects
-	 * 
-	 * @param path
-	 *            the path to the object
-	 * @param o
-	 *            the value to deserialize
-	 * @return the new object
-	 */
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	private Object deserialize(String path, Object o) {
-		if (o.toString().contains("__skriptclass__")) {
-			YAMLNode n = getNode(path + ".__skriptclass__");
-			if (n == null)
-				return null;
-			for (Object o2 : ((Map<String, Object>) o).values()) {
-				for (Map.Entry<String, Object> o3 : ((Map<String, Object>) o2).entrySet()) {
-
-					if (o3.getKey().equals("vector")) {
-						n = getNode(path + ".__skriptclass__." + o3.getKey());
-						if (n == null)
-							return null;
-
-						Double x = n.getDouble("x");
-						Double y = n.getDouble("y");
-						Double z = n.getDouble("z");
-
-						if (x == null || y == null || z == null)
-							return null;
-
-						return new Vector(x, y, z);
-					} else if (o3.getKey().equals("location")) {
-						n = getNode(path + ".__skriptclass__." + o3.getKey());
-						if (n == null)
-							return null;
-
-						String w = n.getString("world");
-						Double x = n.getDouble("x");
-						Double y = n.getDouble("y");
-						Double z = n.getDouble("z");
-						Double yaw = n.getDouble("yaw");
-						Double pitch = n.getDouble("pitch");
-
-						if (w == null | x == null || y == null || z == null || yaw == null || pitch == null)
-							return null;
-
-						return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(), (float) pitch.doubleValue());
-					} else {
-						return Classes.deserialize(o3.getKey(), Base64.getDecoder().decode((String) o3.getValue()));
-					}
-				}
-			}
-		}
-		
-		return o;
-		//return deserialize(o);
-	}
-/*
-	private Object deserialize(Object o) {
-		if (o instanceof String && ((String) o).startsWith("__skriptclass__ ")) {
-			String[] split = ((String) o).replace("__skriptclass__ ", "").split(" \\| ");
-			return Classes.deserialize(split[0], Base64.getDecoder().decode(split[1]));
-		}
-		return o;
-	}
-*/
-	/**
 	 * Gets a property at a location. This will either return an Object or null,
 	 * with null meaning that no configuration value exists at that location. This
 	 * could potentially return a default value (not yet implemented) as defined by
@@ -161,8 +85,7 @@ public class YAMLNode {
 				return null;
 			}
 
-			return deserialize(path, val);
-			//return val;
+			return val;
 		}
 
 		String[] parts = path.split("\\.");
@@ -176,8 +99,7 @@ public class YAMLNode {
 			}
 
 			if (i == parts.length - 1) {
-				return deserialize(path, o);
-				//return o;
+				return o;
 			}
 
 			try {
@@ -780,21 +702,16 @@ public class YAMLNode {
 	 *            a path
 	 */
 	@SuppressWarnings("unchecked")
-	public void removeProperty(String path) {
+	public void removeProperty(String path, SkriptNode skriptNode) {
+		if (root == null || root.isEmpty())
+			return;
 		if (allKeys.contains(path))
 			allKeys.remove(path);
 		for (int i = allKeys.size() - 1; i >= 0; i--) {
 			if (allKeys.get(i).contains(path + "."))
 				allKeys.remove(i);
 		}
-		/*
-		for (Iterator<String> iterator = allKeys.iterator(); iterator.hasNext();) {
-			String key = iterator.next();
-			if (key.contains(path + ".")) {
-				iterator.remove();
-			}
-		}
-		 */
+
 		if (!path.contains(".")) {
 			root.remove(path);
 			return;
@@ -802,18 +719,31 @@ public class YAMLNode {
 
 		String[] parts = path.split("\\.");
 		Map<String, Object> node = root;
-
 		for (int i = 0; i < parts.length; i++) {
-			Object o = node.get(parts[i]);
-
+			Object o = null;
+			try {
+				o = node.get(parts[i]);
+			} catch (NullPointerException ex) {
+				SkriptYaml.warn("The node '" + path + "' does not exist, that yaml is empty " + (skriptNode != null ? skriptNode.toString() : ""));
+				return;
+			}
 			// Found our target!
 			if (i == parts.length - 1) {
 				node.remove(parts[i]);
 				return;
 			}
 
-			node = (Map<String, Object>) o;
+			try {
+				node = (Map<String, Object>) o;
+			} catch (ClassCastException ex) {
+				SkriptYaml.warn("The node '" + parts[i] + "' likely contains a value therefore the node '" + path + "' does not exist " + (skriptNode != null ? skriptNode.toString() : ""));
+				break;
+			}
 		}
+	}
+
+	public void removeProperty(String path) {
+		removeProperty(path, null);
 	}
 
 	public boolean writeDefaults() {

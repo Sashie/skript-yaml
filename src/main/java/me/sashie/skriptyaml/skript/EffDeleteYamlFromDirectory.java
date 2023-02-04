@@ -1,11 +1,5 @@
 package me.sashie.skriptyaml.skript;
 
-import java.io.File;
-
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -20,6 +14,10 @@ import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
+import org.bukkit.event.Event;
+
+import javax.annotation.Nullable;
+import java.io.File;
 
 @Name("Delete all YAML from one or more directories")
 @Description("Syntax 1: Deletes all YAML files from one or more directories and removes them from memory."

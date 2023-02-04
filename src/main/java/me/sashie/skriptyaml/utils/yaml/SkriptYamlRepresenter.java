@@ -1,14 +1,10 @@
 package me.sashie.skriptyaml.utils.yaml;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
+import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.util.Date;
+import ch.njol.skript.util.*;
+import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.api.RepresentedClass;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -22,14 +18,9 @@ import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.util.Date;
-import ch.njol.skript.util.Slot;
-import ch.njol.skript.util.Time;
-import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.WeatherType;
-import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.api.RepresentedClass;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class SkriptYamlRepresenter extends Representer {
 
