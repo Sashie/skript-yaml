@@ -42,6 +42,15 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <!-- Replace this with your package! -->
+                            <shadedPattern>me.sashie.skriptyaml.bstats</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
             </plugin>
         </plugins>
         <resources>
@@ -79,6 +88,13 @@
             <groupId>com.github.SkriptLang</groupId>
             <artifactId>Skript</artifactId>
             <version>2.6.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
