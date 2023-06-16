@@ -13,8 +13,8 @@ import me.sashie.skriptyaml.utils.versions.V2_6;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlConstructor;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlRepresenter;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
-import shaded.org.bstats.bukkit.Metrics;
-import shaded.org.bstats.charts.DrilldownPie;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.DrilldownPie;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -107,12 +107,8 @@ public class SkriptYaml extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		String initServerVer = Bukkit.getServer().getClass().getPackage().getName().substring(23);
-		serverVersion = Integer.parseInt(Character.toString(initServerVer.charAt(3)));
-		if (serverVersion == 1 && Integer.parseInt(Character.toString(initServerVer.charAt(4))) >= 0) {
-			serverVersion = Integer.parseInt(Integer.parseInt(Character.toString(initServerVer.charAt(3))) + ""
-					+ Integer.parseInt(Character.toString(initServerVer.charAt(4))));
-		}
+		String initServerVer = Bukkit.getBukkitVersion().split("\\.")[1].split("\\.")[0];
+		serverVersion = Integer.parseInt(initServerVer);
 
 		Plugin skript = Bukkit.getServer().getPluginManager().getPlugin("Skript");
 		if (skript != null) {
