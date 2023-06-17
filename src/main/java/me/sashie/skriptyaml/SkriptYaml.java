@@ -107,11 +107,9 @@ public class SkriptYaml extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		String initServerVer = Bukkit.getBukkitVersion().split("\\.")[1].split("\\.")[0];
-		serverVersion = Integer.parseInt(initServerVer);
-
 		Plugin skript = Bukkit.getServer().getPluginManager().getPlugin("Skript");
 		if (skript != null) {
+			serverVersion = Skript.getMinecraftVersion().getMinor();
 			if (Skript.isAcceptRegistrations()) {
 				try {
 					SkriptAddon addonInstance = Skript.registerAddon(this);
