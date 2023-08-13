@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.util.Vector;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -28,6 +29,7 @@ import java.util.regex.Pattern;
 public class SkriptYamlConstructor extends SafeConstructor {
 
 	public SkriptYamlConstructor() {
+		super(new LoaderOptions());
 		this.yamlConstructors.put(new Tag("!skriptclass"), new ConstructSkriptClass());
 
 		this.yamlConstructors.put(new Tag("!vector"), new ConstructVector());

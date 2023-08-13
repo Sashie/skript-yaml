@@ -45,6 +45,7 @@ public class SkriptYamlRepresenter extends Representer {
 	private static List<String> representedClasses = new ArrayList<>();
 
 	public SkriptYamlRepresenter() {
+		super(new DumperOptions());
 		this.nullRepresenter = new Represent() {
 			@Override
 			public Node representData(Object o) {
