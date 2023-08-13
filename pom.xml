@@ -6,7 +6,7 @@
 
     <groupId>skript-yaml</groupId>
     <artifactId>skript-yaml</artifactId>
-    <version>1.4.1</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>Skript Yaml</name>
