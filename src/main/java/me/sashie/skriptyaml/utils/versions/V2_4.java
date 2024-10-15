@@ -1,14 +1,14 @@
 package me.sashie.skriptyaml.utils.versions;
 
 import ch.njol.skript.ScriptLoader;
-import ch.njol.skript.classes.Converter;
-import ch.njol.skript.classes.Converter.ConverterInfo;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptLoop;
 import org.bukkit.event.Event;
+import org.skriptlang.skript.lang.converter.Converter;
+import org.skriptlang.skript.lang.converter.ConverterInfo;
 
 import java.lang.reflect.Field;
 import java.util.List;
