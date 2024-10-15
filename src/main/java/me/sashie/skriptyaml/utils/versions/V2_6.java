@@ -1,7 +1,5 @@
 package me.sashie.skriptyaml.utils.versions;
 
-import ch.njol.skript.classes.Converter;
-import ch.njol.skript.classes.Converter.ConverterInfo;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.ConvertedExpression;
@@ -11,6 +9,8 @@ import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.skript.ExprYaml;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptSecLoop;
 import org.bukkit.event.Event;
+import org.skriptlang.skript.lang.converter.Converter;
+import org.skriptlang.skript.lang.converter.ConverterInfo;
 
 import java.util.List;
 
@@ -32,7 +32,6 @@ public class V2_6 implements SkriptAdapter {
 		return ((SkriptColor) color).getName();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ConvertedExpression getConvertedExpr(Expression expr, Class superType, Converter converter) {
 		return new ConvertedExpression<>(expr, superType,
