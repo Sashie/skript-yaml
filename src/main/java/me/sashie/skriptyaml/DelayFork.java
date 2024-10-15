@@ -7,6 +7,6 @@ import org.bukkit.event.Event;
 public abstract class DelayFork extends Delay {
 
 	public static void addDelayedEvent(Event event) {
-		delayed.add(event);
+		addDelayedEvent(event);
 	}
 }
