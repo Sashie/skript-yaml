@@ -100,11 +100,9 @@ public class YAMLProcessor extends YAMLNode {
 		options.setTimeZone(TimeZone.getDefault());
 		options.setSplitLines(false);
 
-		//Representer representer = new SkriptYamlRepresenter();
 		Representer representer = SkriptYaml.getInstance().getRepresenter();
 		representer.setDefaultFlowStyle(format.getStyle());
 
-		//yaml = new Yaml(new SkriptYamlConstructor(), representer, options);
 		yaml = new Yaml(SkriptYaml.getInstance().getConstructor(), representer, options);
 		
 		this.file = file;
@@ -353,7 +351,8 @@ public class YAMLProcessor extends YAMLNode {
 				}
 			}
 			return true;
-		} catch (IOException ignored) {
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		} finally {
 			try {
 				if (stream != null) {

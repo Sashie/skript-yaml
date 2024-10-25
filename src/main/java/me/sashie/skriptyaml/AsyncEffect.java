@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
+import ch.njol.skript.effects.Delay;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.lang.TriggerItem;
@@ -17,7 +18,7 @@ import ch.njol.skript.lang.TriggerItem;
  * <p>
  * Majority of Skript and Minecraft APIs are not thread-safe, so be careful.
  */
-public abstract class AsyncEffect extends DelayFork {
+public abstract class AsyncEffect extends Delay {
 
 	private static final ReentrantLock SKRIPT_EXECUTION = new ReentrantLock(true);
 	private static final ExecutorService THREADS = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -26,7 +27,7 @@ public abstract class AsyncEffect extends DelayFork {
 	@Nullable
 	protected TriggerItem walk(Event e) {
 		debug(e, true);
-		DelayFork.addDelayedEvent(e);
+		SkriptYaml.getInstance().getSkriptAdapter().addDelayedEvent(e);
 		CompletableFuture<Void> run = CompletableFuture.runAsync(new Runnable() {
 			public void run() {
 				execute(e);

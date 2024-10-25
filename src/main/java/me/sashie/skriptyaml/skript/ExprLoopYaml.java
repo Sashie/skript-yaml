@@ -1,7 +1,6 @@
 package me.sashie.skriptyaml.skript;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.classes.Converter;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -13,7 +12,6 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.iterator.ArrayIterator;
@@ -26,6 +24,9 @@ import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -142,13 +143,21 @@ public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 	protected <R> ConvertedExpression<Object, ? extends R> getConvertedExpr(final Class<R>... to) {
 		if (isYamlLoop && loopState != LoopState.INDEX) {
 			Class<R> superType = (Class<R>) Utils.getSuperType(to);
-			Converter<Object, R> converter = new Converter<Object, R>() {
-				@Override
-				@Nullable
-				public R convert(final Object o) {
-					return Converters.convert(o, to);
-				}
-			};
+			Class<?> converterClass = SkriptYaml.getInstance().getSkriptAdapter().getConverterClass();
+
+			Object converter = Proxy.newProxyInstance(
+					converterClass.getClassLoader(),
+					new Class<?>[]{converterClass},
+					new InvocationHandler() {
+						@Override
+						public Object invoke(Object proxy, Method method, Object[] args) {
+							if (method.getName().equals("convert") && args != null && args.length == 1) {
+								Object o = args[0];
+								return SkriptYaml.getInstance().getSkriptAdapter().convert(o, to);
+							}
+							return null;
+						}
+					});
 			return SkriptYaml.getInstance().getSkriptAdapter().getConvertedExpr(this, superType, converter);
 		} else {
 			return super.getConvertedExpr(to);

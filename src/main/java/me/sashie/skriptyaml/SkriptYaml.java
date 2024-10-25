@@ -6,10 +6,7 @@ import ch.njol.skript.SkriptAddon;
 import me.sashie.skriptyaml.api.ConstructedClass;
 import me.sashie.skriptyaml.api.RepresentedClass;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
-import me.sashie.skriptyaml.utils.versions.SkriptAdapter;
-import me.sashie.skriptyaml.utils.versions.V2_3;
-import me.sashie.skriptyaml.utils.versions.V2_4;
-import me.sashie.skriptyaml.utils.versions.V2_6;
+import me.sashie.skriptyaml.utils.versions.*;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlConstructor;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlRepresenter;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
@@ -121,9 +118,11 @@ public class SkriptYaml extends JavaPlugin {
 				}
 			}
 
-			if ((Skript.getVersion().getMajor() >= 3 ? true : (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 6 ? true : false)))
+			if (Skript.getVersion().getMajor() >= 3 || (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 9))
+				adapter = new V2_9();
+			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 6)
 				adapter = new V2_6();
-			else if ((Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 4 ? true : false))
+			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 4)
 				adapter = new V2_4();
 			else
 				adapter = new V2_3();

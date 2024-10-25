@@ -1,7 +1,5 @@
 package me.sashie.skriptyaml.utils.versions.wrapper;
 
-import ch.njol.skript.ScriptLoader;
-import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Expression;
 import org.bukkit.event.Event;
 
@@ -65,7 +63,7 @@ public class SkriptLoop extends AbstractLoop {
 	static public Expression<?> getLoopedExpression(Object o) {
 		if (o != null) {
 			try {
-				return (Expression<?>) getLoopedExpression.invoke(o);//return ((Loop) o).getLoopedExpression();
+				return (Expression<?>) getLoopedExpression.invoke(o);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}

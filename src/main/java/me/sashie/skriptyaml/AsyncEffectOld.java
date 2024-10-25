@@ -1,6 +1,7 @@
 package me.sashie.skriptyaml;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.effects.Delay;
 import ch.njol.skript.events.bukkit.ScriptEvent;
 import ch.njol.skript.events.bukkit.SkriptStopEvent;
 import ch.njol.skript.lang.TriggerItem;
@@ -15,7 +16,7 @@ import javax.annotation.Nullable;
  * <p>
  * Majority of Skript and Minecraft APIs are not thread-safe, so be careful.
  */
-public abstract class AsyncEffectOld extends DelayFork {
+public abstract class AsyncEffectOld extends Delay {
 
 	@Override
 	@Nullable
@@ -26,7 +27,7 @@ public abstract class AsyncEffectOld extends DelayFork {
 			if (getNext() != null)
 				TriggerItem.walk(getNext(), e);
 		} else {
-			DelayFork.addDelayedEvent(e);
+			SkriptYaml.getInstance().getSkriptAdapter().addDelayedEvent(e);
 			Bukkit.getScheduler().runTaskAsynchronously(Skript.getInstance(), new Runnable() {
 				@Override
 				public void run() {

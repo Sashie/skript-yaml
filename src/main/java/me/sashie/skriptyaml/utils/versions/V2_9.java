@@ -18,19 +18,19 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
-public class V2_6 implements SkriptAdapter {
+public class V2_9 implements SkriptAdapter {
 
 	private Field delayedField;
 	private Class<?> converterClass, converterInfoClass;
 	private Method convertMethod;
 
-	public V2_6() {
+	public V2_9() {
 		try {
-			converterClass = Class.forName("ch.njol.skript.classes.Converter");
-			converterInfoClass = Class.forName("ch.njol.skript.classes.Converter.ConverterInfo");
-			Class<?> convertersClass = Class.forName("ch.njol.skript.registrations.Converters");
+			converterClass = Class.forName("org.skriptlang.skript.lang.converter.Converter");
+			converterInfoClass = Class.forName("org.skriptlang.skript.lang.converter.ConverterInfo");
+			Class<?> convertersClass = Class.forName("org.skriptlang.skript.lang.converter.Converters");
 			convertMethod = convertersClass.getMethod("convert", Object.class, Class[].class);
-			delayedField = Delay.class.getDeclaredField("delayed");
+			delayedField = Delay.class.getDeclaredField("DELAYED");
 			delayedField.setAccessible(true);
 		} catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
 			e.printStackTrace();

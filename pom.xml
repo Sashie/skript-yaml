@@ -6,7 +6,7 @@
 
     <groupId>skript-yaml</groupId>
     <artifactId>skript-yaml</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
 
     <name>Skript Yaml</name>
@@ -81,13 +81,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.2-R0.1-SNAPSHOT</version>
+            <version>1.21.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.SkriptLang</groupId>
             <artifactId>Skript</artifactId>
-            <version>2.6.3</version>
+            <version>2.9.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

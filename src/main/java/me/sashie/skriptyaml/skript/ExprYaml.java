@@ -1,7 +1,6 @@
 package me.sashie.skriptyaml.skript;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -218,7 +217,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	}
 
 	@Override
-	public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
+	public void change(Event event, Object[] delta, ChangeMode mode) {
 		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
 
@@ -403,18 +402,18 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	}
 */
 	@Override
-	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
-		if (mode == Changer.ChangeMode.DELETE || mode == Changer.ChangeMode.RESET) {
+	public Class<?>[] acceptChange(final ChangeMode mode) {
+		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 			return CollectionUtils.array(Object.class);
 		}
 		if (state == YamlState.VALUE) {
-			if (mode == Changer.ChangeMode.SET)
+			if (mode == ChangeMode.SET)
 				return CollectionUtils.array(Object.class);
 		} else if (state == YamlState.NODE_KEYS) {
-			if (mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE)
+			if (mode == ChangeMode.ADD || mode == ChangeMode.REMOVE)
 				return CollectionUtils.array(Object[].class);
 		} else if (state == YamlState.LIST) {
-			if (mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE || mode == Changer.ChangeMode.SET)
+			if (mode == ChangeMode.ADD || mode == ChangeMode.REMOVE || mode == ChangeMode.SET)
 				return CollectionUtils.array(Object[].class);
 		}
 		return null;
