@@ -18,13 +18,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
-public class V2_9 implements SkriptAdapter {
+public class V2_8 implements SkriptAdapter {
 
 	private Field delayedField;
 	private Class<?> converterClass, converterInfoClass;
 	private Method convertMethod;
 
-	public V2_9() {
+	public V2_8() {
 		try {
 			converterClass = Class.forName("org.skriptlang.skript.lang.converter.Converter");
 			converterInfoClass = Class.forName("org.skriptlang.skript.lang.converter.ConverterInfo");

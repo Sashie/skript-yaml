@@ -118,8 +118,10 @@ public class SkriptYaml extends JavaPlugin {
 				}
 			}
 
-			if (Skript.getVersion().getMajor() >= 3 || (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 9))
-				adapter = new V2_9();
+			if (Skript.getVersion().getMajor() >= 3 || (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 8))
+				adapter = new V2_8();
+			if (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 7)
+				adapter = new V2_7();
 			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 6)
 				adapter = new V2_6();
 			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 4)
