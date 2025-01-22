@@ -6,6 +6,7 @@ import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.util.Color;
+import ch.njol.skript.util.Date;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.skript.ExprYaml;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptLoop;
@@ -23,7 +24,7 @@ public class V2_3 implements SkriptAdapter {
 
 	private Field byNameField, hasDelayBeforeField, currentLoopsField, delayedField;
 	private Class<?> converterClass;
-	private Method convertMethod;
+	private Method convertMethod, convertMethod2, isCurrentEventMethod, getTimeStampMethod;
 
 	public V2_3() {
 		try {
@@ -36,7 +37,12 @@ public class V2_3 implements SkriptAdapter {
 			converterClass = Class.forName("ch.njol.skript.classes.Converter");
 			Class<?> convertersClass = Class.forName("ch.njol.skript.registrations.Converters");
 			convertMethod = convertersClass.getMethod("convert", Object.class, Class[].class);
+			convertMethod2 = convertersClass.getMethod("convert", Object.class, Class.class);
 			delayedField = Delay.class.getDeclaredField("delayed");
+			Class<?> skriptLoaderClass = Class.forName("ch.njol.skript.ScriptLoader");
+			isCurrentEventMethod = skriptLoaderClass.getMethod("isCurrentEvent", Event.class);
+			Class<?> dateClass = Class.forName("ch.njol.skript.util.Date");
+			getTimeStampMethod = dateClass.getMethod("getTimestamp");
 		} catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -69,6 +75,15 @@ public class V2_3 implements SkriptAdapter {
 	}
 
 	@Override
+	public long getTime(Date date) {
+		try {
+			return (int) getTimeStampMethod.invoke(date);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return 0;
+		}
+	}
+
+	@Override
 	public ConvertedExpression getConvertedExpr(Expression expr, Class superType, Object converter) {
 		try {
 			Constructor<ConvertedExpression> conExCon = ConvertedExpression.class.getConstructor(Expression.class, superType.getClass(), converterClass);
@@ -94,6 +109,15 @@ public class V2_3 implements SkriptAdapter {
     }
 
 	@Override
+	public <R> R convert(Object object, Class<? extends R> to) {
+		try {
+			return (R) convertMethod2.invoke(null, object, to);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return null;
+		}
+	}
+
+	@Override
 	public List<?> currentLoops() {
 		try {
 			return (List<?>) currentLoopsField.get(null);
@@ -115,7 +139,11 @@ public class V2_3 implements SkriptAdapter {
 
 	@Override
 	public boolean isCurrentEvent(Class<? extends Event> event) {
-		return ScriptLoader.isCurrentEvent(event);
+		try {
+			return (boolean) isCurrentEventMethod.invoke(null, event);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return false;
+		}
 	}
 	
 	@Override

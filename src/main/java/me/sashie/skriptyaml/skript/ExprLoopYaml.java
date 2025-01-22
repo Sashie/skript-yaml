@@ -49,7 +49,7 @@ public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 
 	private String name;
 	private Expression<Integer> number;
-	
+
 	private AbstractLoop loop;
 
 	YamlState yamlState;
@@ -62,7 +62,7 @@ public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		name = parser.expr;
 		number = (Expression<Integer>) vars[0];
-	
+
 		String s = name.split("-")[1];
 
 		int i = -1;
@@ -175,7 +175,7 @@ public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 
 	@Override
 	@Nullable
-	protected Object[] get(final Event e) {	
+	protected Object[] get(final Event e) {
 		if (isYamlLoop) {
 			final Object current = loop.getCurrent(e);
 			ExprYaml<?> yamlExpr = ((ExprYaml<?>) loop.getLoopedExpression());
@@ -186,7 +186,7 @@ public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 				case INDEX:
 					return new Number[] {getIndex()};
 				case ID:
-					return new String[] {yamlExpr.getId(e)};	
+					return new String[] {yamlExpr.getId(e)};
 				case VALUE:
 					if (yamlState.equals(YamlState.LIST))
 						return new Object[] {current};
@@ -256,7 +256,7 @@ public class ExprLoopYaml extends SimpleExpressionFork<Object> {
 		if (isYamlLoop) {
 			final Object current = loop.getCurrent(e);
 			Object[] objects = ((ExprYaml<?>) loop.getLoopedExpression()).get(e);
-			
+
 			if (current == null || objects == null)
 				return Classes.getDebugMessage(null);
 

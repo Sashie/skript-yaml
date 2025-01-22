@@ -24,14 +24,12 @@ import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.ArrayIterator;
@@ -40,6 +38,7 @@ import org.bukkit.event.Event;
 import javax.annotation.Nullable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 /**
  * An implementation of the {@link Expression} interface. You should usually extend this class to make a new expression.
@@ -151,19 +150,19 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 	 */
 	@Nullable
 	protected abstract T[] get(Event e);
-	
+
 	@Override
-	public final boolean check(final Event e, final Checker<? super T> c) {
-		return check(e, c, false);
+	public boolean check(Event event, Predicate<? super T> checker, boolean negated) {
+		return check(get(event), checker, negated, getAnd());
 	}
-	
+
 	@Override
-	public final boolean check(final Event e, final Checker<? super T> c, final boolean negated) {
-		return check(get(e), c, negated, getAnd());
+	public boolean check(Event event, Predicate<? super T> checker) {
+		return check(event, checker, false);
 	}
-	
+
 	// TODO return a kleenean (UNKNOWN if 'all' is null or empty)
-	public final static <T> boolean check(final @Nullable T[] all, final Checker<? super T> c, final boolean invert, final boolean and) {
+	public final static <T> boolean check(final @Nullable T[] all, final Predicate<? super T> checker, final boolean invert, final boolean and) {
 		if (all == null)
 			return false;
 		boolean hasElement = false;
@@ -171,7 +170,7 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 			if (t == null)
 				continue;
 			hasElement = true;
-			final boolean b = c.check(t);
+			final boolean b = checker.test(t);
 			if (and && !b)
 				return invert ^ false;
 			if (!and && b)
@@ -191,7 +190,6 @@ public abstract class SimpleExpressionFork<T> implements Expression<T> {
 	 * @return Expression with the desired return type or null if it can't be converted to the given type
 	 * @see Expression#getConvertedExpression(Class...)
 	 * @see ConvertedExpression#newInstance(Expression, Class...)
-	 * @see Converter
 	 */
 	@Nullable
 	protected <R> ConvertedExpression<T, ? extends R> getConvertedExpr(final Class<R>... to) {

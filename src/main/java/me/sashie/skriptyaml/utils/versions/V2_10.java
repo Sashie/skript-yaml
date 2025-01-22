@@ -19,13 +19,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
-public class V2_8 implements SkriptAdapter {
+public class V2_10 implements SkriptAdapter {
 
 	private Field delayedField;
 	private Class<?> converterClass, converterInfoClass;
-	private Method convertMethod, convertMethod2, getTimeStampMethod;
+	private Method convertMethod, convertMethod2;
 
-	public V2_8() {
+	public V2_10() {
 		try {
 			converterClass = Class.forName("org.skriptlang.skript.lang.converter.Converter");
 			converterInfoClass = Class.forName("org.skriptlang.skript.lang.converter.ConverterInfo");
@@ -34,8 +34,6 @@ public class V2_8 implements SkriptAdapter {
 			convertMethod2 = convertersClass.getMethod("convert", Object.class, Class.class);
 			delayedField = Delay.class.getDeclaredField("DELAYED");
 			delayedField.setAccessible(true);
-			Class<?> dateClass = Class.forName("ch.njol.skript.util.Date");
-			getTimeStampMethod = dateClass.getMethod("getTimestamp");
 		} catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -59,11 +57,7 @@ public class V2_8 implements SkriptAdapter {
 
 	@Override
 	public long getTime(Date date) {
-		try {
-			return (int) getTimeStampMethod.invoke(date);
-		} catch (InvocationTargetException | IllegalAccessException e) {
-			return 0;
-		}
+		return date.getTime();
 	}
 
 	@Override
@@ -148,6 +142,5 @@ public class V2_8 implements SkriptAdapter {
 		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
 			e.printStackTrace();
 		}
-
 	}
 }

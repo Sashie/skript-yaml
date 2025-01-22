@@ -3,13 +3,17 @@ package me.sashie.skriptyaml.utils.yaml;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.*;
+import ch.njol.skript.util.slot.Slot;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.RepresentedClass;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.nodes.Node;
@@ -67,6 +71,7 @@ public class SkriptYamlRepresenter extends Representer {
 		this.representers.put(Vector.class, new RepresentVector());
 		this.representers.put(Location.class, new RepresentLocation());
 
+		this.multiRepresenters.put(ConfigurationSection.class, new RepresentConfigurationSection());
 		this.multiRepresenters.put(ConfigurationSerializable.class, new RepresentConfigurationSerializable());
 
 		for (Class<?> c : representers.keySet()) {
@@ -121,9 +126,18 @@ public class SkriptYamlRepresenter extends Representer {
 		}
 	}
 
-	private class RepresentConfigurationSerializable extends RepresentMap {
+	private class RepresentConfigurationSection extends RepresentMap {
+		@NotNull
 		@Override
-		public Node representData(Object data) {
+		public Node representData(@NotNull Object data) {
+			return super.representData(((ConfigurationSection) data).getValues(false));
+		}
+	}
+
+	private class RepresentConfigurationSerializable extends RepresentMap {
+		@NotNull
+		@Override
+		public Node representData(@NotNull Object data) {
 			return representConfigurationSerializable(data);
 		}
 	}
@@ -155,7 +169,10 @@ public class SkriptYamlRepresenter extends Representer {
 		public Node representData(Object data) {
 			Map<String, Object> out = new LinkedHashMap<String, Object>();
 			Location loc = (Location) data;
-			out.put("world", loc.getWorld().getName());
+			World world = loc.getWorld();
+			if (world == null) return null;
+
+			out.put("world", world.getName());
 			out.put("x", loc.getX());
 			out.put("y", loc.getY());
 			out.put("z", loc.getZ());
@@ -227,7 +244,7 @@ public class SkriptYamlRepresenter extends Representer {
 		@Override
 		public Node representData(Object data) {
 			Calendar calendar = Calendar.getInstance(getTimeZone() == null ? TimeZone.getTimeZone("UTC") : timeZone);
-			calendar.setTime(new java.util.Date(((Date) data).getTimestamp()));
+			calendar.setTime(new java.util.Date(SkriptYaml.getInstance().getSkriptAdapter().getTime((Date) data)));
 
 			int years = calendar.get(Calendar.YEAR);
 			int months = calendar.get(Calendar.MONTH) + 1; // 0..12

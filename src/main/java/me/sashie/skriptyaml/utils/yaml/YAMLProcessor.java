@@ -104,7 +104,7 @@ public class YAMLProcessor extends YAMLNode {
 		representer.setDefaultFlowStyle(format.getStyle());
 
 		yaml = new Yaml(SkriptYaml.getInstance().getConstructor(), representer, options);
-		
+
 		this.file = file;
 	}
 
@@ -166,7 +166,7 @@ public class YAMLProcessor extends YAMLNode {
 			try {
 				read(yaml.load(builder.toString()));
 			} catch (ConstructorException e) {
-				SkriptYaml.error("[Load Yaml] Snakeyaml " + e.getProblem() + " in file '" + file.getAbsolutePath() + "'");	//TODO warn about loss of data since certain nodes didnt load
+				SkriptYaml.error("[Load Yaml] Snakeyaml " + e.getProblem() + " in file '" + file.getAbsolutePath() + "' (possible loss of data)");
 			}
 		} catch (YAMLProcessorException e) {
 			root = new LinkedHashMap<String, Object>();
@@ -311,15 +311,15 @@ public class YAMLProcessor extends YAMLNode {
 			if (!root.keySet().isEmpty()) {
 				//CopyOnWriteArraySet<String> set = new CopyOnWriteArraySet<String>(root.keySet());
 				//String[] array = set.toArray(new String[0]);
-		//		String[] array = getKeys();
+				//		String[] array = getKeys();
 				//String[] array = Collections.synchronizedSet(root.keySet()).toArray(new String[0]);
 				//String[] array = root.keySet().toArray(new String[0]);
-		//		firstKey = array[0];
+				//		firstKey = array[0];
 				//firstKey = root.keySet().toArray(new String[root.size()])[0];
-				
-				
+
+
 				firstKey = root.keySet().toArray(new String[root.size()])[0];
-				
+
 			}
 			if (comments.isEmpty() || format != YAMLFormat.EXTENDED) {
 				if (extraLines && header != null)
@@ -368,7 +368,7 @@ public class YAMLProcessor extends YAMLNode {
 	/**
 	 * Prepare a value for serialization, in case it's not a native type (and we
 	 * don't want to serialize objects as YAML represented objects).
-	 * 
+	 *
 	 * @param value
 	 *            the value to serialize
 	 * @return the new object
@@ -389,7 +389,7 @@ public class YAMLProcessor extends YAMLNode {
 				return null;
 
 			// workaround for class 'ch.njol.skript.expressions.ExprTool$1$2'
-			if (val.type.equals("itemstack"))	
+			if (val.type.equals("itemstack"))
 				return Classes.deserialize(val.type, val.data);	// returns ItemStack instead of SkriptClass
 
 			return new SkriptClass(val.type, val.data);
@@ -543,7 +543,7 @@ public class YAMLProcessor extends YAMLNode {
 
 	/**
 	 * Sets the indentation amount used when the yaml file is saved
-	 * 
+	 *
 	 * @param indent
 	 *            an amount from 1 to 10
 	 */

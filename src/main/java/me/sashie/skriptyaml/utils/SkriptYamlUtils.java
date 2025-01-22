@@ -1,6 +1,5 @@
 package me.sashie.skriptyaml.utils;
 
-import ch.njol.skript.registrations.Converters;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
 
@@ -56,7 +55,7 @@ public class SkriptYamlUtils {
 	@SuppressWarnings("unchecked")
 	public final static <T> T[] convertToArray(Object original, Class<T> to) throws ClassCastException {
 		T[] end = (T[]) Array.newInstance(to, 1);
-		T converted = Converters.convert(original, to);
+		T converted = SkriptYaml.getInstance().getSkriptAdapter().convert(original, to);
 		if (converted != null) {
 			end[0] = converted;
 		} else {

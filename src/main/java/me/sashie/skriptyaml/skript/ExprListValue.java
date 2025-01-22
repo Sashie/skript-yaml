@@ -47,7 +47,7 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 	}
 
 	private boolean checks = false;
-	private Expression<Number> index;	
+	private Expression<Number> index;
 	private Expression<String> path, name;
 	private SkriptNode skriptNode;
 

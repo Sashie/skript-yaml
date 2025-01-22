@@ -49,10 +49,9 @@ public class EffSaveYaml extends Effect {
 			try {
 				yaml.save(this.mark == 1 ? false : true);
 			} catch (NullPointerException ex) {
-				ex.printStackTrace();
 				SkriptYaml.warn("The yaml '" + name + "' hasnt been populated yet " + skriptNode.toString());
+				ex.printStackTrace();
 			}
-			
 		}
 	}
 

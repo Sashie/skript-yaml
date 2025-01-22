@@ -10,7 +10,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.log.SkriptLogger;
-import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -206,7 +205,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	public final static <T> T[] convertArray(Object[] original, Class<T> to) throws ClassCastException {
 		T[] end = (T[]) Array.newInstance(to, original.length);
 		for (int i = 0; i < original.length; i++) {
-			T converted = Converters.convert(original[i], to);
+			T converted = SkriptYaml.getInstance().getSkriptAdapter().convert(original[i], to);
 			if (converted != null) {
 				end[i] = converted;
 			} else {
@@ -240,13 +239,13 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 				//config.addNode(path + (delta[0] == null ? "" : "." + delta[0]));
 			else if (mode == ChangeMode.REMOVE)
 				config.removeProperty(path + (delta[0] == null ? "" : "." + delta[0]), skriptNode);
-				//config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
+			//config.setProperty(path + (delta[0] == null ? "" : "." + delta[0]), null);
 		} else if (state == YamlState.LIST) {
 			List<Object> objects = config.getList(path);
 			if (mode == ChangeMode.ADD) {
 				if (objects == null)
 					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta));
-				else 
+				else
 					config.setProperty(path, arrayToList(objects, delta));
 			} else if (mode == ChangeMode.REMOVE) {
 				if (objects == null) {
@@ -272,135 +271,135 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		return list;
 	}
 
-/*TODO	Test for speed later
-	private Object parseString(Object delta) {
-		if (matchedPattern == 0 && String.class.isAssignableFrom(delta.getClass())) {
-			String s = ((String) delta);
-			if (isBoolean(s)) {
-				return parseBoolean(s);
-			} else if (isLong(s)) {
-				return Long.parseLong(s);
-			} else if (isDouble(s)) {
-				return Double.parseDouble(s);
-			} else {
-				return s;
+	/*TODO	Test for speed later
+		private Object parseString(Object delta) {
+			if (matchedPattern == 0 && String.class.isAssignableFrom(delta.getClass())) {
+				String s = ((String) delta);
+				if (isBoolean(s)) {
+					return parseBoolean(s);
+				} else if (isLong(s)) {
+					return Long.parseLong(s);
+				} else if (isDouble(s)) {
+					return Double.parseDouble(s);
+				} else {
+					return s;
+				}
 			}
+			return delta;
 		}
-		return delta;
-	}
-	
-	public static boolean isBoolean(String s) {
-        return ((s != null) && (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on") ||
-        		s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no") || s.equalsIgnoreCase("off")));
-    }
-	
-	public static boolean parseBoolean(String s) {
-        return ((s != null) && (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on")));
-    }
-	
-	private static final int NUMBER_MAX_LENGTH = String.valueOf(Long.MAX_VALUE).length();
 
-	public static boolean isLong(String string) {
-	    if (string == null || string.isEmpty()) {
-	        return false;
-	    }
-	    if (string.length() >= NUMBER_MAX_LENGTH) {
-	        try {
-	            Long.parseLong(string);
-	        } catch (Exception e) {
-	            return false;
-	        }
-	    } else {
-	        int i = 0;
-	        if (string.charAt(0) == '-') {
-	            if (string.length() > 1) {
-	                i++;
-	            } else {
-	                return false;
-	            }
-	        }
-	        for (; i < string.length(); i++) {
-	            if (!Character.isDigit(string.charAt(i))) {
-	                return false;
-	            }
-	        }
-	    }
-	    return true;
-	}
+		public static boolean isBoolean(String s) {
+			return ((s != null) && (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on") ||
+					s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no") || s.equalsIgnoreCase("off")));
+		}
 
-	public static boolean isInteger(String str) {
-	    if (str == null) {
-	        return false;
-	    }
-	    int length = str.length();
-	    if (length == 0) {
-	        return false;
-	    }
-	    int i = 0;
-	    if (str.charAt(0) == '-') {
-	        if (length == 1) {
-	            return false;
-	        }
-	        i = 1;
-	    }
-	    for (; i < length; i++) {
-	        char c = str.charAt(i);
-	        if (c < '0' || c > '9') {
-	            return false;
-	        }
-	    }
-	    return true;
-	}
-	
-	boolean isNumber(String str) {
-	    for (int i=0; i<str.length(); i++) {
-	        char c = str.charAt(i);
-	        if (c < 0x30 || (c >= 0x3a && c <= 0x40) || (c > 0x5a && c <= 0x60) || c > 0x7a)
-	            return false;
-	    }
+		public static boolean parseBoolean(String s) {
+			return ((s != null) && (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on")));
+		}
 
-	    return true;
-	}
+		private static final int NUMBER_MAX_LENGTH = String.valueOf(Long.MAX_VALUE).length();
 
-	public static boolean isDouble(String str) {
-	    if (str == null) {
-	        return false;
-	    }
-	    int length = str.length();
-	    if (length == 0) {
-	        return false;
-	    }
-	    int i = 0;
-	    if (str.charAt(0) == '-') {
-	        if (length == 1) {
-	            return false;
-	        }
-	        ++i;
-	    }
-	    int integerPartSize = 0;
-	    int exponentPartSize = -1;
-	    while (i < length) {
-	        char c = str.charAt(i);
-	        if (c < '0' || c > '9') {
-	            if (c == '.' && integerPartSize > 0 && exponentPartSize == -1) {
-	                exponentPartSize = 0;
-	            } else {
-	                return false;
-	            }
-	        } else if (exponentPartSize > -1) {
-	            ++exponentPartSize;
-	        } else {
-	            ++integerPartSize;
-	        }
-	        ++i;
-	    }
-	    if ((str.charAt(0) == '0' && i > 1 && exponentPartSize < 1)
-	            || exponentPartSize == 0 || (str.charAt(length - 1) == '.')) {
-	        return false;
-	    }
-	    return true;
-	}
-*/
+		public static boolean isLong(String string) {
+			if (string == null || string.isEmpty()) {
+				return false;
+			}
+			if (string.length() >= NUMBER_MAX_LENGTH) {
+				try {
+					Long.parseLong(string);
+				} catch (Exception e) {
+					return false;
+				}
+			} else {
+				int i = 0;
+				if (string.charAt(0) == '-') {
+					if (string.length() > 1) {
+						i++;
+					} else {
+						return false;
+					}
+				}
+				for (; i < string.length(); i++) {
+					if (!Character.isDigit(string.charAt(i))) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		public static boolean isInteger(String str) {
+			if (str == null) {
+				return false;
+			}
+			int length = str.length();
+			if (length == 0) {
+				return false;
+			}
+			int i = 0;
+			if (str.charAt(0) == '-') {
+				if (length == 1) {
+					return false;
+				}
+				i = 1;
+			}
+			for (; i < length; i++) {
+				char c = str.charAt(i);
+				if (c < '0' || c > '9') {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		boolean isNumber(String str) {
+			for (int i=0; i<str.length(); i++) {
+				char c = str.charAt(i);
+				if (c < 0x30 || (c >= 0x3a && c <= 0x40) || (c > 0x5a && c <= 0x60) || c > 0x7a)
+					return false;
+			}
+
+			return true;
+		}
+
+		public static boolean isDouble(String str) {
+			if (str == null) {
+				return false;
+			}
+			int length = str.length();
+			if (length == 0) {
+				return false;
+			}
+			int i = 0;
+			if (str.charAt(0) == '-') {
+				if (length == 1) {
+					return false;
+				}
+				++i;
+			}
+			int integerPartSize = 0;
+			int exponentPartSize = -1;
+			while (i < length) {
+				char c = str.charAt(i);
+				if (c < '0' || c > '9') {
+					if (c == '.' && integerPartSize > 0 && exponentPartSize == -1) {
+						exponentPartSize = 0;
+					} else {
+						return false;
+					}
+				} else if (exponentPartSize > -1) {
+					++exponentPartSize;
+				} else {
+					++integerPartSize;
+				}
+				++i;
+			}
+			if ((str.charAt(0) == '0' && i > 1 && exponentPartSize < 1)
+					|| exponentPartSize == 0 || (str.charAt(length - 1) == '.')) {
+				return false;
+			}
+			return true;
+		}
+	*/
 	@Override
 	public Class<?>[] acceptChange(final ChangeMode mode) {
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {

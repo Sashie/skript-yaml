@@ -8,8 +8,11 @@ import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.ConstructedClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -55,8 +58,10 @@ public class SkriptYamlConstructor extends SafeConstructor {
 	}
 
 	private class ConstructCustomObject extends ConstructYamlMap {
+
+		@Nullable
 		@Override
-		public Object construct(Node node) {
+		public Object construct(@NotNull Node node) {
 			if (node.isTwoStepsConstruction()) {
 				throw new YAMLException("Unexpected referential mapping structure. Node: " + node);
 			}
@@ -80,7 +85,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		}
 
 		@Override
-		public void construct2ndStep(Node node, Object object) {
+		public void construct2ndStep(@NotNull Node node, @NotNull Object object) {
 			throw new YAMLException("Unexpected referential mapping structure. Node: " + node);
 		}
 	}
@@ -116,7 +121,10 @@ public class SkriptYamlConstructor extends SafeConstructor {
 			if (w == null | x == null || y == null || z == null || yaw == null || pitch == null)
 				return null;
 
-			return new Location(Bukkit.getServer().getWorld(w), x, y, z, (float) yaw.doubleValue(),
+			World world = Bukkit.getServer().getWorld(w);
+			if (world == null) return null;
+
+			return new Location(world, x, y, z, (float) yaw.doubleValue(),
 					(float) pitch.doubleValue());
 		}
 	}

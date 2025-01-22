@@ -150,7 +150,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 	@Override
 	public Class<?>[] acceptChange(final ChangeMode mode) {
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET || mode == ChangeMode.SET) {
-			return CollectionUtils.array(Object[].class);	
+			return CollectionUtils.array(Object[].class);
 		}
 		return null;
 	}

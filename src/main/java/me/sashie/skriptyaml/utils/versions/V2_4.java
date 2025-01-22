@@ -4,6 +4,7 @@ import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.util.ConvertedExpression;
+import ch.njol.skript.util.Date;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptLoop;
@@ -20,7 +21,7 @@ public class V2_4 implements SkriptAdapter {
 
 	private Field hasDelayBeforeField, currentLoopsField, delayedField;
 	private Class<?> converterClass, converterInfoClass;
-	private Method convertMethod;
+	private Method convertMethod, convertMethod2, isCurrentEventMethod, getTimeStampMethod;
 
 	public V2_4() {
 		try {
@@ -30,7 +31,12 @@ public class V2_4 implements SkriptAdapter {
 			converterInfoClass = Class.forName("ch.njol.skript.classes.Converter.ConverterInfo");
 			Class<?> convertersClass = Class.forName("ch.njol.skript.registrations.Converters");
 			convertMethod = convertersClass.getMethod("convert", Object.class, Class[].class);
+			convertMethod2 = convertersClass.getMethod("convert", Object.class, Class.class);
 			delayedField = Delay.class.getDeclaredField("delayed");
+			Class<?> skriptLoaderClass = Class.forName("ch.njol.skript.ScriptLoader");
+			isCurrentEventMethod = skriptLoaderClass.getMethod("isCurrentEvent", Event.class);
+			Class<?> dateClass = Class.forName("ch.njol.skript.util.Date");
+			getTimeStampMethod = dateClass.getMethod("getTimestamp");
 		} catch (NoSuchMethodException | ClassNotFoundException | NoSuchFieldException e) {
 			e.printStackTrace();
 		}
@@ -53,6 +59,15 @@ public class V2_4 implements SkriptAdapter {
 	@Override
 	public String getColorName(Object color) {
 		return ((SkriptColor) color).getName();
+	}
+
+	@Override
+	public long getTime(Date date) {
+		try {
+			return (int) getTimeStampMethod.invoke(date);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return 0;
+		}
 	}
 
 	@Override
@@ -84,6 +99,14 @@ public class V2_4 implements SkriptAdapter {
 	}
 
 	@Override
+	public <R> R convert(Object object, Class<? extends R> to) {
+		try {
+			return (R) convertMethod2.invoke(null, object, to);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return null;
+		}
+	}
+	@Override
 	public List<?> currentLoops() {
 		try {
 			return (List<?>) currentLoopsField.get(null);
@@ -105,7 +128,11 @@ public class V2_4 implements SkriptAdapter {
 
 	@Override
 	public boolean isCurrentEvent(Class<? extends Event> event) {
-		return ScriptLoader.isCurrentEvent(event);
+		try {
+			return (boolean) isCurrentEventMethod.invoke(null, event);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return false;
+		}
 	}
 
 	@Override

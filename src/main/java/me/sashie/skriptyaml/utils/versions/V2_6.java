@@ -5,6 +5,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.sections.SecLoop;
+import ch.njol.skript.util.Date;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.skript.ExprYaml;
@@ -22,7 +23,7 @@ public class V2_6 implements SkriptAdapter {
 
 	private Field delayedField;
 	private Class<?> converterClass, converterInfoClass;
-	private Method convertMethod;
+	private Method convertMethod, convertMethod2, getTimeStampMethod;
 
 	public V2_6() {
 		try {
@@ -30,8 +31,11 @@ public class V2_6 implements SkriptAdapter {
 			converterInfoClass = Class.forName("ch.njol.skript.classes.Converter.ConverterInfo");
 			Class<?> convertersClass = Class.forName("ch.njol.skript.registrations.Converters");
 			convertMethod = convertersClass.getMethod("convert", Object.class, Class[].class);
+			convertMethod2 = convertersClass.getMethod("convert", Object.class, Class.class);
 			delayedField = Delay.class.getDeclaredField("delayed");
 			delayedField.setAccessible(true);
+			Class<?> dateClass = Class.forName("ch.njol.skript.util.Date");
+			getTimeStampMethod = dateClass.getMethod("getTimestamp");
 		} catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -46,6 +50,15 @@ public class V2_6 implements SkriptAdapter {
 	@Override
 	public SkriptColor colorFromName(String name) {
 		return SkriptColor.fromName(name);
+	}
+
+	@Override
+	public long getTime(Date date) {
+		try {
+			return (int) getTimeStampMethod.invoke(date);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return 0;
+		}
 	}
 
 	@Override
@@ -76,6 +89,15 @@ public class V2_6 implements SkriptAdapter {
 	public <R> R convert(Object object, Class<? extends R>[] to) {
 		try {
 			return (R) convertMethod.invoke(null, object, to);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public <R> R convert(Object object, Class<? extends R> to) {
+		try {
+			return (R) convertMethod2.invoke(null, object, to);
 		} catch (InvocationTargetException | IllegalAccessException e) {
 			return null;
 		}
