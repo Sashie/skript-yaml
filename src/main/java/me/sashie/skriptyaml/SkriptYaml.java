@@ -6,6 +6,7 @@ import ch.njol.skript.SkriptAddon;
 import me.sashie.skriptyaml.api.ConstructedClass;
 import me.sashie.skriptyaml.api.RepresentedClass;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
+import me.sashie.skriptyaml.utils.UpdateChecker;
 import me.sashie.skriptyaml.utils.versions.*;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlConstructor;
 import me.sashie.skriptyaml.utils.yaml.SkriptYamlRepresenter;
@@ -141,6 +142,7 @@ public class SkriptYaml extends JavaPlugin {
 							return registeredTags();
 						}
 					}));
+			new UpdateChecker(this);
 		} else {
 			Bukkit.getPluginManager().disablePlugin(this);
 			error("Skript not found, plugin disabled.");
