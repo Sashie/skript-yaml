@@ -39,8 +39,14 @@ import java.util.Map;
 		"	message yaml value loop-node from loop-id"})
 @Since("1.3")
 public class ExprLoopYaml extends SimpleExpressionFork<Object> {
+	private static boolean IS_2_8 = false;
 	static {
-		Skript.registerExpression(ExprLoopYaml.class, Object.class, ExpressionType.SIMPLE, "[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s]|7¦iteration)[-%-*integer%]");
+		if (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 8) {
+			Skript.registerExpression(ExprLoopYaml.class, Object.class, ExpressionType.SIMPLE, "[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s])[-%-*integer%]");
+			IS_2_8 = true;
+		} else {
+			Skript.registerExpression(ExprLoopYaml.class, Object.class, ExpressionType.SIMPLE, "[the] loop-(1¦id|2¦val|3¦list|4¦node|5¦key|6¦subnodekey[s]|7¦iteration)[-%-*integer%]");
+		}
 	}
 
 	public static enum LoopState {

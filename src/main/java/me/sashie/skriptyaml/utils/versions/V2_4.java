@@ -64,9 +64,9 @@ public class V2_4 implements SkriptAdapter {
 	@Override
 	public long getTime(Date date) {
 		try {
-			return (int) getTimeStampMethod.invoke(date);
+			return (long) getTimeStampMethod.invoke(date);
 		} catch (InvocationTargetException | IllegalAccessException e) {
-			return 0;
+			return 0L;
 		}
 	}
 
