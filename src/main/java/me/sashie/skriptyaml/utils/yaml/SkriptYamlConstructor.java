@@ -139,10 +139,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 			if (data == null)
 				return null;
 
-			BlockData blockData = Bukkit.createBlockData(data);
-			if (blockData == null) return null;
-
-			return blockData;
+			return Bukkit.createBlockData(data);
 		}
 	}
 
