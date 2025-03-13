@@ -8,6 +8,7 @@ import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.RepresentedClass;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -70,6 +71,7 @@ public class SkriptYamlRepresenter extends Representer {
 
 		this.representers.put(Vector.class, new RepresentVector());
 		this.representers.put(Location.class, new RepresentLocation());
+		this.representers.put(BlockData.class, new RepresentBlockData());
 
 		this.multiRepresenters.put(ConfigurationSection.class, new RepresentConfigurationSection());
 		this.multiRepresenters.put(ConfigurationSerializable.class, new RepresentConfigurationSerializable());
@@ -179,6 +181,17 @@ public class SkriptYamlRepresenter extends Representer {
 			out.put("yaw", (double) loc.getYaw());
 			out.put("pitch", (double) loc.getPitch());
 			return representMapping(new Tag("!location"), out);
+		}
+	}
+
+	private class RepresentBlockData implements Represent {
+		@Override
+		public Node representData(Object data) {
+			Map<String, Object> out = new LinkedHashMap<String, Object>();
+			String blockData = ((BlockData) data).getAsString();
+
+			out.put("blockData", blockData);
+			return representMapping(new Tag("!blockdata"), out);
 		}
 	}
 

@@ -6,10 +6,16 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.WeatherType;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.ConstructedClass;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockSupport;
+import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.structure.Mirror;
+import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +43,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 
 		this.yamlConstructors.put(new Tag("!vector"), new ConstructVector());
 		this.yamlConstructors.put(new Tag("!location"), new ConstructLocation());
+		this.yamlConstructors.put(new Tag("!blockdata"), new ConstructBlockData());
 		
 		this.yamlConstructors.put(new Tag("!skriptdate"), new ConstructSkriptDate());
 		//this.yamlConstructors.put(Tag.TIMESTAMP, new ConstructSkriptDate());
@@ -126,6 +133,23 @@ public class SkriptYamlConstructor extends SafeConstructor {
 
 			return new Location(world, x, y, z, (float) yaw.doubleValue(),
 					(float) pitch.doubleValue());
+		}
+	}
+
+	private class ConstructBlockData extends AbstractConstruct {
+		@Override
+		public Object construct(Node node) {
+			final Map<Object, Object> values = constructMapping((MappingNode) node);
+
+			String data = (String) values.get("blockData");
+
+			if (data == null)
+				return null;
+
+			BlockData blockData = Bukkit.createBlockData(data);
+			if (blockData == null) return null;
+
+			return blockData;
 		}
 	}
 
