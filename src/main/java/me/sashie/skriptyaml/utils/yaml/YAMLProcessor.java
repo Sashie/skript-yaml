@@ -24,6 +24,7 @@ import ch.njol.skript.variables.SerializedVariable;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.StringUtil;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -383,7 +384,7 @@ public class YAMLProcessor extends YAMLNode {
 			for (int i = 0; i < ((List<Object>) value).size(); i++)
 				((List<Object>) value).set(i, serialize(((List<Object>) value).get(i)));
 			return value;
-		} else if (!(SkriptYamlRepresenter.contains(value) || value instanceof ConfigurationSerializable || value instanceof Number || value instanceof Map || value instanceof List)) {
+		} else if (!(SkriptYamlRepresenter.contains(value) || value instanceof ConfigurationSerializable || value instanceof Number || value instanceof BlockData || value instanceof Map || value instanceof List)) {
 			SerializedVariable.Value val = Classes.serialize(value);
 			if (val == null)
 				return null;

@@ -96,6 +96,7 @@ public class SkriptYamlRepresenter extends Representer {
 	public static boolean contains(Object object) {
 		if (object == null)
 			return false;
+
 		return representedClasses.contains(object.getClass().getSimpleName());
 	}
 
