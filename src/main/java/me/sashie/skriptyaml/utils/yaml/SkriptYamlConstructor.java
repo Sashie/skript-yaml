@@ -127,21 +127,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		}
 	}
 
-	/*private class ConstructBlockData extends AbstractConstruct {
-		@Override
-		public Object construct(Node node) {
-			final Map<Object, Object> values = constructMapping((MappingNode) node);
-
-			String data = (String) values.get("blockData");
-
-			if (data == null)
-				return null;
-
-			return Bukkit.createBlockData(data);
-		}
-	}*/
-
-	public class ConstructBlockData extends AbstractConstruct {
+	private class ConstructBlockData extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
 			ScalarNode scalar = (ScalarNode) node;

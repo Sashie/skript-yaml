@@ -186,17 +186,6 @@ public class SkriptYamlRepresenter extends Representer {
 		}
 	}
 
-	/*private class RepresentBlockData extends RepresentMap {
-		@Override
-		public Node representData(Object data) {
-			Map<String, Object> out = new LinkedHashMap<String, Object>();
-			String blockData = ((BlockData) data).getAsString();
-
-			out.put("blockData", blockData);
-			return representMapping(new Tag("!blockdata"), out);
-		}
-	}*/
-
 	private class RepresentBlockData implements Represent {
 		@Override
 		public Node representData(Object data) {
