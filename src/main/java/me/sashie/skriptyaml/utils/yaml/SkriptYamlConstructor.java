@@ -7,7 +7,6 @@ import ch.njol.skript.util.WeatherType;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.api.ConstructedClass;
 import org.bukkit.*;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +29,8 @@ import java.util.regex.Pattern;
 
 public class SkriptYamlConstructor extends SafeConstructor {
 
-	public SkriptYamlConstructor() {
-		super(new LoaderOptions());
+	public SkriptYamlConstructor(LoaderOptions yamlLoaderOptions) {
+		super(yamlLoaderOptions);
 		this.yamlConstructors.put(new Tag("!skriptclass"), new ConstructSkriptClass());
 
 		this.yamlConstructors.put(new Tag("!vector"), new ConstructVector());
@@ -39,7 +38,6 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		this.yamlConstructors.put(new Tag("!blockdata"), new ConstructBlockData());
 		
 		this.yamlConstructors.put(new Tag("!skriptdate"), new ConstructSkriptDate());
-		//this.yamlConstructors.put(Tag.TIMESTAMP, new ConstructSkriptDate());
 		this.yamlConstructors.put(new Tag("!skripttime"), new ConstructSkriptTime());
 		this.yamlConstructors.put(new Tag("!skripttimespan"), new ConstructSkriptTimespan());
 		this.yamlConstructors.put(new Tag("!skriptcolor"), new ConstructSkriptColor());
@@ -129,7 +127,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		}
 	}
 
-	private class ConstructBlockData extends AbstractConstruct {
+	/*private class ConstructBlockData extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
 			final Map<Object, Object> values = constructMapping((MappingNode) node);
@@ -140,6 +138,15 @@ public class SkriptYamlConstructor extends SafeConstructor {
 				return null;
 
 			return Bukkit.createBlockData(data);
+		}
+	}*/
+
+	public class ConstructBlockData extends AbstractConstruct {
+		@Override
+		public Object construct(Node node) {
+			ScalarNode scalar = (ScalarNode) node;
+			String nodeValue = scalar.getValue();
+			return Bukkit.createBlockData(nodeValue);
 		}
 	}
 

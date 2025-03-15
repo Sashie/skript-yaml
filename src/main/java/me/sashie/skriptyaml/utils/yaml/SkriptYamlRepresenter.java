@@ -71,7 +71,8 @@ public class SkriptYamlRepresenter extends Representer {
 
 		this.representers.put(Vector.class, new RepresentVector());
 		this.representers.put(Location.class, new RepresentLocation());
-		this.representers.put(BlockData.class, new RepresentBlockData());
+
+		this.multiRepresenters.put(BlockData.class, new RepresentBlockData());
 
 		this.multiRepresenters.put(ConfigurationSection.class, new RepresentConfigurationSection());
 		this.multiRepresenters.put(ConfigurationSerializable.class, new RepresentConfigurationSerializable());
@@ -185,7 +186,7 @@ public class SkriptYamlRepresenter extends Representer {
 		}
 	}
 
-	private class RepresentBlockData implements Represent {
+	/*private class RepresentBlockData extends RepresentMap {
 		@Override
 		public Node representData(Object data) {
 			Map<String, Object> out = new LinkedHashMap<String, Object>();
@@ -193,6 +194,13 @@ public class SkriptYamlRepresenter extends Representer {
 
 			out.put("blockData", blockData);
 			return representMapping(new Tag("!blockdata"), out);
+		}
+	}*/
+
+	private class RepresentBlockData implements Represent {
+		@Override
+		public Node representData(Object data) {
+			return representScalar(new Tag("!blockdata"), ((BlockData) data).getAsString());
 		}
 	}
 

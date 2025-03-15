@@ -16,6 +16,7 @@ import org.bstats.charts.DrilldownPie;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.yaml.snakeyaml.LoaderOptions;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -119,9 +120,11 @@ public class SkriptYaml extends JavaPlugin {
 				}
 			}
 
-			if (Skript.getVersion().getMajor() >= 3 || (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 8))
+			if (Skript.getVersion().getMajor() >= 3 || (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 10))
+				adapter = new V2_10();
+			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 8)
 				adapter = new V2_8();
-			else if (Skript.getVersion().getMajor() >= 2 && Skript.getVersion().getMinor() >= 7)
+			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 7)
 				adapter = new V2_7();
 			else if (Skript.getVersion().getMajor() == 2 && Skript.getVersion().getMinor() >= 6)
 				adapter = new V2_6();
@@ -131,7 +134,11 @@ public class SkriptYaml extends JavaPlugin {
 				adapter = new V2_3();
 
 			representer = new SkriptYamlRepresenter();
-			constructor = new SkriptYamlConstructor();
+			LoaderOptions yamlLoaderOptions = new LoaderOptions();
+			yamlLoaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE);
+			yamlLoaderOptions.setCodePointLimit(Integer.MAX_VALUE);
+			yamlLoaderOptions.setTagInspector(tag -> true);
+			constructor = new SkriptYamlConstructor(yamlLoaderOptions);
 			
 			// new MetricsLite(this);
 			Metrics metrics = new Metrics(this, 1814);
