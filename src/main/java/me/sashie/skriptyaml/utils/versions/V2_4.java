@@ -7,6 +7,8 @@ import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
+import me.sashie.skriptyaml.skript.ExprYaml;
+import me.sashie.skriptyaml.utils.versions.wrapper.AbstractLoop;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptLoop;
 import org.bukkit.event.Event;
 
@@ -137,7 +139,12 @@ public class V2_4 implements SkriptAdapter {
 
 	@Override
 	public SkriptLoop getLoop(int i, String input) {
-		return V2_3.getLoop(i, input, currentLoops());
+		return V2_3.getLoop(i, input, currentLoops(), ExprYaml.class);
+	}
+
+	@Override
+	public AbstractLoop getLoop(int i, String input, Class<? extends Expression<?>> loopedExpression) {
+		return V2_3.getLoop(i, input, currentLoops(), loopedExpression);
 	}
 
 	@Override

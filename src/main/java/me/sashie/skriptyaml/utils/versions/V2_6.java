@@ -9,6 +9,7 @@ import ch.njol.skript.util.Date;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.skript.ExprYaml;
+import me.sashie.skriptyaml.utils.versions.wrapper.AbstractLoop;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptSecLoop;
 import org.bukkit.event.Event;
 
@@ -137,6 +138,28 @@ public class V2_6 implements SkriptAdapter {
 			}
 		}
 
+		return new SkriptSecLoop(loop);
+	}
+
+	@Override
+	public AbstractLoop getLoop(int i, String input, Class<? extends Expression<?>> loopedExpression) {
+		if (loopedExpression == null) return null;
+		int j = 1;
+		SecLoop loop = null;
+		for (SecLoop l : currentLoops()) {
+			if (l.getLoopedExpression().getClass().isAssignableFrom(loopedExpression)) {
+				if (j < i) {
+					j++;
+					continue;
+				}
+				if (loop != null) {
+					return null;
+				}
+				loop = l;
+				if (j == i)
+					break;
+			}
+		}
 		return new SkriptSecLoop(loop);
 	}
 
