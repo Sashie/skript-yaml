@@ -5,10 +5,12 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.util.ConvertedExpression;
+import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.Date;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.skript.ExprYaml;
+import me.sashie.skriptyaml.utils.versions.wrapper.AbstractLoop;
 import me.sashie.skriptyaml.utils.versions.wrapper.SkriptLoop;
 import org.bukkit.event.Event;
 
@@ -148,7 +150,12 @@ public class V2_3 implements SkriptAdapter {
 	
 	@Override
 	public SkriptLoop getLoop(int i, String input) {
-		return getLoop(i, input, currentLoops());
+		return getLoop(i, input, currentLoops(), ExprYaml.class);
+	}
+
+	@Override
+	public AbstractLoop getLoop(int i, String input, Class<? extends Expression<?>> loopedExpression) {
+		return getLoop(i, input, currentLoops(), loopedExpression);
 	}
 
 	@Override
@@ -162,11 +169,11 @@ public class V2_3 implements SkriptAdapter {
 
 	}
 
-	public static SkriptLoop getLoop(int i, String input, List<?> currentLoops) {
+	public static SkriptLoop getLoop(int i, String input, List<?> currentLoops, Class<?> cls ) {
 		int j = 1;
 		Object loop = null;
 		for (final Object l : currentLoops) {
-			if (SkriptLoop.getLoopedExpression(l) instanceof ExprYaml) {
+			if (SkriptLoop.getLoopedExpression(l).getClass().isAssignableFrom(cls)) {
 				if (j < i) {
 					j++;
 					continue;

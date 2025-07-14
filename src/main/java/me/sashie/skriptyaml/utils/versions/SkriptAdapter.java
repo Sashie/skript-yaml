@@ -40,6 +40,8 @@ public interface SkriptAdapter {
 
 	AbstractLoop getLoop(int i, String input);
 
+	AbstractLoop getLoop(int i, String input, Class<? extends Expression<?>> loopedExpression);
+
 	void addDelayedEvent(Event event);
 
 }
