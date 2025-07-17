@@ -23,14 +23,14 @@ import javax.annotation.Nullable;
 public class EffDeleteYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffDeleteYaml.class, "delete [y[a]ml] %strings%");	//TODO add option to keep loaded in memory
+		Skript.registerEffect(EffDeleteYaml.class, "delete y[a]ml %strings%");	//TODO add option to keep loaded in memory
 	}
 
-	private Expression<String> file;
+	private Expression<Object> file;
 
 	@Override
 	protected void execute(@Nullable Event event) {
-		for (String name : this.file.getAll(event)) {
+		for (Object name : this.file.getAll(event)) {
 			if (!SkriptYaml.YAML_STORE.containsKey(name))
 				continue;
 			SkriptYaml.YAML_STORE.get(name).getFile().delete();
@@ -46,7 +46,7 @@ public class EffDeleteYaml extends Effect {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
-		file = (Expression<String>) exprs[0];
+		file = (Expression<Object>) exprs[0];
 		return true;
 	}
 }

@@ -28,6 +28,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.reader.UnicodeReader;
@@ -37,6 +38,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 /**
  * YAML configuration loader. To use this class, construct it with path to a
@@ -82,6 +84,7 @@ public class YAMLProcessor extends YAMLNode {
 	protected String header = null;
 	protected boolean extraHeaderLine;
 	protected YAMLFormat format;
+	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
 	/*
 	 * Map from property key to comment. Comment may have multiple lines that are
@@ -101,10 +104,14 @@ public class YAMLProcessor extends YAMLNode {
 		options.setTimeZone(TimeZone.getDefault());
 		options.setSplitLines(false);
 
+		// TODO register custom tags to handle string types
+
 		Representer representer = SkriptYaml.getInstance().getRepresenter();
 		representer.setDefaultFlowStyle(format.getStyle());
+		representer.addClassTag(UUID.class, Tag.STR);
 
 		yaml = new Yaml(SkriptYaml.getInstance().getConstructor(), representer, options);
+		yaml.addImplicitResolver(new Tag(UUID.class), UUID_PATTERN, null);
 
 		this.file = file;
 	}
@@ -154,7 +161,7 @@ public class YAMLProcessor extends YAMLNode {
 			if (stream == null)
 				throw new IOException("Stream is null!");
 
-			input = new BufferedReader(new UnicodeReader(stream));
+			input = new BufferedReader(new UnicodeReader(stream), 65536);
 
 			List<String> lines = new ArrayList<String>();
 			for (String line = input.readLine(); line != null; line = input.readLine()) {
@@ -164,11 +171,11 @@ public class YAMLProcessor extends YAMLNode {
 				else if (line.startsWith(COMMENT_PREFIX))
 					recursiveCommentSearch(line, lines, input);
 			}
-			try {
-				read(yaml.load(builder.toString()));
-			} catch (ConstructorException e) {
-				SkriptYaml.error("[Load Yaml] Snakeyaml " + e.getProblem() + " in file '" + file.getAbsolutePath() + "' (possible loss of data)");
-			}
+
+			read(yaml.load(builder.toString()));
+			//read(yaml.load(input));
+		} catch (ConstructorException e) {
+			SkriptYaml.error("[Load Yaml] Snakeyaml " + e.getProblem() + " in file '" + file.getAbsolutePath() + "' (possible loss of data)");
 		} catch (YAMLProcessorException e) {
 			root = new LinkedHashMap<String, Object>();
 		} finally {

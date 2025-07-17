@@ -41,7 +41,7 @@ public class CondNodeHasList extends Condition {
 		if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
 			return false;
 		Object o =  SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event));
-		return o != null ? (o instanceof List) ^ isNegated() : false ^ isNegated();
+		return o != null ? (o instanceof List) ^ isNegated() : isNegated();
 	}
 
 	@Override

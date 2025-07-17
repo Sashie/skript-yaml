@@ -41,9 +41,9 @@ public class EffLoadYaml extends Effect {
 
 	static {
 		Skript.registerEffect(EffLoadYaml.class, 
-				"[re]load [(1¦non[(-| )]relative)] [y[a]ml] %strings%",
-				"[re]load [(1¦non[(-| )]relative)] [y[a]ml] %string% as %string%",
-				"[re]load [(1¦non[(-| )]relative)] [y[a]ml] %strings% using [the] [file] path[s] as [the] id[s]");
+				"[re]load [(1¦non[(-| )]relative)] y[a]ml %strings%",
+				"[re]load [(1¦non[(-| )]relative)] y[a]ml %string% as %string%",
+				"[re]load [(1¦non[(-| )]relative)] y[a]ml %strings% using [the] [file] path[s] as [the] id[s]");
 	}
 
 	private Expression<String> file;

@@ -32,7 +32,7 @@ public class ExprAllYamlNodes extends SimpleExpression<String> {
 
 	static {
 		Skript.registerExpression(ExprAllYamlNodes.class, String.class, ExpressionType.SIMPLE,
-				"[all] [[skript-]y[a]ml] (node|path)[s] (of|in|from) %string%");
+				"[all] [skript-]y[a]ml (node|path)[s] (of|in|from) %string%");
 	}
 
 	private Expression<String> file;

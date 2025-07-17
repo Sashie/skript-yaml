@@ -136,6 +136,7 @@ public class SkriptYaml extends JavaPlugin {
 			representer = new SkriptYamlRepresenter();
 			LoaderOptions yamlLoaderOptions = new LoaderOptions();
 			yamlLoaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE);
+			yamlLoaderOptions.setAllowRecursiveKeys(true);
 			yamlLoaderOptions.setCodePointLimit(Integer.MAX_VALUE);
 			yamlLoaderOptions.setTagInspector(tag -> true);
 			constructor = new SkriptYamlConstructor(yamlLoaderOptions);

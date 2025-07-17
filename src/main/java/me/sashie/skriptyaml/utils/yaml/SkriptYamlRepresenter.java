@@ -23,6 +23,7 @@ import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
+import java.io.NotSerializableException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -35,8 +36,7 @@ public class SkriptYamlRepresenter extends Representer {
 	static {		
 		if (SkriptYaml.getInstance().getServerVersion() <= 12) {
 			try {
-				Class<?> baseRepresenterClass = BaseRepresenter.class;//Class.forName("org.yaml.snakeyaml.representer.BaseRepresenter");
-				//representMapping(Tag tag, Map<?, ?> mapping, Boolean flowStyle)
+				Class<?> baseRepresenterClass = BaseRepresenter.class;
 				representMappingMethod = baseRepresenterClass.getDeclaredMethod("representMapping", Tag.class, Map.class, Boolean.class);
 				representMappingMethod.setAccessible(true);
 				representScalarMethod = baseRepresenterClass.getDeclaredMethod("representScalar", Tag.class, String.class, Character.class);

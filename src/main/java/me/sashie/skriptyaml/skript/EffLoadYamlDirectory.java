@@ -38,8 +38,8 @@ public class EffLoadYamlDirectory extends Effect {
 
 	static {
 		Skript.registerEffect(EffLoadYamlDirectory.class, 
-				"[re]load all [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
-				"[re]load all [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% using [the] filename as [the] id");
+				"[re]load all y[a]ml from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
+				"[re]load all y[a]ml from [(1¦non[(-| )]relative)] director(y|ies) %strings% using [the] filename as [the] id");
 	}
 
 	private Expression<String> directories;

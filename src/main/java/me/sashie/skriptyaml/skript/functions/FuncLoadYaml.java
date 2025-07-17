@@ -5,7 +5,9 @@ import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.function.JavaFunction;
 import ch.njol.skript.lang.function.Parameter;
+import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.registrations.DefaultClasses;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
@@ -23,18 +25,15 @@ public class FuncLoadYaml extends JavaFunction<Boolean> {
 			.examples("loadYaml(\"someId\", \"plugins/someThing/someYamlFile.yml\", false)")
 			.since("1.3.3");
 	}
- 
-	final static ClassInfo<String> stringClass = Classes.getExactClassInfo(String.class);
-	final static ClassInfo<Boolean> booleanClass = Classes.getExactClassInfo(Boolean.class);
 
 	public FuncLoadYaml() {
 		super("loadYaml",
 				new Parameter[] { 
-						new Parameter<>("name", stringClass, true, null),
-						new Parameter<>("file", stringClass, true, null),
-						new Parameter<>("isRelative", booleanClass, true, null)
+						new Parameter<>("name", Classes.getExactClassInfo(String.class), true, null),
+						new Parameter<>("file", Classes.getExactClassInfo(String.class), true, null),
+						new Parameter<>("isRelative", Classes.getExactClassInfo(Boolean.class), true, new SimpleLiteral<Boolean>(false, true))
 					},
-				booleanClass, true);
+				Classes.getExactClassInfo(Boolean.class), true);
 	}
 
 	@Override

@@ -35,8 +35,8 @@ public class EffDeleteYamlFromDirectory extends AsyncEffectOld {
 
 	static {
 		Skript.registerEffect(EffDeleteYamlFromDirectory.class,
-				"delete (all|any) [loaded] [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
-				"delete (all|any) [loaded] [y[a]ml] from [(1¦non[(-| )]relative)] director(y|ies) %strings% using [the] filename as [the] id");
+				"delete (all|any) [loaded] y[a]ml from [(1¦non[(-| )]relative)] director(y|ies) %strings%",
+				"delete (all|any) [loaded] y[a]ml from [(1¦non[(-| )]relative)] director(y|ies) %strings% using [the] filename as [the] id");
 	}
 
 	private Expression<String> directories;

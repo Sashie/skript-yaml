@@ -20,10 +20,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,12 +28,13 @@ public class SkriptYamlConstructor extends SafeConstructor {
 
 	public SkriptYamlConstructor(LoaderOptions yamlLoaderOptions) {
 		super(yamlLoaderOptions);
-		this.yamlConstructors.put(new Tag("!skriptclass"), new ConstructSkriptClass());
+		this.yamlConstructors.put(new Tag(UUID.class), new ConstructUuid());
 
 		this.yamlConstructors.put(new Tag("!vector"), new ConstructVector());
 		this.yamlConstructors.put(new Tag("!location"), new ConstructLocation());
 		this.yamlConstructors.put(new Tag("!blockdata"), new ConstructBlockData());
-		
+
+		this.yamlConstructors.put(new Tag("!skriptclass"), new ConstructSkriptClass());
 		this.yamlConstructors.put(new Tag("!skriptdate"), new ConstructSkriptDate());
 		this.yamlConstructors.put(new Tag("!skripttime"), new ConstructSkriptTime());
 		this.yamlConstructors.put(new Tag("!skripttimespan"), new ConstructSkriptTimespan());
@@ -130,8 +128,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 	private class ConstructBlockData extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
-			ScalarNode scalar = (ScalarNode) node;
-			String nodeValue = scalar.getValue();
+			String nodeValue = ((ScalarNode) node).getValue();
 			return Bukkit.createBlockData(nodeValue);
 		}
 	}
@@ -162,8 +159,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 
 		@Override
 		public Object construct(Node node) {
-			ScalarNode scalar = (ScalarNode) node;
-			String nodeValue = scalar.getValue();
+			String nodeValue = ((ScalarNode) node).getValue();
 			Matcher match = YMD_REGEXP.matcher(nodeValue);
 			if (match.matches()) {
 				String year_s = match.group(1);
@@ -224,8 +220,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 	public class ConstructSkriptTime extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
-			ScalarNode scalar = (ScalarNode) node;
-			String nodeValue = scalar.getValue();
+			String nodeValue = ((ScalarNode) node).getValue();
 			return Time.parse(nodeValue);
 		}
 	}
@@ -233,8 +228,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 	public class ConstructSkriptTimespan extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
-			ScalarNode scalar = (ScalarNode) node;
-			String nodeValue = scalar.getValue();
+			String nodeValue = ((ScalarNode) node).getValue();
 			return Timespan.parse(nodeValue);
 		}
 	}
@@ -242,8 +236,7 @@ public class SkriptYamlConstructor extends SafeConstructor {
 	public class ConstructSkriptColor extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
-			ScalarNode scalar = (ScalarNode) node;
-			String nodeValue = scalar.getValue();
+			String nodeValue = ((ScalarNode) node).getValue();
 			return SkriptYaml.getInstance().getSkriptAdapter().colorFromName(nodeValue);
 		}
 	}
@@ -251,10 +244,16 @@ public class SkriptYamlConstructor extends SafeConstructor {
 	public class ConstructSkriptWeather extends AbstractConstruct {
 		@Override
 		public Object construct(Node node) {
-			ScalarNode scalar = (ScalarNode) node;
-			String nodeValue = scalar.getValue();
+			String nodeValue = ((ScalarNode) node).getValue();
 			return WeatherType.parse(nodeValue);
 		}
 	}
 
+	public class ConstructUuid extends AbstractConstruct {
+		@Override
+		public Object construct(Node node) {
+			String nodeValue = ((ScalarNode) node).getValue();
+			return UUID.fromString(nodeValue);
+		}
+	}
 }

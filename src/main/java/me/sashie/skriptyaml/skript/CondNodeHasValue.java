@@ -40,26 +40,24 @@ public class CondNodeHasValue extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		return path.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
+		String path = this.path.getSingle(event);
+		String file = this.file.getSingle(event);
+
+		if (!SkriptYaml.YAML_STORE.containsKey(file))
+			return false;
+		if (this.path.isSingle())
+			return (SkriptYaml.YAML_STORE.get(file).getProperty(path) != null) ^ isNegated();
+		else {
+			String[] paths = (String[]) this.path.getAll(event);
+			boolean check;
+			for (String p : paths) {
+				check = (SkriptYaml.YAML_STORE.get(file).getProperty(p) != null);
+				if (!check) {
 					return false;
-				if (path.isSingle())
-					return (SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event)) != null);
-				else {
-					String[] paths = (String[]) path.getAll(event);
-					boolean check;
-					for (String p : paths) {
-						check = (SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(p) != null);
-						if (!check) {
-							return false;
-						}
-					}
-					return true;
 				}
 			}
-		}, isNegated());
+			return !isNegated();
+		}
 	}
 
 	@Override

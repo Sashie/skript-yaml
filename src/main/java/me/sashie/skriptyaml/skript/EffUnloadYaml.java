@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 public class EffUnloadYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffUnloadYaml.class, "unload [y[a]ml] [(1¦director(y|ies))] %strings%");
+		Skript.registerEffect(EffUnloadYaml.class, "unload y[a]ml [(1¦director(y|ies))] %strings%");
 	}
 
 	private Expression<String> file;

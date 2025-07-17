@@ -35,24 +35,10 @@ public class CondYamlIsLoaded extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		return file.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(s))
-					return false;
-				return true;
-			}
-		}, isNegated());
-		/*
-		return file.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
-					return false;
-				return true;
-			}
-		}, isNegated());
-		*/
+		String file = this.file.getSingle(event);
+		if (!SkriptYaml.YAML_STORE.containsKey(file))
+			return false;
+		return !isNegated();
 	}
 
 	@Override

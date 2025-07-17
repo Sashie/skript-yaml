@@ -30,7 +30,7 @@ public class EffSaveYaml extends Effect {
 
 	static {
 		Skript.registerEffect(EffSaveYaml.class,
-				"save [y[a]ml] %strings% [with an indentation of %-number%] [(1¦[and] with(out| no) extra lines between nodes)]");
+				"save y[a]ml %strings% [with an indentation of %-number%] [(1¦[and] with(out| no) extra lines between nodes)]");
 	}
 
 	private Expression<String> file;

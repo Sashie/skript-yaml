@@ -46,7 +46,7 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprYamlComments.class, Object.class, ExpressionType.SIMPLE,
-				"[the] comment[s] (of|from) [y[a]ml] node[s] %strings% (of|in|from) %string% [(1¦with [an] extra line)]",
+				"[the] comment[s] (of|from) y[a]ml node[s] %strings% (of|in|from) %string% [(1¦with [an] extra line)]",
 				"[the] (comment[s] (at|on) [the] top of |header (of|from)) %string% [(1¦with [an] extra line)]");
 	}
 

@@ -34,19 +34,23 @@ import java.util.*;
 		"\n  - Lists accept list variables for input" +
 		"\n  - Using 'without string checks' optional is a tiny bit faster but doesn't check/convert strings for numbers or booleans")
 @Examples({
-		"set yaml value \"test1.test2\" from \"config\" to \"test3\"",
+		"set yaml value \"test1.test2\" from \"config\" to \"test3\" # sets the node \"test1.test2\" to the string \"test3\"",
 		"set yaml list \"list.name\" from \"config\" to {_list::*}",
 		" ",
 		"set {_test} to yaml value \"test1.test2\" from \"config\"",
-		"broadcast \"%{_test}%\""
+		"broadcast \"%{_test}%\"",
+		" ",
+		"# To delete a value you can use either of these two syntax",
+		"delete yaml value \"test1.test2\" in \"uniqueID\"",
+		"remove \"test2\" from yaml node key \"test1\" in \"uniqueID\""
 })
 @Since("1.0.0")
 public class ExprYaml<T> extends SimpleExpressionFork<T> {
 
 	static {
 		Skript.registerExpression(ExprYaml.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks]");
-		//"[[skript-]y[a]ml] (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks] [using %-object% as default]"
+				"[skript-]y[a]ml (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks]");
+		//"[skript-]y[a]ml (1¦value|2¦(node|path) list|3¦(node|path)[s with] key[s]|4¦list) %string% (of|in|from) %string% [without string checks] [using %-object% as default]"
 	}
 
 	private boolean checks = false;
@@ -244,9 +248,9 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 			List<Object> objects = config.getList(path);
 			if (mode == ChangeMode.ADD) {
 				if (objects == null)
-					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta));
+					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta, checks));
 				else
-					config.setProperty(path, arrayToList(objects, delta));
+					config.setProperty(path, arrayToList(objects, delta, checks));
 			} else if (mode == ChangeMode.REMOVE) {
 				if (objects == null) {
 					SkriptYaml.warn("There is no list at path '" + path + "' in yaml '" + name + "' " + skriptNode.toString());
@@ -256,16 +260,16 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 					objects.remove(StringUtil.parseString(o, checks));
 			} else if (mode == ChangeMode.SET) {
 				if (objects == null) {
-					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta));
+					config.setProperty(path, arrayToList(new LinkedList<Object>(), delta, checks));
 				} else {
 					objects.clear();
-					config.setProperty(path, arrayToList(objects, delta));
+					config.setProperty(path, arrayToList(objects, delta, checks));
 				}
 			}
 		}
 	}
 
-	private List<Object> arrayToList(List<Object> list, Object[] array) {
+	public static List<Object> arrayToList(List<Object> list, Object[] array, boolean checks) {
 		for (Object o : array)
 			list.add(StringUtil.parseString(o, checks));
 		return list;

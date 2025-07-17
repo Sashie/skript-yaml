@@ -24,6 +24,7 @@ import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Array;
+import java.util.LinkedList;
 import java.util.List;
 
 @Name("YAML list value")
@@ -43,7 +44,7 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 
 	static {
 		Skript.registerExpression(ExprListValue.class, Object.class, ExpressionType.SIMPLE,
-				"[[skript-]y[a]ml] (index|value) %number% (of|in|from) list %string% (of|in|from) %string% [without string checks]");
+				"(index|value) %number% (of|in|from) [skript-]y[a]ml list %string% (of|in|from) %string% [without string checks]");
 	}
 
 	private boolean checks = false;
@@ -104,7 +105,7 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 		final String path = this.path.getSingle(event);
 		final int index = this.index.getSingle(event).intValue();
 
-		Object[] objects = check(event, this.name.getSingle(event), path, index, false);
+		Object[] objects = check(event, this.name.getSingle(event), path, index, false, null);
 		if (objects == null)
 			return null;
 
@@ -131,41 +132,49 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 		final String path = this.path.getSingle(event);
 		final int index = this.index.getSingle(event).intValue();
 
-		Object[] objects = check(event, this.name.getSingle(event), path, index, true);
-		if (objects == null)
+		Object[] objects = check(event, this.name.getSingle(event), path, index, true, delta);
+		if (objects == null && mode != ChangeMode.SET)
 			return;
 
-		List<Object> items = (List<Object>) objects[0];
+		List<Object> items = null;
+		boolean setMode = mode == ChangeMode.SET;
+		if (setMode && objects == null) {
+			// List is initialized in check method in this case
+			items = SkriptYaml.YAML_STORE.get(name).getList(path);
+		} else {
+			items = (List<Object>) objects[0];
+		}
+
 		if (items == null)
 			return;
 
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 			items.remove(index - 1);
-		} else if (mode == ChangeMode.SET) {
+		} else if (setMode) {
 			items.set(index - 1, StringUtil.parseString(delta[0], checks));
 		}
 		((YAMLProcessor) objects[1]).setProperty(path, items);
 	}
 
-	public Object[] check(Event event, String name, String path, int index, boolean alsoReturnConfig) {
+	public Object[] check(Event event, String name, String path, int index, boolean alsoReturnConfig, Object[] delta) {
 		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
 			return null;
 		Object[] objects;
 		List<Object> items;
 		if (alsoReturnConfig) {
-			//objects = new Object[2];
-			//objects[1] = SkriptYaml.YAML_STORE.get(name);
-			//items = ((YAMLProcessor) objects[1]).getList(path);
 			items = ((YAMLProcessor) ((objects = new Object[2])[1] = SkriptYaml.YAML_STORE.get(name))).getList(path);
 		} else {
 			objects = new Object[1];
+			items = SkriptYaml.YAML_STORE.get(name).getList(path);
+		}
+		if (items == null && delta != null) {
+			SkriptYaml.YAML_STORE.get(this.name.getSingle(event)).setProperty(path, ExprYaml.arrayToList(new LinkedList<Object>(), delta, checks));
 			items = SkriptYaml.YAML_STORE.get(name).getList(path);
 		}
 		if (items == null) {
 			SkriptYaml.warn("The node '" + path + "' in yaml '" + name + "' is not a list " + skriptNode.toString());
 			return null;
 		}
-
 		if (index < 1 || index > items.size()) {
 			SkriptYaml.warn("The index of node '" + path + "' in yaml '" + name + "' needs to be between 1 and " + items.size() + " " + skriptNode.toString());
 			return null;

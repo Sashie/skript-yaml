@@ -43,25 +43,23 @@ public class CondYamlPathExists extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		return path.check(event, new Checker<String>() {
-			@Override
-			public boolean check(final String s) {
-				if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
+		String path = this.path.getSingle(event);
+		String file = this.file.getSingle(event);
+
+		if (!SkriptYaml.YAML_STORE.containsKey(file))
+			return false;
+		if (this.path.isSingle())
+			return SkriptYaml.YAML_STORE.get(file).getAllKeys().contains(path) ^ isNegated();
+		else {
+			boolean check;
+			for (String p : this.path.getAll(event)) {
+				check = SkriptYaml.YAML_STORE.get(file).getAllKeys().contains(p);
+				if (!check) {
 					return false;
-				if (path.isSingle())
-					return SkriptYaml.YAML_STORE.get(file.getSingle(event)).getAllKeys().contains(path.getSingle(event));
-				else {
-					boolean check;
-					for (String p : path.getAll(event)) {
-						check = SkriptYaml.YAML_STORE.get(file.getSingle(event)).getAllKeys().contains(p);
-						if (!check) {
-							return false;
-						}
-					}
-					return true;
 				}
 			}
-		}, isNegated());
+			return !isNegated();
+		}
 	}
 
 	@Override
