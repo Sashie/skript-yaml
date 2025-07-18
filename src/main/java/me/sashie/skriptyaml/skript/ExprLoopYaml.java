@@ -203,6 +203,8 @@ public class ExprLoopYaml extends AbstractLoopExpression<Object> {
 						return loopStateListError(s);
 					loopState = LoopState.SUB_NODE_KEYS;
 				}
+				isYamlLoop = true;
+				return true;
 			}
 		}
 		SkriptYaml.error("A 'loop-" + s + "' can only be used in a yaml expression loop ie. 'loop yaml node keys \"node\" from \"config\"' " + getNodeMsg());
