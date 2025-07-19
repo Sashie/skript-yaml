@@ -1,7 +1,9 @@
 package me.sashie.skriptyaml.utils.yaml;
 
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.skript.ExprYaml.YamlState;
+import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import org.bukkit.ChatColor;
 
@@ -17,12 +19,6 @@ import java.util.*;
 
 
 public class YAMLAPI {
-
-	public final static HashMap<String, YAMLProcessor> YAML_STORE = new HashMap<String, YAMLProcessor>();
-
-	public static void load(String id, String file) {
-		load(file, id, false);
-	}
 
 	public static void loadFromDefault(String id, String path, String defaultYamlFile) {
 	    InputStream stream = null;
@@ -44,49 +40,39 @@ public class YAMLAPI {
 		load(id, path + File.separator + defaultYamlFile + ".yml", false);
 	}
 
-	public static void load(String id, String file, boolean root) {
-		final String name = StringUtil.checkSeparator(file);
-
-		File yamlFile = null;
-		if (root) {
-			yamlFile = new File(StringUtil.checkRoot(name));
-		} else {
-			Path server = Paths.get("").normalize().toAbsolutePath();
-			yamlFile = new File(server + File.separator + name);
-		}
-		load(id, yamlFile);
+	public static boolean load(String id, String file, boolean isNonRelative) {
+		File yamlFile = SkriptYamlUtils.getFile(file, isNonRelative);
+		return load(id, yamlFile, null);
 	}
 
-	public static void load(String id, File yamlFile) {
+	public static boolean load(String id, File file, SkriptNode skriptNode) {
 		try {
-			if (!yamlFile.exists()) {
+			if (!file.exists()) {
 				File folder;
-				String filePath = yamlFile.getPath();
+				String filePath = file.getPath();
 				int index = filePath.lastIndexOf(File.separator);
 				folder = new File(filePath.substring(0, index));
 				if (index >= 0 && !folder.exists()) {
 					folder.mkdirs();
 				}
-				yamlFile.createNewFile();
+				file.createNewFile();
 			}
 		} catch (IOException error) {
-			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + yamlFile.getName() + ")");
-			return;
+			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + file.toString() + ") " + (skriptNode != null ? skriptNode.toString() : ""));
+			return false;
 		}
 
-		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
+		YAMLProcessor yaml = new YAMLProcessor(file, false, YAMLFormat.EXTENDED);
 
 		try {
 			yaml.load();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (id.equals("")) {
-				YAML_STORE.put(StringUtil.stripExtention(yamlFile.getName()), yaml);
-			} else {
-				YAML_STORE.put(id, yaml);
-			}
+			SkriptYaml.YAML_STORE.put(id, yaml);
 		}
+
+		return true;
 	}
 
 	public static void loadDir(String directory, boolean useFileAsID, boolean root) {
@@ -123,9 +109,9 @@ public class YAMLAPI {
 				e.printStackTrace();
 			} finally {
 				if (useFileAsID) {
-					YAML_STORE.put(StringUtil.stripExtention(yamlFile.getName()), yaml);
+					SkriptYaml.YAML_STORE.put(StringUtil.stripExtention(yamlFile.getName()), yaml);
 				} else {
-					YAML_STORE.put(StringUtil.checkLastSeparator(name) + yamlFile.getName(), yaml);
+					SkriptYaml.YAML_STORE.put(StringUtil.checkLastSeparator(name) + yamlFile.getName(), yaml);
 				}
 			}
 		}
@@ -137,33 +123,32 @@ public class YAMLAPI {
 	}
 
 	public static String[] loadedYamlNames() {
-		if (YAML_STORE.isEmpty())
+		if (SkriptYaml.YAML_STORE.isEmpty())
 			return null;
-		return YAML_STORE.keySet().toArray(new String[YAML_STORE.keySet().size()]);
-	
+		return SkriptYaml.YAML_STORE.keySet().toArray(new String[0]);
 	}
 
 
 
 	public static YAMLProcessor get(String id) {
-		if (!YAML_STORE.containsKey(id)) {
+		if (!SkriptYaml.YAML_STORE.containsKey(id)) {
 			SkriptYaml.warn("No yaml by the name '" + id + "' has been loaded");
 			return null;
 		}
 
-		return YAML_STORE.get(id);
+		return SkriptYaml.YAML_STORE.get(id);
 	}
 
 	public static boolean isLoaded(String id) {
-		return YAML_STORE.containsKey(id);
+		return SkriptYaml.YAML_STORE.containsKey(id);
 	}
 
 	public static boolean isEmpty(String id) {
-		return YAML_STORE.get(id).getAllKeys().isEmpty();
+		return SkriptYaml.YAML_STORE.get(id).getAllKeys().isEmpty();
 	}
 
 	public static boolean hasValue(String id, String path) {
-		return (YAML_STORE.get(id).getProperty(path) != null);
+		return (SkriptYaml.YAML_STORE.get(id).getProperty(path) != null);
 	}
 
 	public static Object getValue(String id, String path) {

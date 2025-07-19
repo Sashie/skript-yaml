@@ -23,7 +23,6 @@ import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
-import java.io.NotSerializableException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -59,6 +58,7 @@ public class SkriptYamlRepresenter extends Representer {
 		};
 
 		this.representers.put(String.class, new RepresentString());
+		this.representers.put(UUID.class, new RepresentUuid());
 
 		this.representers.put(SkriptClass.class, new RepresentSkriptClass());
 		this.representers.put(ItemType.class, new RepresentSkriptItemType());
@@ -109,6 +109,13 @@ public class SkriptYamlRepresenter extends Representer {
 	private class RepresentString implements Represent {
 		public Node representData(Object data) {
 			return representScalar(data);
+		}
+	}
+
+	private class RepresentUuid implements Represent {
+		@Override
+		public Node representData(Object data) {
+			return representScalar(Tag.STR, data.toString(), DumperOptions.ScalarStyle.PLAIN);
 		}
 	}
 

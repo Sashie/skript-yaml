@@ -8,9 +8,10 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -36,8 +37,9 @@ public class CondYamlIsLoaded extends Condition {
 	@Override
 	public boolean check(final Event event) {
 		String file = this.file.getSingle(event);
-		if (!SkriptYaml.YAML_STORE.containsKey(file))
-			return false;
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(file);
+		if (yaml == null)
+			return isNegated();
 		return !isNegated();
 	}
 

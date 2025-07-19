@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -34,9 +35,10 @@ public class CondYamlIsEmpty extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
-			return false;
-		return SkriptYaml.YAML_STORE.get(file.getSingle(event)).getAllKeys().isEmpty() ^ isNegated();
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(file.getSingle(event));
+		if (yaml == null)
+			return isNegated();
+		return yaml.getAllKeys().isEmpty() ^ isNegated();
 	}
 
 	@Override

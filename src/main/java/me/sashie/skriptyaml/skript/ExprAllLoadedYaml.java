@@ -83,7 +83,7 @@ public class ExprAllLoadedYaml extends SimpleExpression<String> {
 			if (directory == null) {
 				if (SkriptYaml.YAML_STORE.isEmpty())
 					return null;
-				return SkriptYaml.YAML_STORE.keySet().toArray(new String[SkriptYaml.YAML_STORE.keySet().size()]);
+				return SkriptYaml.YAML_STORE.keySet().toArray(new String[0]);
 			} else {
 				return getYamlFromDirectories(directory.getAll(event));
 			}

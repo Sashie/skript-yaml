@@ -2,19 +2,32 @@ package me.sashie.skriptyaml.utils;
 
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class SkriptYamlUtils {
 
-	public static boolean yamlExists(String name, SkriptNode skriptNode) {
-		if (SkriptYaml.YAML_STORE.containsKey(name))
-			return true;
+	public static YAMLProcessor yamlExists(String name, SkriptNode skriptNode) {
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
+		if (yaml != null)
+			return yaml;
 		SkriptYaml.warn("No yaml by the name '" + name + "' has been loaded " + skriptNode.toString());
-		return false;
+		return null;
+	}
+
+	public static File getFile(String file, boolean isNonRelative) {
+		String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
+		if (isNonRelative) {
+			return new File(StringUtil.checkRoot(StringUtil.checkSeparator(file)));
+		} else {
+			return new File(server + StringUtil.checkSeparator(file));
+		}
 	}
 
 	public static File[] directoryFilter(String name, boolean root, String errorPrefix, SkriptNode skriptNode) {
@@ -62,5 +75,16 @@ public class SkriptYamlUtils {
 			throw new ClassCastException();
 		}
 		return end;
+	}
+
+	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+
+	public static Object convertUUIDs(Object input) {
+		if (input instanceof String) {
+			if (UUID_PATTERN.matcher((String) input).matches()) {
+				input = UUID.fromString((String) input);
+			}
+		}
+		return input;
 	}
 }

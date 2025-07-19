@@ -12,14 +12,13 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
+import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
-import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
-import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import me.sashie.skriptyaml.utils.yaml.YAMLAPI;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 
 @Name("Load YAML")
 @Description("Loads a YAML file into memory." +
@@ -67,48 +66,17 @@ public class EffLoadYaml extends Effect {
 	}
 
 	private void load(String name, Event event) {
-		File yamlFile = null;
-		String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
-		if (mark == 1) {
-			yamlFile = new File(StringUtil.checkRoot(StringUtil.checkSeparator(name)));
-		} else {
-			yamlFile = new File(server + StringUtil.checkSeparator(name));
-		}
-
-		try {
-			if (!yamlFile.exists()) {
-				File folder;
-				String filePath = yamlFile.getPath();
-				int index = filePath.lastIndexOf(File.separator);
-				folder = new File(filePath.substring(0, index));
-				if (index >= 0 && !folder.exists()) {
-					folder.mkdirs();
-				}
-				yamlFile.createNewFile();
-			}
-		} catch (IOException error) {
-			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + name + ") " + skriptNode.toString());
-			return;
-		}
-
-		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
-
-		try {
-			yaml.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			String n = null;
-			if (matchedPattern == 0)
-				n = StringUtil.stripExtention(yamlFile.getName());
-			else if (matchedPattern == 1)
-				n = this.id.getSingle(event);
-			else if (matchedPattern == 2)
-				n = name;
-			SkriptYaml.YAML_STORE.put(n, yaml);
-		}
+		File yamlFile = SkriptYamlUtils.getFile(name, mark == 1);
+		String n = null;
+		if (matchedPattern == 0)
+			n = StringUtil.stripExtention(yamlFile.getName());
+		else if (matchedPattern == 1)
+			n = this.id.getSingle(event);
+		else if (matchedPattern == 2)
+			n = name;
+		YAMLAPI.load(n, yamlFile, skriptNode);
 	}
-	
+
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
 		return "[re]load yaml" + (mark == 1 ? " non-relative " : " ") + this.file.toString(event, b) + (id != null ? " as " + this.id.toString(event, b) : (matchedPattern == 2 ? " using the file path as the id" : ""));

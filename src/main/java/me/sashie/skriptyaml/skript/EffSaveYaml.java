@@ -41,9 +41,9 @@ public class EffSaveYaml extends Effect {
 	@Override
 	protected void execute(@Nullable Event event) {
 		for (String name : this.file.getAll(event)) {
-			if (!SkriptYaml.YAML_STORE.containsKey(name))
-				continue;
 			YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
+			if (yaml == null)
+				continue;
 			if (yamlIndent != null)
 				yaml.setIndent(this.yamlIndent.getSingle(event).intValue());
 			try {

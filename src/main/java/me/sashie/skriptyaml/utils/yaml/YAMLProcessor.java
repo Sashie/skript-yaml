@@ -84,7 +84,6 @@ public class YAMLProcessor extends YAMLNode {
 	protected String header = null;
 	protected boolean extraHeaderLine;
 	protected YAMLFormat format;
-	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
 	/*
 	 * Map from property key to comment. Comment may have multiple lines that are
@@ -104,14 +103,10 @@ public class YAMLProcessor extends YAMLNode {
 		options.setTimeZone(TimeZone.getDefault());
 		options.setSplitLines(false);
 
-		// TODO register custom tags to handle string types
-
 		Representer representer = SkriptYaml.getInstance().getRepresenter();
 		representer.setDefaultFlowStyle(format.getStyle());
-		representer.addClassTag(UUID.class, Tag.STR);
 
 		yaml = new Yaml(SkriptYaml.getInstance().getConstructor(), representer, options);
-		yaml.addImplicitResolver(new Tag(UUID.class), UUID_PATTERN, null);
 
 		this.file = file;
 	}

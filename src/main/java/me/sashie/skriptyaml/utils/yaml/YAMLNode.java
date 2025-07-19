@@ -22,6 +22,7 @@ package me.sashie.skriptyaml.utils.yaml;
 import ch.njol.util.StringUtils;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
+import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import org.bukkit.ChatColor;
 
 import javax.annotation.Nullable;
@@ -85,7 +86,7 @@ public class YAMLNode {
 				return null;
 			}
 
-			return val;
+			return SkriptYamlUtils.convertUUIDs(val);
 		}
 
 		String[] parts = path.split("\\.");
@@ -99,7 +100,7 @@ public class YAMLNode {
 			}
 
 			if (i == parts.length - 1) {
-				return o;
+				return SkriptYamlUtils.convertUUIDs(o);
 			}
 
 			try {
@@ -374,7 +375,7 @@ public class YAMLNode {
 		if (o == null) {
 			return null;
 		} else if (o instanceof Map) {
-			return (Map<String, Object>) o;
+			return recursivelyConvertUUIDsInMap((Map<String, Object>) o);
 		} else {
 			return null;
 		}
@@ -394,10 +395,41 @@ public class YAMLNode {
 		if (o == null) {
 			return null;
 		} else if (o instanceof List) {
-			return (List<Object>) o;
+			return recursivelyConvertUUIDsInList((List<Object>) o);
 		} else {
 			return null;
 		}
+	}
+
+	private Map<String, Object> recursivelyConvertUUIDsInMap(Map<String, Object> map) {
+		Map<String, Object> result = new LinkedHashMap<>();
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			Object value = entry.getValue();
+			if (value instanceof Map) {
+				value = recursivelyConvertUUIDsInMap((Map<String, Object>) value);
+			} else if (value instanceof List) {
+				value = recursivelyConvertUUIDsInList((List<Object>) value);
+			} else {
+				value = SkriptYamlUtils.convertUUIDs(value);
+			}
+			result.put(entry.getKey(), value);
+		}
+		return result;
+	}
+
+	private List<Object> recursivelyConvertUUIDsInList(List<Object> list) {
+		List<Object> result = new ArrayList<>();
+		for (Object value : list) {
+			if (value instanceof Map) {
+				value = recursivelyConvertUUIDsInMap((Map<String, Object>) value);
+			} else if (value instanceof List) {
+				value = recursivelyConvertUUIDsInList((List<Object>) value);
+			} else {
+				value = SkriptYamlUtils.convertUUIDs(value);
+			}
+			result.add(value);
+		}
+		return result;
 	}
 
 	/**

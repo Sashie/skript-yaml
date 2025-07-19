@@ -8,9 +8,10 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -43,17 +44,19 @@ public class CondNodeHasValue extends Condition {
 		String path = this.path.getSingle(event);
 		String file = this.file.getSingle(event);
 
-		if (!SkriptYaml.YAML_STORE.containsKey(file))
-			return false;
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(file);
+		if (yaml == null)
+			return isNegated();
+
 		if (this.path.isSingle())
-			return (SkriptYaml.YAML_STORE.get(file).getProperty(path) != null) ^ isNegated();
+			return (yaml.getProperty(path) != null) ^ isNegated();
 		else {
 			String[] paths = (String[]) this.path.getAll(event);
 			boolean check;
 			for (String p : paths) {
-				check = (SkriptYaml.YAML_STORE.get(file).getProperty(p) != null);
+				check = (yaml.getProperty(p) != null);
 				if (!check) {
-					return false;
+					return isNegated();
 				}
 			}
 			return !isNegated();

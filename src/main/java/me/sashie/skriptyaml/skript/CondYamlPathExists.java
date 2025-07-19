@@ -8,9 +8,10 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -46,16 +47,18 @@ public class CondYamlPathExists extends Condition {
 		String path = this.path.getSingle(event);
 		String file = this.file.getSingle(event);
 
-		if (!SkriptYaml.YAML_STORE.containsKey(file))
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(file);
+		if (yaml == null)
 			return false;
+
 		if (this.path.isSingle())
-			return SkriptYaml.YAML_STORE.get(file).getAllKeys().contains(path) ^ isNegated();
+			return yaml.getAllKeys().contains(path) ^ isNegated();
 		else {
 			boolean check;
 			for (String p : this.path.getAll(event)) {
-				check = SkriptYaml.YAML_STORE.get(file).getAllKeys().contains(p);
+				check = yaml.getAllKeys().contains(p);
 				if (!check) {
-					return false;
+					return isNegated();
 				}
 			}
 			return !isNegated();

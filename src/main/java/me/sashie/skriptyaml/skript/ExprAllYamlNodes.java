@@ -55,17 +55,15 @@ public class ExprAllYamlNodes extends SimpleExpression<String> {
 	@Override
 	@Nullable
 	protected String[] get(Event event) {
-
 		final String name = this.file.getSingle(event);
 
-		if (!SkriptYaml.YAML_STORE.containsKey(name)) {
-			//SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
+		if (yaml == null) {
+			SkriptYaml.warn("No yaml file by the name '" + name + "' has been loaded");
 			return null;
 		}
 
-		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
-
-		List<String> nodes = config.getAllKeys();
+		List<String> nodes = yaml.getAllKeys();
 		if (nodes != null)
 			return nodes.toArray(new String[nodes.size()]);
 		return null;

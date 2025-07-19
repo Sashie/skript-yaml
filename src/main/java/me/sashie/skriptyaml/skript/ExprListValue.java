@@ -140,8 +140,8 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 		boolean setMode = mode == ChangeMode.SET;
 		if (setMode && objects == null) {
 			// List is initialized in check method in this case
-			items = SkriptYaml.YAML_STORE.get(name).getList(path);
-		} else {
+			items = SkriptYaml.YAML_STORE.get(this.name.getSingle(event)).getList(path);
+		} else if (objects != null) {
 			items = (List<Object>) objects[0];
 		}
 
@@ -157,19 +157,20 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 	}
 
 	public Object[] check(Event event, String name, String path, int index, boolean alsoReturnConfig, Object[] delta) {
-		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
+		YAMLProcessor config = SkriptYamlUtils.yamlExists(name, skriptNode);
+		if (config == null)
 			return null;
 		Object[] objects;
 		List<Object> items;
 		if (alsoReturnConfig) {
-			items = ((YAMLProcessor) ((objects = new Object[2])[1] = SkriptYaml.YAML_STORE.get(name))).getList(path);
+			items = ((YAMLProcessor) ((objects = new Object[2])[1] = config)).getList(path);
 		} else {
 			objects = new Object[1];
-			items = SkriptYaml.YAML_STORE.get(name).getList(path);
+			items = config.getList(path);
 		}
 		if (items == null && delta != null) {
-			SkriptYaml.YAML_STORE.get(this.name.getSingle(event)).setProperty(path, ExprYaml.arrayToList(new LinkedList<Object>(), delta, checks));
-			items = SkriptYaml.YAML_STORE.get(name).getList(path);
+			config.setProperty(path, ExprYaml.arrayToList(new LinkedList<Object>(), delta, checks));
+			items = config.getList(path);
 		}
 		if (items == null) {
 			SkriptYaml.warn("The node '" + path + "' in yaml '" + name + "' is not a list " + skriptNode.toString());

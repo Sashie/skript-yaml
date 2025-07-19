@@ -10,6 +10,8 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import me.sashie.skriptyaml.SkriptYaml;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -38,9 +40,12 @@ public class CondNodeHasList extends Condition {
 
 	@Override
 	public boolean check(final Event event) {
-		if (!SkriptYaml.YAML_STORE.containsKey(file.getSingle(event)))
-			return false;
-		Object o =  SkriptYaml.YAML_STORE.get(file.getSingle(event)).getProperty(path.getSingle(event));
+		YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(file.getSingle(event));
+		if (yaml == null)
+			return isNegated();
+		Object o =  yaml.getProperty(path.getSingle(event));
+		if (o == null) 
+			return isNegated();
 		return o != null ? (o instanceof List) ^ isNegated() : isNegated();
 	}
 

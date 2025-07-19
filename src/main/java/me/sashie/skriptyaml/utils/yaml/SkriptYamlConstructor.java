@@ -26,9 +26,19 @@ import java.util.regex.Pattern;
 
 public class SkriptYamlConstructor extends SafeConstructor {
 
+	public SkriptYamlConstructor() {
+		this(new LoaderOptions() {
+			{
+				setMaxAliasesForCollections(Integer.MAX_VALUE);
+				setAllowRecursiveKeys(true);
+				setCodePointLimit(Integer.MAX_VALUE);
+				setTagInspector(tag -> true);
+			}
+		});
+	}
+
 	public SkriptYamlConstructor(LoaderOptions yamlLoaderOptions) {
 		super(yamlLoaderOptions);
-		this.yamlConstructors.put(new Tag(UUID.class), new ConstructUuid());
 
 		this.yamlConstructors.put(new Tag("!vector"), new ConstructVector());
 		this.yamlConstructors.put(new Tag("!location"), new ConstructLocation());
@@ -246,14 +256,6 @@ public class SkriptYamlConstructor extends SafeConstructor {
 		public Object construct(Node node) {
 			String nodeValue = ((ScalarNode) node).getValue();
 			return WeatherType.parse(nodeValue);
-		}
-	}
-
-	public class ConstructUuid extends AbstractConstruct {
-		@Override
-		public Object construct(Node node) {
-			String nodeValue = ((ScalarNode) node).getValue();
-			return UUID.fromString(nodeValue);
 		}
 	}
 }

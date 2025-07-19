@@ -1,28 +1,25 @@
 package me.sashie.skriptyaml.skript.functions;
 
-import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.function.JavaFunction;
 import ch.njol.skript.lang.function.Parameter;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.registrations.DefaultClasses;
-import me.sashie.skriptyaml.SkriptYaml;
-import me.sashie.skriptyaml.utils.StringUtil;
-import me.sashie.skriptyaml.utils.yaml.YAMLFormat;
-import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+import me.sashie.skriptyaml.utils.yaml.YAMLAPI;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
 
 public class FuncLoadYaml extends JavaFunction<Boolean> {
 
 	static {
 		Functions.registerFunction(new FuncLoadYaml())
-			.description("Loads a yaml file.")
-			.examples("loadYaml(\"someId\", \"plugins/someThing/someYamlFile.yml\", false)")
+			.description("Loads a yaml file. Returns true is the load was successful.",
+					" - 1st parameter: (string) The id you would like to use",
+					" - 2nd parameter: (string) The file path",
+					" - 3rd parameter: (boolean) Whether you want to use a non relative path ie. c:/somefolder rather than relative to the server ")
+			.examples("loadYaml(\"someId\", \"plugins/someThing/someYamlFile.yml\")",
+					"loadYaml(\"someId\", \"plugins/someThing/someYamlFile.yml\", true)")
 			.since("1.3.3");
 	}
 
@@ -31,53 +28,20 @@ public class FuncLoadYaml extends JavaFunction<Boolean> {
 				new Parameter[] { 
 						new Parameter<>("name", Classes.getExactClassInfo(String.class), true, null),
 						new Parameter<>("file", Classes.getExactClassInfo(String.class), true, null),
-						new Parameter<>("isRelative", Classes.getExactClassInfo(Boolean.class), true, new SimpleLiteral<Boolean>(false, true))
+						new Parameter<>("isNonRelative", Classes.getExactClassInfo(Boolean.class), true, new SimpleLiteral<Boolean>(false, true))
 					},
 				Classes.getExactClassInfo(Boolean.class), true);
 	}
 
 	@Override
 	@Nullable
-	public Boolean[] execute(FunctionEvent e, Object[][] params) {
+	public Boolean[] execute(FunctionEvent<?> e, Object[][] params) {
 		String name = (String) params[0][0];
 		String file = (String) params[1][0];
-		Boolean isRelative = (Boolean) params[2][0];
+		Boolean isNonRelative = (Boolean) params[2][0];
 
-		File yamlFile = null;
-		String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
-		if (isRelative) {
-			yamlFile = new File(StringUtil.checkRoot(StringUtil.checkSeparator(file)));
-		} else {
-			yamlFile = new File(server + StringUtil.checkSeparator(file));
-		}
-
-		try {
-			if (!yamlFile.exists()) {
-				File folder;
-				String filePath = yamlFile.getPath();
-				int index = filePath.lastIndexOf(File.separator);
-				folder = new File(filePath.substring(0, index));
-				if (index >= 0 && !folder.exists()) {
-					folder.mkdirs();
-				}
-				yamlFile.createNewFile();
-			}
-		} catch (IOException error) {
-			SkriptYaml.error("[Load Yaml] " + error.getMessage() + " (" + file + ")");
-			return new Boolean[] { false };
-		}
-
-		YAMLProcessor yaml = new YAMLProcessor(yamlFile, false, YAMLFormat.EXTENDED);
-
-		try {
-			yaml.load();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			SkriptYaml.YAML_STORE.put(name, yaml);
-		}
-
-		return new Boolean[] { true };
+		boolean loaded = YAMLAPI.load(name, file, isNonRelative);
+		return new Boolean[] { loaded };
 	}
 	
 	@Override

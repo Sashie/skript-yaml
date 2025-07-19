@@ -16,19 +16,19 @@ import org.bstats.charts.DrilldownPie;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yaml.snakeyaml.LoaderOptions;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public class SkriptYaml extends JavaPlugin {
 
 	public final static Logger LOGGER = Bukkit.getServer() != null ? Bukkit.getLogger() : Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	public final static HashMap<String, YAMLProcessor> YAML_STORE = new HashMap<String, YAMLProcessor>();
+	public final static ConcurrentHashMap<String, YAMLProcessor> YAML_STORE = new ConcurrentHashMap<String, YAMLProcessor>();
 
 	private static SkriptYaml instance;
 	private int serverVersion;
@@ -134,12 +134,7 @@ public class SkriptYaml extends JavaPlugin {
 				adapter = new V2_3();
 
 			representer = new SkriptYamlRepresenter();
-			LoaderOptions yamlLoaderOptions = new LoaderOptions();
-			yamlLoaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE);
-			yamlLoaderOptions.setAllowRecursiveKeys(true);
-			yamlLoaderOptions.setCodePointLimit(Integer.MAX_VALUE);
-			yamlLoaderOptions.setTagInspector(tag -> true);
-			constructor = new SkriptYamlConstructor(yamlLoaderOptions);
+			constructor = new SkriptYamlConstructor();
 			
 			// new MetricsLite(this);
 			Metrics metrics = new Metrics(this, 1814);

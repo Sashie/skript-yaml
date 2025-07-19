@@ -50,9 +50,9 @@ public class EffUnloadYaml extends Effect {
 						it.remove();
 				}
 			} else {
-				if (!SkriptYaml.YAML_STORE.containsKey(name)) 
-					continue;
-				SkriptYaml.YAML_STORE.remove(name);
+				YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(name);
+				if (yaml != null)
+					SkriptYaml.YAML_STORE.remove(name);
 			}
 		}
 	}

@@ -14,6 +14,8 @@ import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
+import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
+
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -57,8 +59,9 @@ public class EffDeleteYamlFromDirectory extends AsyncEffectOld {
 				} else if (matchedPattern == 1) {
 					n = StringUtil.stripExtention(yamlFile.getName());
 				}
-				if (SkriptYaml.YAML_STORE.containsKey(n)) {
-					SkriptYaml.YAML_STORE.get(n).getFile().delete();
+				YAMLProcessor yaml = SkriptYaml.YAML_STORE.get(n);
+				if (yaml != null) {
+					yaml.getFile().delete();
 					SkriptYaml.YAML_STORE.remove(n);
 				}
 			}
