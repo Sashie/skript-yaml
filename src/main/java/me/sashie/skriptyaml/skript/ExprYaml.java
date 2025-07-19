@@ -146,10 +146,9 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 	public T[] get(Event event, String path, YamlState state) {
 		final String name = this.file.getSingle(event);
 
-		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
+		YAMLProcessor config = SkriptYamlUtils.yamlExists(name, skriptNode);
+		if (config == null)
 			return null;
-
-		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		if (state == YamlState.VALUE) {
 			Object o = config.getProperty(path);
@@ -224,10 +223,9 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 		final String name = this.file.getSingle(event);
 		final String path = this.node.getSingle(event);
 
-		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
+		YAMLProcessor config = SkriptYamlUtils.yamlExists(name, skriptNode);
+		if (config == null)
 			return;
-
-		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 			config.removeProperty(path, skriptNode);

@@ -80,10 +80,9 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 	protected Object[] get(Event event) {
 		final String name = this.file.getSingle(event);
 
-		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
+		YAMLProcessor config = SkriptYamlUtils.yamlExists(name, skriptNode);
+		if (config == null)
 			return null;
-
-		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		String s = null;
 		if (state == States.COMMENT) {
@@ -102,10 +101,9 @@ public class ExprYamlComments extends SimpleExpression<Object> {
 		final String name = this.file.getSingle(event);
 		String[] paths = null;
 
-		if (!SkriptYamlUtils.yamlExists(name, skriptNode))
+		YAMLProcessor config = SkriptYamlUtils.yamlExists(name, skriptNode);
+		if (config == null)
 			return;
-
-		YAMLProcessor config = SkriptYaml.YAML_STORE.get(name);
 
 		if (state == States.COMMENT) {
 			paths = this.paths.getAll(event);
