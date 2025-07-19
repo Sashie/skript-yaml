@@ -5,7 +5,6 @@ import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.skript.ExprYaml.YamlState;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
-import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -157,7 +156,7 @@ public class YAMLAPI {
 		Object o = config.getProperty(path);
 		if (o != null) {
 			if (String.class.isAssignableFrom(o.getClass()))
-				o = ChatColor.translateAlternateColorCodes('&', ((String) o));
+				o = StringUtil.translateColorCodes((String) o);
 			return o;
 		}
 		return null;
@@ -208,7 +207,7 @@ public class YAMLAPI {
 			Object o = config.getProperty(path);
 			if (o != null) {
 				if (String.class.isAssignableFrom(o.getClass()))
-					o = ChatColor.translateAlternateColorCodes('&', ((String) o));
+					o = StringUtil.translateColorCodes((String) o);
 				return o;
 			}
 			return null;

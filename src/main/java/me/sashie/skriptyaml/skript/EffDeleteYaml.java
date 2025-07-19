@@ -17,18 +17,21 @@ import org.bukkit.event.Event;
 import javax.annotation.Nullable;
 
 @Name("Delete YAML")
-@Description("Deletes a YAML file and removes it from memory.")
+@Description("Deletes a YAML file and optionally removes it from memory.\n" +
+		"  - If you want to keep the file loaded in memory, use the 'and keep loaded in memory' option")
 @Examples({
-		"delete yaml \"config\""
+		"delete yaml \"config\"",
+		"delete yaml \"config\" and keep loaded in memory"
 })
 @Since("1.1.5")
 public class EffDeleteYaml extends Effect {
 
 	static {
-		Skript.registerEffect(EffDeleteYaml.class, "delete y[a]ml %strings%");	//TODO add option to keep loaded in memory
+		Skript.registerEffect(EffDeleteYaml.class, "delete y[a]ml %strings% [and keep loaded in memory]");
 	}
 
 	private Expression<Object> file;
+	private boolean keepLoaded;
 
 	@Override
 	protected void execute(@Nullable Event event) {
@@ -37,19 +40,21 @@ public class EffDeleteYaml extends Effect {
 			if (yaml == null)
 				continue;
 			yaml.getFile().delete();
-			SkriptYaml.YAML_STORE.remove(name);
+			if (!keepLoaded)
+				SkriptYaml.YAML_STORE.remove(name);
 		}
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean b) {
-		return "delete yaml " + this.file.toString(event, b);
+		return "delete yaml " + this.file.toString(event, b) + (keepLoaded ? " and keep loaded in memory" : "");
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
 		file = (Expression<Object>) exprs[0];
+		keepLoaded = parser.expr.toLowerCase().endsWith("keep loaded in memory");
 		return true;
 	}
 }

@@ -19,11 +19,10 @@
 
 package me.sashie.skriptyaml.utils.yaml;
 
-import ch.njol.util.StringUtils;
 import me.sashie.skriptyaml.SkriptYaml;
 import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
-import org.bukkit.ChatColor;
+import me.sashie.skriptyaml.utils.StringUtil;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -136,7 +135,7 @@ public class YAMLNode {
 
 		for (int i = 0; i < parts.length; i++) {
 			String[] prevPathParts = Arrays.copyOf(parts, i + 1);
-			String prevPath = StringUtils.join(prevPathParts, ".");
+			String prevPath = StringUtil.joinString(prevPathParts, ".");
 
 			if (!allKeys.contains(prevPath))
 				allKeys.add(prevPath);
@@ -190,8 +189,7 @@ public class YAMLNode {
 		if (o == null) {
 			return null;
 		}
-		//return o.toString();
-		return ChatColor.translateAlternateColorCodes('&', o.toString());
+		return StringUtil.translateColorCodes(o.toString());
 	}
 
 	/**
@@ -401,6 +399,7 @@ public class YAMLNode {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String, Object> recursivelyConvertUUIDsInMap(Map<String, Object> map) {
 		Map<String, Object> result = new LinkedHashMap<>();
 		for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -417,6 +416,7 @@ public class YAMLNode {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Object> recursivelyConvertUUIDsInList(List<Object> list) {
 		List<Object> result = new ArrayList<>();
 		for (Object value : list) {

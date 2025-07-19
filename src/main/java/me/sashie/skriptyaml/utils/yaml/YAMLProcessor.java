@@ -28,7 +28,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.reader.UnicodeReader;
@@ -38,7 +37,6 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 /**
  * YAML configuration loader. To use this class, construct it with path to a
@@ -197,7 +195,7 @@ public class YAMLProcessor extends YAMLNode {
 				buildYaml(line);
 				recursiveHeaderSearch(line, header, input);
 			} catch (IOException ignored) {}
-		} else if (!line.startsWith(HEADER_PREFIX)) {
+		} else if (line != null && !line.startsWith(HEADER_PREFIX)) {
 			setHeader(header.toArray(new String[header.size()]));
 			header.clear();
 		}
@@ -211,7 +209,7 @@ public class YAMLProcessor extends YAMLNode {
 				buildYaml(line);
 				recursiveCommentSearch(line, comment, input);
 			} catch (IOException ignored) {}
-		} else if (line != null && !line.startsWith(COMMENT_PREFIX) || !line.startsWith(HEADER_PREFIX) || !line.isEmpty() && line.contains(":")) {
+		} else if (line != null && (!line.startsWith(COMMENT_PREFIX) || !line.startsWith(HEADER_PREFIX) || !line.isEmpty() && line.contains(":"))) {
 			String l = line.split(":")[0];
 			if (!l.startsWith(" ")) // root level comments only
 				setComment(l, false, comment.toArray(new String[comment.size()]));

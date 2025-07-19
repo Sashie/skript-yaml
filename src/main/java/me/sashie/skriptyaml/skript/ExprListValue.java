@@ -19,7 +19,6 @@ import me.sashie.skriptyaml.debug.SkriptNode;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
-import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -34,7 +33,7 @@ import java.util.List;
 		"\n  - This expression does not save to file" +
 		"\n  - Using 'without string checks' optional is a tiny bit faster but doesn't check/convert strings for numbers or booleans")
 @Examples({
-		"set index 1 in list \"test1.test2\" from \"config\" to \"test3\"",
+		"set index 1 in yaml list \"test1.test2\" from \"config\" to \"test3\"",
 		" ",
 		"set {_test} to yaml index 1 in list \"test1.test2\" from \"config\"",
 		"broadcast \"%{_test}%\""
@@ -110,13 +109,11 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 			return null;
 
 		List<Object> items = (List<Object>) objects[0];
-		if (items == null)
-			return null;
 
 		Object o = items.get(index - 1);
 		if (o != null) {
 			if (!checks && String.class.isAssignableFrom(o.getClass()))
-				o = ChatColor.translateAlternateColorCodes('&', ((String) o));
+				o = StringUtil.translateColorCodes((String) o);
 			try {
 				return SkriptYamlUtils.convertToArray(o, (Class<T>) o.getClass());
 			} catch (ClassCastException e) {
@@ -133,24 +130,14 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 		final int index = this.index.getSingle(event).intValue();
 
 		Object[] objects = check(event, this.name.getSingle(event), path, index, true, delta);
-		if (objects == null && mode != ChangeMode.SET)
+		if (objects == null)
 			return;
 
-		List<Object> items = null;
-		boolean setMode = mode == ChangeMode.SET;
-		if (setMode && objects == null) {
-			// List is initialized in check method in this case
-			items = SkriptYaml.YAML_STORE.get(this.name.getSingle(event)).getList(path);
-		} else if (objects != null) {
-			items = (List<Object>) objects[0];
-		}
-
-		if (items == null)
-			return;
+		List<Object> items = (List<Object>) objects[0];
 
 		if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) {
 			items.remove(index - 1);
-		} else if (setMode) {
+		} else if (mode == ChangeMode.SET) {
 			items.set(index - 1, StringUtil.parseString(delta[0], checks));
 		}
 		((YAMLProcessor) objects[1]).setProperty(path, items);
@@ -169,6 +156,7 @@ public class ExprListValue<T> extends SimpleExpressionFork<T> {
 			items = config.getList(path);
 		}
 		if (items == null && delta != null) {
+			// If no list is initialized then we'll do it here
 			config.setProperty(path, ExprYaml.arrayToList(new LinkedList<Object>(), delta, checks));
 			items = config.getList(path);
 		}

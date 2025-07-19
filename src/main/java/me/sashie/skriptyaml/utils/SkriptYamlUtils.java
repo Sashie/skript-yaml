@@ -22,10 +22,10 @@ public class SkriptYamlUtils {
 	}
 
 	public static File getFile(String file, boolean isNonRelative) {
-		String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
 		if (isNonRelative) {
 			return new File(StringUtil.checkRoot(StringUtil.checkSeparator(file)));
 		} else {
+			String server = new File("").getAbsoluteFile().getAbsolutePath() + File.separator;
 			return new File(server + StringUtil.checkSeparator(file));
 		}
 	}

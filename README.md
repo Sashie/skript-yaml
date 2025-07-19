@@ -99,13 +99,16 @@ Unloads a yaml file from memory and deletes the file
 
 #### Syntax
 
-`delete y[a]ml %string%`
+`delete y[a]ml %string% and keep loaded in memory`
 
 #### Example
 
 ```skript
 # Delete the YAML file with ID "config" from memory and disk
 delete yaml "config"
+
+# Delete the YAML file with ID "config" from disk and keep it in memory
+delete yaml "config" and keep loaded in memory
 ```
 
 ---

@@ -20,7 +20,6 @@ import me.sashie.skriptyaml.utils.SkriptYamlUtils;
 import me.sashie.skriptyaml.utils.StringUtil;
 import me.sashie.skriptyaml.utils.yaml.YAMLNode;
 import me.sashie.skriptyaml.utils.yaml.YAMLProcessor;
-import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
@@ -154,7 +153,7 @@ public class ExprYaml<T> extends SimpleExpressionFork<T> {
 			Object o = config.getProperty(path);
 			if (o != null) {
 				if (!checks && String.class.isAssignableFrom(o.getClass()))
-					o = ChatColor.translateAlternateColorCodes('&', ((String) o));
+					o = StringUtil.translateColorCodes((String) o);
 				try {
 					return SkriptYamlUtils.convertToArray(o, (Class<T>) o.getClass());
 				} catch (ClassCastException e) {

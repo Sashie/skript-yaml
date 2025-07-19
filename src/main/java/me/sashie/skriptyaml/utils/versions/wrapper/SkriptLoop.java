@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 
 public class SkriptLoop extends AbstractLoop {
 
-	static Class loopClass;
+	static Class<?> loopClass;
 	static Method getCurrent, getLoopedExpression;
 
 
