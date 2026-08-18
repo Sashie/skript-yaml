@@ -455,7 +455,7 @@ loop yaml node keys "node" from "config":
 
 ## Conditions
 
-### Condition (Is yaml loaded) {#condition-is-yaml-loaded}
+### Condition (Is yaml loaded)
 Checks if one or more yaml files are loaded into memory using said id
 
 #### Syntax
@@ -473,7 +473,7 @@ if yaml "config" is loaded:
 ```
 ---
 
-### Condition (Is yaml modified) {#condition-is-yaml-modified}
+### Condition (Is yaml modified)
 Checks if a YAML file has been modified since it was last loaded or saved
 
 #### Syntax
@@ -500,7 +500,7 @@ if yaml "config" is unsaved:
 ```
 ---
 
-### Condition (Is yaml empty) {#condition-is-yaml-empty}
+### Condition (Is yaml empty)
 Only checks if there are any nodes or not
 
 #### Syntax
@@ -516,7 +516,7 @@ if yaml "config" is empty:
 ```
 ---
 
-### Condition (Does yaml path have value) {#condition-does-yaml-path-have-value}
+### Condition (Does yaml path have value)
 Checks if one or more values exist at a path in a cached YAML file using said ID.
   - First input is the path
   - Second input is the id
@@ -541,7 +541,7 @@ if yaml path "test.test" in "config" has value:
 ```
 ---
 
-### Condition (Does yaml path exist) {#condition-does-yaml-path-exist}
+### Condition (Does yaml path exist)
 Checks if one or more paths exist in a cached yaml file using said id
   - First input is the path
   - Second input is the id
@@ -568,7 +568,7 @@ if yaml path "test.test" and "boop.boop" in "config" exists:
 ```
 ---
 
-### Condition (Does yaml path have list) {#condition-does-yaml-path-have-list}
+### Condition (Does yaml path have list)
 Checks if one or more paths contain a list in a cached yaml file using said id
   - First input is the path
   - Second input is the id
@@ -590,7 +590,7 @@ if yaml node "listnode" from "example" has list:
 ```
 ---
 
-### Condition (Does yaml exist) {#condition-does-yaml-exist}
+### Condition (Does yaml exist)
 Checks if a yaml file exists
   - You really shouldn't have to use this since the [load yaml](#effect-load-yaml) effect creates one if it doesn't already exist
   - Input is the yaml file path
