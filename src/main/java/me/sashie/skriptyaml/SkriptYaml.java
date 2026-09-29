@@ -3,6 +3,7 @@ package me.sashie.skriptyaml;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptAddon;
+import ch.njol.skript.util.Version;
 import me.sashie.skriptyaml.api.ConstructedClass;
 import me.sashie.skriptyaml.api.RepresentedClass;
 import me.sashie.skriptyaml.utils.SkriptYamlUtils;
@@ -108,7 +109,10 @@ public class SkriptYaml extends JavaPlugin {
 	public void onEnable() {
 		Plugin skript = Bukkit.getServer().getPluginManager().getPlugin("Skript");
 		if (skript != null) {
-			serverVersion = Skript.getMinecraftVersion().getMinor();
+			// for 26.1+ versions, use major version instead of minor for now
+			// technically we should include minors, but it gets the job done for now
+			Version mcVersion = Skript.getMinecraftVersion();
+			serverVersion = mcVersion.getMajor() > 1 ? mcVersion.getMajor() : mcVersion.getMinor();
 			if (Skript.isAcceptRegistrations()) {
 				try {
 					SkriptAddon addonInstance = Skript.registerAddon(this);
